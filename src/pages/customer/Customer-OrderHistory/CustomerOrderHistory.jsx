@@ -1,6 +1,6 @@
 import "./customer-orderhistory.css";
 
-import CustomerTopbar from "../../../components/navbar/CustomerTopbar";
+import CustomerTopbar from "../../../components/NavBar/CustomerTopbar";
 
 import {
   ClipboardList,

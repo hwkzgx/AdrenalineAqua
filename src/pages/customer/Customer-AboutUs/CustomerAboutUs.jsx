@@ -1,5 +1,5 @@
 import "./customer-aboutus.css";
-import CustomerNavbar from "../../../components/navbar/CustomerNavbar";
+import CustomerNavbar from "../../../components/NavBar/CustomerNavbar";
 import AquaLogo from "../../../assets/AquaLogo.png";
 
 import Director1 from "../../../assets/Directors/director1.png";

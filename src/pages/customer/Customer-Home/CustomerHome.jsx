@@ -1,5 +1,5 @@
 import "./customer-home.css";
-import CustomerNavbar from "../../../components/navbar/CustomerNavbar";
+import CustomerNavbar from "../../../components/NavBar/CustomerNavbar";
 import HeroImage from "../../../assets/HeroImage.png";
 import AboutImage from "../../../assets/About-Image.png";
 import FooterImage from "../../../assets/FooterImage.png";

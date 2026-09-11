@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import "./customer-dashboard.css";
-import CustomerTopbar from "../../../components/navbar/CustomerTopbar";
+import CustomerTopbar from "../../../components/NavBar/CustomerTopbar";
 import { supabase } from "../../../supabase";
 
 import {

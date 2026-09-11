@@ -1,5 +1,5 @@
 import "./customer-makeorder.css";
-import CustomerTopbar from "../../../components/navbar/CustomerTopbar";
+import CustomerTopbar from "../../../components/NavBar/CustomerTopbar";
 import { useState, useEffect } from "react";
 import { CheckCircle, XCircle } from "lucide-react";
 import {

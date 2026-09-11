@@ -1,5 +1,5 @@
 import "./customer-contacts.css";
-import CustomerNavbar from "../../../components/navbar/CustomerNavbar";
+import CustomerNavbar from "../../../components/NavBar/CustomerNavbar";
 import AquaLogo from "../../../assets/AquaLogo.png";
 
 import {

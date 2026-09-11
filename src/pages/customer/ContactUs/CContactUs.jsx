@@ -1,5 +1,5 @@
 import "./ccontactus.css";
-import CustomerTopbar from "../../../components/navbar/CustomerTopbar";
+import CustomerTopbar from "../../../components/NavBar/CustomerTopbar";
 import AquaLogo from "../../../assets/AquaLogo.png";
 
 import {
