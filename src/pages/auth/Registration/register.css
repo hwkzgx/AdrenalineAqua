@@ -1,0 +1,143 @@
+.auth-container {
+  display: flex;
+  height: 100vh;
+}
+
+.auth-left {
+  flex: 1;
+  background: linear-gradient(135deg, #0f172a, #1e3a8a, #0ea5e9);
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+}
+
+.auth-left .logo {
+  width: 120px;
+  margin-bottom: 20px;
+}
+
+
+.auth-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.branding {
+  position: relative;
+  text-align: center;
+  z-index: 2;
+}
+
+.brand-logo {
+  width: 140px;
+  margin-bottom: 10px;
+  animation: float 3s ease-in-out infinite;
+ margin-right: 165px;
+}
+
+.branding h1 {
+  font-size: 28px;
+  margin: 0;
+}
+
+.branding p {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.register-card {
+  width: 350px;
+  padding: 35px;
+  border-radius: 18px;
+
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(255,255,255,0.25);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  color: #1e3a8a; 
+}
+
+.register-card h2 {
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  font-size: 13px;
+  opacity: 0.85;
+  margin-bottom: 20px;
+}
+
+.register-input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+
+  border-radius: 10px;
+  border: 1px solid #1e3a8a;
+
+  background: rgba(255,255,255,0.25);
+
+  color: #0f172a; 
+  outline: none;
+}
+.register-input:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 5px rgba(14,165,233,0.5);
+}
+
+
+.register-input::placeholder {
+  color: rgba(15, 23, 42, 0.6);
+}
+
+.aregister-btn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0f172a, #1e3a8a, #0ea5e9);
+  color: white;
+
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.aregister-btn:hover {
+  transform: translateY(-2px);
+}
+
+.signup-text {
+  margin-top: 15px;
+  font-size: 12px;
+  color: #1e3a8a;
+}
+
+.signup-text span {
+  color: #60a5fa;
+  cursor: pointer;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #1e3a8a;
+  font-size: 13px;
+  cursor: pointer;
+  align-self: flex-start;
+  margin-bottom: 10px;
+}

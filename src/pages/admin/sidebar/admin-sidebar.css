@@ -1,0 +1,169 @@
+
+
+/* LOGO */
+.logo {
+  width: 100px;
+  margin: 0 auto 12px auto;
+  display: block;
+}
+
+/* BUTTONS */
+.sidebar button {
+  background: transparent;
+  border: none;
+
+  color: #e5e7eb;
+  text-align: left;
+
+  padding: 6px 8px;
+  font-size: 12px;
+
+  cursor: pointer;
+  border-radius: 5px;
+
+  transition: 0.2s ease;
+}
+
+.sidebar button:hover {
+  background: #4571af;
+  transform: translateX(2px);
+}
+
+/* DROPDOWN */
+.dropdown {
+  display: flex;
+  flex-direction: column;
+
+  margin-left: 8px;
+  padding-left: 6px;
+
+  border-left: 2px solid #374151;
+}
+
+/* BOTTOM */
+.sidebar-bottom {
+  margin-top: auto;
+  border-top: 1px solid #374151;
+  padding-top: 10px;
+}
+
+/* PROFILE */
+.admin-profile {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  background: #4571af;
+  padding: 6px;
+  border-radius: 6px;
+
+  margin-bottom: 8px;
+}
+
+.admin-profile img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+.admin-profile .name {
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.admin-profile .role {
+  font-size: 9px;
+  color: #cbd5e1;
+}
+
+/* LOGOUT */
+.admin-profile .adlogout {
+  width: 100%;
+  background: #aa2c2c;
+  color: white;
+
+  padding: 6px;
+  font-size: 12px;
+  border-radius: 5px;
+}
+
+.admin-profile .adlogout:hover {
+  background: #dc2626 ;
+}
+
+/* PROFILE DROPDOWN (GOES UP) */
+.profile-dropdown {
+  position: absolute; /* 🔥 important */
+  bottom: 60px;       /* pushes it ABOVE profile */
+  left: 10px;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #1e3a8a;
+  border-radius: 8px;
+
+  padding: 5px;
+  gap: 5px;
+
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+/* dropdown buttons */
+.profile-dropdown button {
+  background: transparent;
+  border: none;
+
+  color: #e5e7eb;
+  text-align: left;
+
+  padding: 6px 8px;
+  font-size: 12px;
+
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.profile-dropdown button:hover {
+  background: #4571af;
+}
+
+/* logout style */
+.profile-dropdown .logout {
+   background:red;
+  color: white;
+}
+
+.profile-dropdown .logout:hover {
+  background: #b81b1b;
+  transform: none; /* alisin yung slide */
+}
+.profile-dropdown {
+  animation: slideUp 0.2s ease;
+}
+
+/* RIGHT SIDE ARROW ICON */
+.profile-arrow {
+  margin-left: auto;
+  font-size: 12px;
+  color: #cbd5e1;
+
+  transition: 0.2s ease;
+}
+
+/* rotate when open */
+.admin-profile:hover .profile-arrow {
+  transform: rotate(180deg);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

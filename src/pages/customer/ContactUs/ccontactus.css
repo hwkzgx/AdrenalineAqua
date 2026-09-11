@@ -1,0 +1,144 @@
+/* HERO */
+.contact-hero {
+  padding: 80px 10%;
+  background: url("../../../assets/ContactHeroImg.png") no-repeat center;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 80px 10%;
+  min-height: 90vh;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  overflow: hidden;
+}
+
+.contact-hero-text h1 {
+ font-size: 3rem;
+  color: #0077b6;
+  margin-bottom: 10px;
+}
+
+.contact-hero-text p {
+   font-size: 1rem;
+  color: #333;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+/* MAIN SECTION */
+.contact-page-section {
+  padding: 80px 10%;
+  background: #f8fbff;
+}
+
+.contact-page-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
+  align-items: stretch; 
+}
+
+/* FORM */
+.contact-form-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-form-card h2 {
+  margin-bottom: 20px;
+  color: #023e8a;
+}
+
+.contact-form-card input,
+.contact-form-card textarea {
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.contact-form-card textarea {
+  height: 120px;
+  resize: none;
+}
+
+.contact-form-card button {
+  width: 100%;
+  padding: 12px;
+  background: #0077b6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.contact-form-card button:hover {
+  background: #023e8a;
+}
+
+/* INFO CARD */
+.contact-info-card {
+  flex: 2; 
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+
+  display: flex;
+  flex-direction: row; 
+  align-items: center; 
+  justify-content: space-between; 
+  gap: 30px;
+}
+
+.contact-details-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; 
+}
+
+.contact-details-content h2 {
+  margin-bottom: 20px;
+  color: #023e8a;
+  text-align: left;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: #333;
+}
+
+.info-item svg {
+  color: #0077b6;
+  margin-top: 4px;
+  flex-shrink: 0; 
+}
+
+
+.contact-map-box {
+  width: 300px;
+  height: 250px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0; 
+}
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .contact-page-container {
+    flex-direction: column;
+  }
+
+  .contact-hero-text h1 {
+    font-size: 2.2rem;
+  }
+}

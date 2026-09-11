@@ -1,0 +1,121 @@
+.role-container {
+  height: 100vh;
+  background: linear-gradient(135deg, #0f172a, #1e3a8a, #0ea5e9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: sans-serif;
+}
+
+.role-card {
+  width: 900px;
+  background: white;
+  border-radius: 30px;
+  padding: 40px 60px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  text-align: center;
+}
+
+.rsheader {
+  text-align: center;
+  position: relative;
+}
+
+.rsheader h2 {
+  color: #004b8d;
+  font-size: 34px;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.rsheader p {
+  color: #666;
+  font-size: 15px;
+}
+
+.back {
+  position: absolute;
+  left: 0;
+  top: 10px;
+  cursor: pointer;
+  color: #003f7d;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.grid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+  margin-top: 50px;
+}
+
+.role-box {
+  border: 2px solid #005a9c;
+  border-radius: 14px;
+  height: 180px;
+  width: 200px; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: 0.25s ease;
+  background: white;
+}
+
+.role-box:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 25px rgba(0, 90, 156, 0.25);
+}
+
+.role-box.active {
+  background: #005a9c;
+  color: white;
+  box-shadow: 0 8px 20px rgba(0, 90, 156, 0.3);
+}
+
+.role-box.active .icon-wrapper {
+  color: white;
+}
+
+.icon-wrapper {
+  font-size: 60px;
+  color: #005a9c;
+  margin-bottom: 15px;
+}
+
+.role-box p {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.start-btn {
+  font-weight: bold;
+  display: block;
+  margin: 50px auto 0;
+  width: 260px;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  background:  white;
+  color: black;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  border: 2px solid rgb(0, 0, 0);
+}
+
+.start-btn:hover {
+  transform: translateY(-2px);
+  background:  #005a9c;
+  color: white;
+  box-shadow: 0 6px 15px rgba(0, 90, 156, 0.3);
+}
+
+.start-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

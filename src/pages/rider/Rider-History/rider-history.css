@@ -1,0 +1,278 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background: #f1f5f9;
+}
+
+.history-container {
+  width: 100%;
+  max-width: 850px;
+  min-height: 100vh;
+  margin: auto;
+  background: #f8fafc;
+  padding: 24px;
+  padding-bottom: 110px;
+}
+
+/* Modern Summary Stat Cards */
+.history-summary-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.summary-card {
+  flex: 1;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+}
+
+.summary-icon-box {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.summary-icon-box.green {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.summary-icon-box.blue {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.summary-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-top: 2px;
+}
+
+/* Section Title */
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  margin-bottom: 16px;
+  padding: 0 4px;
+}
+
+.section-title h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.section-date-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+/* Pinalaki at Mas Modernong History Card */
+.history-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 18px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.04);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.history-card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.07);
+}
+
+/* Makapal na green accent bar sa kaliwa */
+.history-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background-color: #22c55e;
+}
+
+.historytop-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.history-id-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.success-icon {
+  color: #22c55e;
+}
+
+.label {
+  font-size: 12px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.history-card h2 {
+  font-size: 17px;
+  color: #0f172a;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+/* Status Badge */
+.historydelstatus {
+  background: #dcfce7;
+  color: #15803d;
+  padding: 7px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+
+.customer-name {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 16px 0 12px 0;
+}
+
+.history-details-box {
+  background: #f8fafc;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.historyinfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #475569;
+  font-size: 14px;
+}
+
+.info-icon {
+  color: #0284c7;
+  flex-shrink: 0;
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-around;
+  padding: 12px 0;
+  z-index: 1000;
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.04);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.nav-item.active {
+  color: #0284c7;
+  font-weight: 600;
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 768px) {
+  .history-container {
+    padding: 16px;
+    padding-bottom: 100px;
+  }
+
+  .history-summary-row {
+    gap: 12px;
+  }
+
+  .summary-card {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .summary-value {
+    font-size: 18px;
+  }
+
+  .history-card {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .customer-name {
+    font-size: 18px !important;
+    margin-top: 8px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .historyinfo {
+    font-size: 13px;
+  }
+}

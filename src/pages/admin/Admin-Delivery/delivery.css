@@ -1,0 +1,502 @@
+/* =========================
+   PAGE WRAPPER
+========================= */
+.delivery-page {
+  background-color: #f8fafc;
+  padding: 30px;
+  min-height: 100vh;
+}
+
+/* HEADER */
+.delivery-header {
+  margin-bottom: 24px;
+}
+
+.delivery-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.delivery-header p {
+  color: #64748b;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* =========================
+   CONTROLS
+========================= */
+.delivery-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.delivery-search {
+  width: 280px;
+  height: 48px;
+  padding: 0 16px;
+  border: 3px solid #02457A;
+  border-radius: 12px;
+  font-size: 15px;
+  outline: none;
+  background: white;
+}
+
+.delivery-search:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.delivery-filter {
+  width: 150px;
+  height: 48px;
+  padding: 0 14px;
+  border: 3px solid #02457A;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  background: white;
+  color: #02457A;
+  cursor: pointer;
+  outline: none;
+}
+
+/* =========================
+   TABLE CONTAINER
+========================= */
+.delivery-table-container {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+/* HEADER */
+.delivery-table th {
+  background: #1e3a8a;
+  color: white;
+  padding: 16px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+}
+
+/* BODY */
+.delivery-table td {
+  padding: 16px;
+  font-size: 12px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+}
+
+/* HOVER */
+.delivery-table tr:hover {
+  background: #f8fafc;
+}
+
+/* =========================
+   STATUS
+========================= */
+.delivery-status {
+ padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.delivery-status.pending { background: #fff7ed; color: #c2410c; }
+.delivery-status.out-for-delivery { background: #eff6ff; color: #1d4ed8; }
+.delivery-status.processing { background: #fefce8; color: #ca8a04; }
+.delivery-status.delivered { background: #ecfdf5; color: #047857; }
+
+/* =========================
+   ACTIONS
+========================= */
+.delivery-actions button {
+  border: none;
+  width: 70px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+}
+
+.delivery-actions .edit {
+  background: #f59e0b;
+}
+
+.delivery-actions .delete {
+  background: #ef4444;
+}
+
+.delivery-actions label{
+  padding-left: 5px;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+.delivery-empty {
+  text-align: center;
+  padding: 80px 0;
+  color: #64748b;
+}
+
+/* =========================
+   MODAL OVERLAY
+========================= */
+
+.delivery-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  pointer-events: auto; /* IMPORTANT */
+}
+
+.delivery-edit-modal {
+  pointer-events: auto;
+  position: relative;
+  z-index: 10000;
+}
+
+/* =========================
+   EDIT MODAL
+========================= */
+
+.delivery-edit-modal {
+  width: 400px;
+  background: #edf3f8;
+
+  border: 2px solid #0b74d1;
+  border-radius: 8px;
+
+  padding: 20px;
+  position: relative;
+}
+
+.delivery-edit-modal h2 {
+  font-size: 24px;
+  width: 200px;
+  color: #003b73;
+  margin-bottom: 30px;
+}
+
+.delivery-form-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 15px;
+  gap: 12px;
+}
+
+.delivery-form-group label {
+  width: 120px;
+
+  font-size: 14px;
+  font-weight: 700;
+  color: #003b73;
+}
+
+.delivery-form-group input,
+.delivery-form-group select {
+  flex: 1;
+  height: 32px;
+
+  border: 1px solid #6ea8d8;
+  border-radius: 5px;
+
+  padding: 0 10px;
+  font-size: 13px;
+
+  background: white;
+}
+
+/* =========================
+   MODAL ACTIONS
+========================= */
+
+.delivery-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+
+  margin-top: 25px;
+}
+.delivery-edit-modal,
+.delivery-delete-modal {
+  position: relative;
+}
+
+.delivery-close-btn {
+  position: absolute;
+  top: 5px;
+  right: -160px;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #003b73;
+  background: transparent;
+  border: none;
+}
+
+.delivery-save-btn {
+  position: relative;
+  z-index: 10001;
+}
+
+/* =========================
+   DELETE MODAL
+========================= */
+
+.delivery-delete-modal {
+  width: 560px;
+  background: #f8f8f8;
+
+  border: 2px solid #0b74d1;
+  border-radius: 10px;
+
+  padding: 25px;
+  position: relative;
+}
+
+.delivery-delete-modal h2 {
+  text-align: center;
+
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.delivery-delete-modal h6 {
+  text-align: center;
+
+  font-size: 12px;
+  font-weight: 200;
+
+  margin-bottom: 20px;
+}
+
+.deliverydelete-close-btn {
+  position: absolute;
+  top: 5px;
+  right: -220px;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #003b73;
+  background: transparent;
+  border: none;
+}
+
+/* WARNING BOX */
+
+.delivery-warning-box {
+  background: #f9e6db;
+
+  border-left: 6px solid #ff6b35;
+  border-radius: 6px;
+
+  padding: 18px;
+}
+
+.Ord-warning-box h3 {
+  color: #ff3b30;
+  font-size: 26px;
+  text-align: center;
+
+  margin-bottom: 10px;
+}
+
+.delivery-warning-box p {
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.delivery-warning-box hr {
+  border: none;
+  border-top: 1px solid #e7cfc5;
+
+  margin: 18px 0;
+}
+
+/* DELETE INFO */
+
+.delivery-delete-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.delivery-delete-info p {
+  font-size: 13px;
+  color: #222;
+}
+
+/* DELETE ACTIONS */
+
+.delivery-delete-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+
+  margin-top: 20px;
+}
+
+.cancel {
+  background: #5d5d66;
+  color: white;
+
+  border: none;
+  border-radius: 6px;
+
+  padding: 10px 24px;
+  cursor: pointer;
+}
+
+.delivery-confirm-delete {
+  background: #ff3b30;
+  color: white;
+
+  border: none;
+  border-radius: 6px;
+
+  padding: 10px 24px;
+  cursor: pointer;
+}
+
+.deliverydelete-close-btn {
+  position: absolute;
+  top: 5px;
+  right: -230px;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #003b73;
+  background: transparent;
+  border: none;
+}
+
+.delivery-closeAction {
+  border-radius: 5px;
+}
+
+.delivery-addBtn,
+.delivery-save-btn,
+.delivery-confirm-delete {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 99999;
+  cursor: pointer;
+}
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  min-width: 250px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-size: 14px;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateX(100px);
+  transition: all 0.3s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.toast.success {
+  background: #22c55e; 
+}
+
+.toast.error {
+  background: #ef4444;
+}
+
+.toast-icon {
+  display: flex;
+  align-items: center;
+}
+
+.toast-text {
+  flex: 1;
+}
+
+/* =========================================
+   MODERN COLORFUL TABLE RIDER DROPDOWN
+========================================= */
+
+.table-rider-dropdown {
+  /* Tinatanggal ang default na lumang arrow ng browser */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* Kulay at Padding */
+  background-color: #f0f7ff; /* Soft blue background para may kulay */
+  border: 2px solid #93c5fd;  /* Malinaw na blue border */
+  border-radius: 8px;
+  padding: 8px 36px 8px 14px; /* May space sa kanan para sa arrow */
+  
+  /* Font styling */
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e40af; /* Dark blue text para madaling basahin */
+  
+  cursor: pointer;
+  width: 100%;
+  min-width: 50px;
+
+  /* Custom modern arrow icon (kulay blue) */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%231e40af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+
+  /* Smooth transition */
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.08);
+}
+
+/* Hover Effect (Kapag tinapatan ng mouse) */
+.table-rider-dropdown:hover {
+  background-color: #e0f2fe;
+  border-color: #3b82f6;
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.15);
+}
+
+/* Focus Effect (Kapag pinindot / binuksan) */
+.table-rider-dropdown:focus {
+  outline: none;
+  background-color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}
+
+/* Kulay ng mga options sa loob ng dropdown kapag binuksan */
+.table-rider-dropdown option {
+  background-color: #ffffff;
+  color: #1e293b;
+  font-weight: 500;
+  padding: 10px;
+}

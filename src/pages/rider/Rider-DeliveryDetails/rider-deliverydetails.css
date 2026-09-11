@@ -1,0 +1,583 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background: #f5f7fb;
+}
+
+.details-container {
+  width: 100%;
+  max-width: 900px;
+  min-height: 100vh;
+  margin: auto;
+  padding: 25px;
+  padding-bottom: 40px;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: -1000px;
+}
+
+.header-left {
+  display: flex;
+  gap: 4px;
+  margin-top: 10px;
+  align-items: flex-start;
+  margin-left: 5px;
+}
+
+.back-btn {
+  color: #333;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.header h2 {
+  font-size: 25px;
+  font-weight: 700;
+  margin: 0;
+  margin-bottom: -10px;
+  padding: 0;
+  white-space: nowrap;
+}
+
+/* CARDS */
+.top-card,
+.section {
+  margin-top: 20px;
+  padding: 22px;
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid #ececec;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.detailstop-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.detailslabel {
+  color: #888;
+  font-size: 13px;
+}
+
+.deliverydetstatus {
+  background: #fff2d8;
+  color: #d48b00;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.customer-name {
+  font-size: 24px;
+}
+
+/* MESSAGE BUTTON */
+.message-btn {
+  width: 100%;
+  height: 50px;
+  border: none;
+  border-radius: 12px;
+  background: #eef5ff;
+  color: #0d6efd;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* SCHEDULE */
+.schedule {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* SECTION */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.section h3 {
+  font-size: 15px;
+  margin: 8px;
+  margin-left: -5px;
+}
+
+h3::before,
+h3::after,
+.section-title h3::before,
+.section-title h3::after {
+  content: none !important;
+  display: none !important;
+  background: transparent !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.address {
+  color: #555;
+  line-height: 1.6;
+}
+
+/* OPEN MAP BUTTON */
+.open-map {
+  margin-top: 18px;
+  width: 100%;
+  height: 48px;
+  border: 1px solid #0d6efd;
+  background: white;
+  color: #0d6efd;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* ITEMS */
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding: 10px 0;
+}
+
+/* ACCEPT / DELIVERED BUTTONS */
+.accept-btn {
+  width: 100%;
+  height: 45px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 12px;
+  background: #0d6efd;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.delivered-btn {
+  width: 100%;
+  height: 45px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 12px;
+  background: #059d00;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.accept-btn:hover,
+.delivered-btn:hover,
+.message-btn:hover,
+.open-map:hover {
+  opacity: 0.9;
+}
+
+/* ==========================================
+    MODAL STYLINGS (Confirmation & Map Modals)
+    ================================---------- */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(2px);
+}
+
+.confirm-modal-box {
+  background: #fff;
+  padding: 24px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 320px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: modalPop 0.3s ease-in-out;
+}
+
+.confirm-modal-box h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
+  color: #1e293b;
+}
+
+.confirm-modal-box p {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.confirm-btn-group {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.modal-no-btn {
+  padding: 9px 18px;
+  background: #e2e8f0;
+  color: #475569;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.modal-no-btn:hover {
+  background: #cbd5e1;
+}
+
+.modal-yes-btn {
+  padding: 9px 18px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.modal-yes-btn:hover {
+  background: #1d4ed8;
+}
+
+/* Map Modal Specific */
+.map-modal-box {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 500px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  animation: modalPop 0.3s ease-in-out;
+}
+
+.map-modal-header {
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.map-modal-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.map-close-icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-modal-body {
+  padding: 15px;
+  background: #f8fafc;
+}
+
+.map-modal-destination {
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.map-container-wrapper {
+  height: 350px;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #cbd5e1;
+}
+
+.map-modal-footer {
+  padding: 12px 20px;
+  text-align: right;
+  border-top: 1px solid #e2e8f0;
+}
+
+.map-close-btn {
+  padding: 8px 18px;
+  background: #64748b;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.map-close-btn:hover {
+  background: #475569;
+}
+
+/* ==========================================
+   CONTAINER TRACKING MODAL STYLES (NEW)
+   ========================================== */
+.container-modal-box {
+  background: #fff;
+  padding: 24px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 360px;
+  text-align: left;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: modalPop 0.3s ease-in-out;
+  box-sizing: border-box;
+}
+
+.container-modal-title {
+  margin: 0 0 6px 0;
+  font-size: 18px;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.container-modal-subtitle {
+  margin: 0 0 20px 0;
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.container-input-group {
+  margin-bottom: 15px;
+}
+
+.container-input-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #334155;
+}
+
+.container-input-group input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 15px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.container-input-group input:focus {
+  border-color: #2563eb;
+}
+
+.container-balance-box {
+  background-color: #f8fafc;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #e2e8f0;
+}
+
+.container-balance-box span {
+  font-size: 13px;
+  color: #475569;
+}
+
+.container-balance-box strong {
+  font-size: 14px;
+  color: #2563eb;
+}
+
+.container-modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.container-btn-cancel {
+  flex: 1;
+  padding: 10px;
+  background: #e2e8f0;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #475569;
+  transition: background 0.2s;
+}
+
+.container-btn-cancel:hover {
+  background: #cbd5e1;
+}
+
+.container-btn-save {
+  flex: 1;
+  padding: 10px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.container-btn-save:hover {
+  background: #1d4ed8;
+}
+
+@keyframes modalPop {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* TABLET */
+@media (max-width: 992px) {
+  .details-container {
+    max-width: 100%;
+  }
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .details-container {
+    padding: 15px;
+    padding-bottom: 90px;
+  }
+
+  .detailstop-row {
+    display: flex;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100%;
+  }
+
+  .customer-row {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+
+  .customer-name {
+    font-size: 18px !important;
+    margin: 0 !important;
+  }
+
+  .message-btn {
+    width: auto !important;
+    padding: 6px 14px;
+    height: 36px;
+    font-size: 13px;
+    margin: 0 !important;
+  }
+
+  .schedule {
+    display: flex;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100%;
+  }
+
+  .section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+  }
+
+  .section-title {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+    width: 100% !important;
+    margin-bottom: 12px;
+  }
+
+  .section-title svg {
+    flex-shrink: 0;
+    background: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .address {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 15px;
+    color: #4b5563;
+  }
+
+  .open-map {
+    width: 100% !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+  }
+
+  .item-row {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 8px 0;
+  }
+}

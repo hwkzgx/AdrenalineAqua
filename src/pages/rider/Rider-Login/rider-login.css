@@ -1,0 +1,268 @@
+* {
+  box-sizing: border-box;
+}
+
+.login-wrapper {
+  height: 100vh;
+  display: flex;
+  font-family: Arial, sans-serif;
+}
+
+.riderlogin-left {
+  flex: 1;
+  background: linear-gradient(135deg, #0f172a, #1e3a8a, #0ea5e9);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+.riderlogin-left .overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+}
+
+.branding {
+  position: relative;
+  text-align: center;
+  z-index: 2;
+}
+
+/* NA-FIX: Tinanggal ang margin-left at align-items, pinalitan ng margin auto para pumagitna */
+.brand-logo {
+  display: block;
+  width: 140px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.branding h1 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.branding p {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.login-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  background: white;
+  height: 100vh;
+}
+
+.login-right::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at top,
+    rgba(255, 255, 255, 0.08),
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+.login-card {
+  width: 350px;
+  padding: 35px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  color: #1e3a8a;
+  margin: auto;
+  position: relative;
+  text-align: left; 
+}
+
+.login-card h2 {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.subtitle {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-bottom: 20px;
+}
+
+.login-header {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 10px;
+  border: 1px solid #1e3a8a;
+  background: rgba(255,255,255,0.25);
+  color: #0f172a;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.login-input::placeholder {
+  color: rgba(15, 23, 42, 0.6);
+}
+
+.login-input:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 5px rgba(14,165,233,0.5);
+}
+
+.login-btn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0f172a, #1e3a8a, #0ea5e9);
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.login-btn:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+}
+
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .login-wrapper {
+    position: relative;
+    display: block;
+  }
+
+  .riderlogin-left {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    align-items: flex-start;
+    padding-top: 60px;
+  }
+
+  .brand-logo {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 8px;
+    width: 80px;
+  }
+
+  .branding h1 {
+    font-size: 20px;
+  }
+
+  .branding p {
+    font-size: 12px;
+  }
+
+  .login-right {
+    position: relative;
+    z-index: 2;
+    background: transparent;
+    height: 100vh;
+    min-height: 100vh;
+  }
+
+  .login-right::before {
+    display: none;
+  }
+
+  .login-card {
+    width: 90%;
+    max-width: 350px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+
+  .login-options {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 20px;
+  }
+
+  .login-input {
+    font-size: 16px;
+  }
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: #0ea5e9;
+  font-size: 13px;
+  white-space: nowrap; 
+}
+
+.remember input {
+  cursor: pointer;
+}
+
+.forgot {
+  cursor: pointer;
+  color: #60a5fa;
+  transition: 0.2s ease;
+}
+
+.forgot:hover {
+  color: #1e3a8a;
+  text-decoration: underline;
+}
+
+.signup-text {
+  margin-top: 15px;
+  font-size: 12px;
+  color: #1e3a8a;
+}
+
+.signup-text span {
+  color: #60a5fa;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.signup-text span:hover {
+  color: #93c5fd;
+  text-decoration: underline;
+}
+
+.login-body {
+  text-align: center;
+}

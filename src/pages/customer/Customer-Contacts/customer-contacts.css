@@ -1,0 +1,235 @@
+/* HERO SECTION */
+.contact-hero {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 80px 10%;
+  min-height: 85vh;
+  background: url("../../../assets/ContactHeroImg.png") no-repeat center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-hero-text {
+  max-width: 55%;
+  width: 100%;
+}
+
+.contact-hero-text h1 {
+  font-size: 3rem;
+  color: #0077b6;
+  margin-bottom: 10px;
+}
+
+.contact-hero-text h2,
+.contact-hero-text h3 {
+  font-size: 1.5rem;
+  color: #023e8a;
+  margin-bottom: 20px;
+}
+
+.contact-hero-text p {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+/* MAIN SECTION (Compact spacing) */
+.contact-page-section {
+  padding: 40px 8%;
+  background: #f8fbff;
+}
+
+.contact-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+/* FORM CARD (Compact) */
+.contact-form-card {
+  width: 100%;
+  background: white;
+  padding: 20px 25px;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-form-card h2 {
+  margin-bottom: 12px;
+  color: #023e8a;
+  font-size: 1.3rem;
+}
+
+.contact-form-card input,
+.contact-form-card textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
+}
+
+.contact-form-card textarea {
+  height: 90px;
+  resize: none;
+}
+
+.contact-form-card button {
+  width: 100%;
+  padding: 10px;
+  background: #0077b6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: 0.3s;
+}
+
+.contact-form-card button:hover {
+  background: #023e8a;
+}
+
+/* INFO CARD (Compact & Responsive Map Stacking) */
+.contact-info-card {
+  width: 100%;
+  background: white;
+  padding: 20px 25px;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: row; 
+  align-items: center; 
+  justify-content: space-between; 
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.contact-details-content {
+  flex: 1 1 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px; 
+}
+
+.contact-details-content h2 {
+  margin-bottom: 6px;
+  color: #023e8a;
+  font-size: 1.3rem;
+  text-align: left;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #333;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.info-item svg {
+  color: #0077b6;
+  margin-top: 3px;
+  flex-shrink: 0; 
+}
+
+/* MAP BOX */
+.contact-map-box {
+  flex: 1 1 280px;
+  width: 100%;
+  height: 220px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.contact-map-box iframe {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 0;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN (TABLETS & PHONES)
+   ========================================== */
+
+@media (max-width: 1024px) {
+  .contact-hero-text {
+    max-width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .contact-hero {
+    padding: 70px 6%;
+    min-height: unset !important;
+    height: auto;
+  }
+
+  .contact-page-section {
+    padding: 25px 4%;
+  }
+
+  .contact-hero-text h2,
+  .contact-hero-text h3 {
+    font-size: 0.95rem !important;
+  }
+
+  .contact-hero-text p {
+    font-size: 0.8rem !important;
+  }
+
+  .contact-form-card h2,
+  .contact-details-content h2 {
+    font-size: 1.05rem !important;
+  }
+
+  .contact-form-card input,
+  .contact-form-card textarea,
+  .info-item {
+    font-size: 0.8rem !important;
+  }
+
+  .contact-form-card h2,
+  .contact-details-content h2 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+
+  .contact-form-card input,
+  .contact-form-card textarea {
+    margin-bottom: 8px;
+    padding: 8px;
+    font-size: 0.82rem;
+  }
+
+  .contact-form-card textarea {
+    height: 75px;
+  }
+
+  .contact-form-card button {
+    padding: 8px;
+    font-size: 0.85rem;
+  }
+
+  .info-item {
+    font-size: 0.82rem;
+    gap: 8px;
+  }
+
+  .contact-map-box {
+    height: 180px;
+  }
+}

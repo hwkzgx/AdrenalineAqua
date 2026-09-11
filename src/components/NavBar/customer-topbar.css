@@ -1,0 +1,414 @@
+/* GLOBAL RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* TOPBAR */
+.customer-topbar {
+ display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 50px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.customer-topbar-logo img {
+  width: 70px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* NAV LINKS */
+.ctopbar-links {
+  display: flex;
+  gap: 40px;
+}
+
+.customer-topbar .ctopbar-links a {
+  text-decoration: none;
+  color: #004a99;
+  font-weight: 600;
+  transition: 0.3s;
+  position: relative;
+  padding-bottom: 5px;
+}
+
+/* UNDERLINE ANIMATION */
+.customer-topbar .ctopbar-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0%;
+  height: 2px;
+  background: #1e90ff;
+  transition: 0.3s;
+}
+
+/* HOVER UNDERLINE */
+.customer-topbar .ctopbar-links a:hover::after {
+  width: 100%;
+}
+
+/* ACTIVE LINK */
+.customer-topbar .ctopbar-links a.active {
+  color: #1e90ff;
+}
+
+/* ACTIVE UNDERLINE */
+.customer-topbar .ctopbar-links a.active::after {
+  width: 100%;
+}
+
+/* RIGHT SIDE */
+.ctopbar-buttons {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+/* ICON BUTTON */
+.icon-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #f3f6f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.3s ease;
+  color: #374151;
+  font-size: 18px;
+}
+
+.icon-btn:hover {
+  background: #00a8cc;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* PROFILE WRAPPER */
+.profile-wrapper {
+  position: relative;
+}
+
+/* DROPDOWN PANEL */
+.dropdown-panel {
+  position: absolute;
+  top: 55px;
+  right: 0;
+  width: 240px;
+  background: white;
+  border-radius: 18px;
+  padding: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  animation: fadeIn 0.2s ease;
+  z-index: 999;
+}
+
+/* DROPDOWN ITEMS */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #374151;
+  transition: 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: #f3f6f9;
+  color: #00a8cc;
+}
+
+/* LOGOUT BUTTON */
+.cus-logout-btn {
+  width: 100%;
+  margin-top: 8px;
+  border: none;
+  outline: none;
+  background: #00a8cc;
+  color: white;
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.3s ease;
+}
+
+.cus-logout-btn:hover {
+  background: #0087a8;
+}
+
+/* NOTIFICATION PANEL */
+.notif-panel {
+  width: 320px;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* NOTIF TABS */
+.notif-tabs {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.notif-tabs span {
+  flex: 1;
+  text-align: center;
+  padding: 14px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #6b7280;
+  font-weight: 500;
+  transition: 0.3s ease;
+}
+
+/* ACTIVE TAB */
+.notif-tabs span.active {
+  color: #00a8cc;
+  border-bottom: 3px solid #00a8cc;
+  font-weight: 600;
+}
+
+/* NOTIFICATION LIST */
+.notif-list {
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* EMPTY TEXT */
+.notif-placeholder {
+  text-align: center;
+  font-size: 14px;
+  color: #9ca3af;
+  padding: 30px 0;
+}
+
+/* FOOTER */
+.notif-footer {
+  border-top: 1px solid #e5e7eb;
+  padding: 12px;
+}
+
+.notif-footer button {
+  width: 100%;
+  border: none;
+  background: #e0f7fc;
+  color: #00a8cc;
+  padding: 11px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s ease;
+}
+
+.notif-footer button:hover {
+  background: #c5eff9;
+}
+
+/* SCROLLBAR */
+.notif-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notif-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+  .customer-topbar .ctopbar-links {
+    gap: 20px;
+  }
+
+  .customer-topbar .ctopbar-links a {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 900px) {
+  .customer-topbar {
+    padding: 0 20px;
+  }
+
+  .customer-topbar .ctopbar-links {
+    display: none;
+  }
+}
+
+/* CUSTOMER LOGOUT MODAL */
+
+.cus-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+/* 🔥 MAS MALAKI + MAS MODERN */
+.cus-modal-box {
+  background: #f4f9ff;
+  padding: 60px 50px;
+  border-radius: 18px;
+  width: 520px;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  border: 2px solid #0a4a8a;
+}
+
+.cus-modal-box h3 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0a4a8a;
+  margin-bottom: 10px;
+}
+
+.cus-modal-box p {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+/* BUTTON AREA */
+.cus-modal-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 25px;
+}
+
+/* SAME SIZE BUTTONS */
+.cus-modal-cancel-btn,
+.cus-modal-logout-btn {
+  width: 180px;
+  height: 48px;
+  border-radius: 30px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: 0.2s ease;
+}
+
+/* 🔴 CANCEL */
+.cus-modal-cancel-btn {
+  background: #ff3b30;
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.cus-modal-cancel-btn:hover {
+  background: #e02f26;
+  transform: scale(1.05);
+}
+
+/* 🔵 CONFIRM */
+.cus-modal-logout-btn {
+  background: #005b9f;
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.cus-modal-logout-btn:hover {
+  background: #004a82;
+  transform: scale(1.05);
+}
+
+/* NOTIFICATION BADGE COUNTER */
+.icon-btn {
+  position: relative;
+}
+
+.notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ff3b30;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  border: 2px solid white;
+}
+
+/* NOTIFICATION ITEMS STYLING */
+.notif-item {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.notif-item:hover {
+  background: #f8fafc;
+}
+
+.notif-item.unread {
+  background: #eff6ff;
+}
+
+.notif-item.unread p {
+  font-weight: 600;
+  color: #1e3a8a;
+}
+
+.notif-item p {
+  font-size: 13px;
+  color: #334155;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.notif-time {
+  font-size: 11px;
+  color: #94a3b8;
+}
+

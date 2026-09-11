@@ -1,0 +1,317 @@
+.track-order-page {
+  min-height: 100vh;
+  padding: 30px;
+  background-image: url("../../../assets/aqua-bg.png");
+  background-size: cover;
+  background-position: center;
+  font-family: Arial, sans-serif;
+}
+
+.track-order-container {
+  display: flex;
+  gap: 25px;
+  align-items: stretch;
+}
+
+/* LEFT */
+.track-order-left {
+  flex: 1;
+  background: rgba(255,255,255,0.92);
+  border-radius: 25px;
+  padding: 30px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* RIGHT */
+.track-order-right {
+  flex: 1;
+  background: rgba(255,255,255,0.92);
+  border-radius: 25px;
+  padding: 18px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* HEADER */
+.track-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.track-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: #1787ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.track-header h2 {
+  margin: 0;
+  color: #0b2f6d;
+  font-size: 34px;
+}
+
+.track-header p {
+  margin-top: 5px;
+  color: #8a96a8;
+  font-size: 14px;
+}
+
+/* ORDER ID */
+.order-id-section {
+  margin-top: 25px;
+}
+
+.order-id-section span {
+  color: #7e8da5;
+  font-size: 14px;
+}
+
+.order-id-section h3 {
+  margin-top: 6px;
+  color: #16356c;
+  font-size: 28px;
+}
+
+/* PROGRESS */
+.progress-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 35px;
+  position: relative;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90px;
+  text-align: center;
+}
+
+.progress-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #d7dde7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.progress-step.completed .progress-circle,
+.progress-step.active .progress-circle {
+  background: #1686ff;
+}
+
+.progress-step p {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #708099;
+  font-weight: 600;
+}
+
+.progress-line {
+  flex: 1;
+  height: 4px;
+  background: #d8dde7;
+  margin: 0 5px;
+  margin-bottom: 35px;
+}
+
+.active-line {
+  background: #1686ff;
+}
+
+/* ETA */
+.eta-card {
+  margin-top: 35px;
+  background: #e9f3ff;
+  border-radius: 18px;
+  padding: 22px;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.eta-icon {
+  color: #1686ff;
+}
+
+.eta-card h4 {
+  margin: 0;
+  color: #4d6f9c;
+}
+
+.eta-card h2 {
+  margin: 5px 0;
+  color: #0b2f6d;
+}
+
+.eta-card p {
+  margin: 0;
+  font-size: 13px;
+  color: #7d8ea7;
+}
+
+/* DRIVER */
+.driver-card {
+  margin-top: 25px;
+  background: white;
+  border-radius: 18px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.driver-left {
+  display: flex;
+  gap: 15px;
+}
+
+.driver-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #d9ebff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #167eff;
+}
+
+.driver-card h3 {
+  margin: 0;
+  color: #17315e;
+}
+
+.driver-card p {
+  margin-top: 5px;
+  color: #8794a8;
+  font-size: 14px;
+}
+
+.message-btn {
+  margin-top: 15px;
+  border: 1px solid #d5dbe7;
+  background: white;
+  padding: 10px 18px;
+  border-radius: 10px;
+  color: #1686ff;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* MAP */
+.map-card {
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.leaflet-map {
+  height: 470px;
+  width: 100%;
+}
+
+.leaflet-container {
+  height: 470px;
+  width: 100%;
+}
+
+/* ADDRESS */
+.delivery-card {
+  margin-top: 25px;
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  padding: 10px;
+}
+
+.delivery-icon {
+  color: #1686ff;
+}
+
+.delivery-card h3 {
+  margin: 0;
+  color: #1686ff;
+  font-size: 28px;
+}
+
+.delivery-card p {
+  margin-top: 10px;
+  color: #4e6487;
+  font-size: 22px;
+  line-height: 1.5;
+}
+
+/* SEARCH */
+.track-search {
+  margin-top: 22px;
+  width: 230px;
+  height: 45px;
+  background: #fff;
+  border: 2px solid #1787ff;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+}
+
+.track-search svg {
+  color: #5b9df0;
+  flex-shrink: 0;
+}
+
+.track-search input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+  background: transparent;
+  color: #16356c;
+}
+
+.track-search input::placeholder {
+  color: #9aa7b8;
+}
+
+.order-top {
+  margin-top: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pickup-card {
+  background: #ffffff;
+  border-left: 5px solid #2563eb;
+  border-radius: 14px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.pickup-card h3 {
+  color: #2563eb;
+  margin-bottom: 8px;
+  font-size: 20px;
+}
+
+.pickup-card p {
+  color: #555;
+  margin: 0;
+}

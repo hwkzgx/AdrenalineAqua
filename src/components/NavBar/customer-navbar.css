@@ -1,0 +1,95 @@
+.customer-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 50px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* LOGO */
+.customer-navbar-logo img {
+  width: 70px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* NAV LINKS */
+.navbar-links {
+  display: flex;
+  gap: 40px;
+}
+
+.navbar-links a {
+  text-decoration: none;
+  color: #004a99;
+  font-weight: 600;
+  transition: 0.3s;
+  position: relative;
+  padding-bottom: 5px;
+}
+
+/* hover */
+.navbar-links a:hover {
+  color: #1e90ff;
+}
+
+/* underline animation */
+.navbar-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0%;
+  height: 2px;
+  background: #1e90ff;
+  transition: 0.3s;
+}
+
+.navbar-links a:hover::after {
+  width: 100%;
+}
+
+/* ACTIVE PAGE */
+.navbar-links a.active {
+  color: #1e90ff;
+}
+
+.navbar-links a.active::after {
+  width: 100%;
+}
+/* BUTTONS */
+.navbar-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+/* SIGN IN BUTTON */
+.signin-btn {
+  background: #1e90ff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.signin-btn:hover {
+  background: #0d6efd;
+}
+
+/* REGISTER BUTTON */
+.register-btn {
+  background: #2dbd2d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.register-btn:hover {
+  background: #1f9d1f;
+}

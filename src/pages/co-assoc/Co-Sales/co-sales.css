@@ -1,0 +1,139 @@
+/* =========================
+   PAGE WRAPPER
+========================= */
+.cosales-page {
+  background-color: #f8fafc;
+  padding: 30px;
+  min-height: 100vh;
+}
+
+/* HEADER */
+.cosales-header {
+  margin-bottom: 24px;
+}
+
+.cosales-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.cosales-header p {
+  color: #64748b;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* =========================
+   CONTROLS
+========================= */
+.cosales-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.cosales-search {
+  width: 500px;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.cosales-search:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.cosales-filter {
+ width: 200px;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: white;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+}
+
+/* =========================
+   TABLE CONTAINER
+========================= */
+.cosales-table-container {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+/* TABLE */
+.cosales-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* HEADER */
+.cosales-table th {
+  background: #1e3a8a;
+  color: white;
+  padding: 16px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+}
+
+/* BODY */
+.cosales-table td {
+  padding: 16px;
+  font-size: 14px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+}
+
+/* HOVER */
+.cosales-table tr:hover {
+  background: #f8fafc;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+.sales-empty {
+  text-align: center;
+  padding: 80px 0;
+  color: #64748b;
+}
+
+.cosales-bottom {
+  margin-top: 30px;
+}
+
+.cosales-graph-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.graph-title {
+  margin-bottom: 20px;
+  color: #334155;
+}
+
+.graph-placeholder {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+}

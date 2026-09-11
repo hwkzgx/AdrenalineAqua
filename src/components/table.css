@@ -1,0 +1,42 @@
+.table-container {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.main-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.main-table th {
+  background: #1e3a8a;
+  color: white;
+  padding: 14px;
+  font-size: 12px;
+  text-align: left;
+}
+
+.main-table td {
+  padding: 14px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+   position: relative;
+  z-index: 1;
+}
+
+.main-table tr:hover {
+  background: #f8fafc;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #64748b;
+}
+.main-table button {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}

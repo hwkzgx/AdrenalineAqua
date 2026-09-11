@@ -1,0 +1,143 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* ABOUT HERO */
+.about-hero {
+  padding: 80px 10%;
+  background: url("../../../assets/AboutHeroImg.png") no-repeat center;
+    display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 80px 10%;
+  min-height: 90vh;
+    background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  overflow: hidden;
+}
+
+.about-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.about-text {
+  flex: 1;
+}
+
+.about-text h1 {
+  font-size: 2.8rem;
+  color: #0077b6;
+  margin-bottom: 20px;
+}
+
+.about-text p {
+  color: #444;
+  line-height: 1.6;
+  margin-bottom: 15px;
+  font-size: 1rem;
+}
+
+
+/* DIRECTORS */
+.directors-section {
+  padding: 80px 10%;
+  text-align: center;
+  background: white;
+}
+
+.directors-section h1 {
+  font-size: 2.5rem;
+  color: #0077b6;
+  margin-bottom: 40px;
+}
+
+.directors-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+}
+
+.director-card {
+  background: #f8fbff;
+  border-radius: 15px;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: 0.3s ease;
+}
+
+.director-card:hover {
+  transform: translateY(-5px);
+}
+
+.director-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+.director-card h2 {
+  color: #023e8a;
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+}
+
+.director-card p {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 50px 10%;
+  color: white;
+  flex-wrap: wrap;
+  gap: 30px;
+
+  background: url("../../../assets/FooterImage.png") no-repeat center;
+  background-size: cover;
+  position: relative;
+}
+
+.footer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+}
+
+.footer > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+
+  .about-content,
+  .about-contact-info {
+    flex-direction: column;
+  }
+
+  .about-map-box {
+    width: 100%;
+    height: 250px;
+  }
+
+  .about-text {
+    text-align: center;
+  }
+
+}

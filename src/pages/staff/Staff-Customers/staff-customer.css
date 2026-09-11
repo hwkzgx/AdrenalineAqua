@@ -1,0 +1,293 @@
+/* ========================= */
+/* MODAL OVERLAY */
+/* ========================= */
+
+.StfCusmodal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 9999;
+}
+
+/* ========================= */
+/* EDIT MODAL */
+/* ========================= */
+
+.StfCusedit-modal,
+.StfCusadd-modal {
+  width: 420px;
+  background: #f4f7fb;
+
+  border: 2px solid #0b74d1;
+  border-radius: 10px;
+
+  padding: 25px;
+  position: relative;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+.StfCusedit-modal h2,
+.StfCusadd-modal h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #003b73;
+
+  margin-bottom: 30px;
+}
+
+/* ADD BUTTON */
+.cusadd-btn {
+  background: #02457a;
+  color: white;
+  border: none;
+  padding: 11px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  width: 340px;
+  height: 45px;
+  margin-top: 0;
+}
+
+/* CLOSE BUTTON */
+
+.StfCusclose-btn {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+
+  font-size: 22px;
+  font-weight: bold;
+
+  cursor: pointer;
+  color: #003b73;
+}
+
+/* FORM */
+
+.StfCusform-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.StfCusform-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #003b73;
+
+  margin-bottom: 8px;
+}
+
+.StfCusform-group input {
+  height: 42px;
+
+  border: 1px solid #7fb8e6;
+  border-radius: 6px;
+
+  padding: 0 12px;
+  font-size: 14px;
+
+  outline: none;
+  background: white;
+}
+
+.StfCusform-group input:focus {
+  border-color: #0b74d1;
+  box-shadow: 0 0 0 3px rgba(11,116,209,0.15);
+}
+
+/* ========================= */
+/* MODAL ACTIONS */
+/* ========================= */
+
+.StfCusmodal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+
+  margin-top: 30px;
+}
+
+/* CANCEL BUTTON */
+
+.StfCuscancel-dark {
+  background: #d9d9d9;
+  color: #333;
+
+  border: none;
+  border-radius: 6px;
+
+  padding: 10px 20px;
+  font-size: 14px;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.StfCuscancel-dark:hover {
+  background: #c9c9c9;
+}
+
+/* SAVE BUTTON */
+
+.StfCussave-btn {
+  background: #004b87;
+  color: white;
+
+  border: none;
+  border-radius: 6px;
+
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.StfCussave-btn:hover {
+  background: #003866;
+}
+
+/* ========================= */
+/* DELETE MODAL */
+/* ========================= */
+
+.StfCusdelete-modal {
+  width: 700px;
+  background: white;
+
+  border: 2px solid #0b74d1;
+  border-radius: 12px;
+
+  padding: 30px;
+  position: relative;
+
+  box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+}
+
+.StfCusdelete-modal h1 {
+  text-align: center;
+
+  font-size: 32px;
+  font-weight: 700;
+
+  margin-bottom: 25px;
+  color: #111;
+}
+.StfCusdelete-modal h6 {
+  text-align: center;
+
+  font-size: 16px;
+  font-weight: 20;
+
+  margin-bottom: 25px;
+  color: #111;
+}
+
+/* WARNING BOX */
+
+.StfCuswarning-box {
+  background: #fff1eb;
+
+  border-left: 6px solid #ff5a1f;
+  border-radius: 8px;
+
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.StfCuswarning-box h3 {
+  color: #ff3d00;
+  font-size: 22px;
+
+  margin-bottom: 10px;
+}
+
+.StfCuswarning-box p {
+  color: #444;
+  font-size: 15px;
+
+  line-height: 1.5;
+}
+
+.StfCuswarning-box hr {
+  border: none;
+  border-top: 1px solid #e7cfc5;
+
+  margin: 20px 0;
+}
+
+/* DELETE INFO */
+
+.StfCusdelete-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.StfCusdelete-info p {
+  font-size: 15px;
+  color: #222;
+}
+
+/* DELETE BUTTON */
+
+.StfCusdelete-btn {
+  background: #ff3b30;
+  color: white;
+
+  border: none;
+  border-radius: 6px;
+
+  padding: 12px 26px;
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.StfCusdelete-btn:hover {
+  background: #d92d23;
+}
+
+/* ========================= */
+/* ACTION BUTTONS */
+/* ========================= */
+
+.StfCusaction-btn {
+  border: none;
+  border-radius: 5px;
+
+  padding: 6px 12px;
+  font-size: 12px;
+
+  cursor: pointer;
+  color: white;
+
+  transition: 0.2s ease;
+}
+
+.StfCusedit-action-btn {
+  background: #02457A;
+}
+
+.StfCusedit-action-btn:hover {
+  background: #01365f;
+}
+
+.StfCusdelete-action-btn {
+  background: #FB2C36;
+}
+
+.StfCusdelete-action-btn:hover {
+  background: #d91f29;
+}

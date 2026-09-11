@@ -1,0 +1,557 @@
+/* PAGE */
+.StfOrd-page {
+  background-color: #f8fafc;
+  padding: 30px;
+  min-height: 100vh;
+}
+
+/* HEADER */
+.StfOrd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.StfOrd-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.StfOrd-header p {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.StfOrd-add {
+  background: #02457A;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* CONTROLS */
+.StfOrd-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/* SEARCH */
+.StfOrd-search {
+  width: 280px;
+  height: 48px;
+  padding: 0 16px;
+  border: 3px solid #02457A;
+  border-radius: 12px;
+  font-size: 15px;
+  outline: none;
+  background: white;
+}
+
+/* ALL STATUS */
+.StfOrd-filter {
+  width: 150px;
+  height: 48px;
+  padding: 0 14px;
+  border: 3px solid #02457A;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  background: white;
+  color: #02457A;
+  cursor: pointer;
+  outline: none;
+}
+
+/* ADD BUTTON */
+
+.StfOrd-status.pending {
+  background: #fff7ed;
+  color: #c2410c;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+
+}
+
+.StfOrd-addBtn {
+  width: 150px;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: #02457A;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+  margin-top: 0px;
+}
+.StfOrd-addBtn:hover {
+  opacity: 0.9;
+}
+
+/* TABLE */
+.table-container {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+/* STATUS */
+.StfOrd-status {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.StfOrd-status.pending { background: #fff7ed; color: #c2410c; }
+.StfOrd-status.processing { background: #eff6ff; color: #1d4ed8; }
+.StfOrd-status.delivered { background: #ecfdf5; color: #047857; }
+
+/* ACTION ICON BUTTONS */
+.StfOrd-actions {
+  display: flex;
+  gap: 8px;
+  justify-content:center;
+}
+
+.StfOrd-iconBtn {
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+}
+
+.StfOrd-iconBtn.view {
+  background: #2563eb;
+}
+
+.StfOrd-iconBtn.edit {
+  background: #f59e0b;
+}
+
+.StfOrd-iconBtn.delete {
+  background: #ef4444;
+}
+
+/* =========================
+   MODAL OVERLAY
+========================= */
+
+.StfOrd-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  pointer-events: auto; /* IMPORTANT */
+}
+
+.StfOrd-edit-modal {
+  pointer-events: auto;
+  position: relative;
+  z-index: 10000;
+}
+
+/* =========================
+   VIEW MODAL
+========================= */
+
+.StfOrd-view-modal {
+  width: 400px;
+  min-height: 360px;
+
+  background: #edf3f8;
+
+  border: 2px solid #0b74d1;
+  border-radius: 8px;
+
+  padding: 20px;
+  position: relative;
+}
+
+.StfOrd-view-modal h2 {
+  font-size: 24px;
+  color: #003b73;
+  margin-bottom: 35px;
+}
+
+.StfOrd-view-info {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.StfOrd-view-info div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.StfOrd-view-info label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #003b73;
+}
+
+.StfOrd-view-info p {
+  font-size: 13px;
+  color: #222;
+}
+
+.StfOrd-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+
+  border-radius: 5px;
+  background: none;
+  border: none;
+
+  cursor: pointer;
+  color: #777;
+}
+
+/* =========================
+   EDIT MODAL
+========================= */
+
+.StfOrd-edit-modal {
+  width: 400px;
+  background: #edf3f8;
+
+  border: 2px solid #0b74d1;
+  border-radius: 8px;
+
+  padding: 20px;
+  position: relative;
+}
+
+.StfOrd-edit-modal h2 {
+  font-size: 24px;
+  color: #003b73;
+  margin-bottom: 30px;
+}
+
+.StfOrd-form-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 15px;
+  gap: 12px;
+}
+
+.StfOrd-form-group label {
+  width: 80px;
+
+  font-size: 14px;
+  font-weight: 700;
+  color: #003b73;
+}
+
+.StfOrd-form-group input,
+.StfOrd-form-group select {
+  flex: 1;
+  height: 32px;
+
+  border: 1px solid #6ea8d8;
+  border-radius: 5px;
+
+  padding: 0 10px;
+  font-size: 13px;
+
+  background: white;
+}
+
+/* =========================
+   MODAL ACTIONS
+========================= */
+
+.StfOrd-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+
+  margin-top: 25px;
+}
+.StfOrd-view-modal,
+.StfOrd-edit-modal,
+.StfOrd-delete-modal {
+  position: relative;
+}
+
+.StfOrd-close-btn {
+  position: absolute;
+  top: 5px;
+  right: -160px;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #003b73;
+  background: transparent;
+  border: none;
+}
+
+.StfOrd-save-btn {
+  position: relative;
+  z-index: 10001;
+}
+/* =========================
+   DELETE MODAL
+========================= */
+
+.StfOrd-delete-modal {
+  width: 560px;
+  background: #f8f8f8;
+
+  border: 2px solid #0b74d1;
+  border-radius: 10px;
+
+  padding: 25px;
+  position: relative;
+}
+
+.StfOrd-delete-modal h1 {
+  text-align: center;
+
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.StfOrd-delete-modal h6 {
+  text-align: center;
+
+  font-size: 13px;
+  font-weight: 400;
+
+  margin-bottom: 20px;
+}
+
+/* WARNING BOX */
+
+.StfOrd-warning-box {
+  background: #f9e6db;
+
+  border-left: 6px solid #ff6b35;
+  border-radius: 6px;
+
+  padding: 18px;
+}
+
+.StfOrd-warning-box h3 {
+  color: #ff3b30;
+  font-size: 26px;
+
+  margin-bottom: 10px;
+}
+
+.StfOrd-warning-box p {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.StfOrd-warning-box hr {
+  border: none;
+  border-top: 1px solid #e7cfc5;
+
+  margin: 18px 0;
+}
+
+/* DELETE INFO */
+
+.StfOrd-delete-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.StfOrd-delete-info p {
+  font-size: 13px;
+  color: #222;
+}
+
+/* DELETE ACTIONS */
+
+.StfOrd-delete-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+
+  margin-top: 20px;
+}
+
+.StfOrd-cancel-btn {
+  background: #5d5d66;
+  color: white;
+
+  border: none;
+  border-radius: 6px;
+
+  padding: 10px 24px;
+  cursor: pointer;
+}
+
+.StfOrd-confirm-delete {
+  background: #ff3b30;
+  color: white;
+
+  border: none;
+  border-radius: 6px;
+
+  padding: 10px 24px;
+  cursor: pointer;
+}
+.StfOrddelete-close-btn {
+  position: absolute;
+  top: 5px;
+  right: -230px;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #003b73;
+  background: transparent;
+  border: none;
+}
+
+.StfOrd-closeAction {
+  border-radius: 5px;
+}
+
+.StfOrd-addBtn,
+.StfOrd-save-btn,
+.StfOrd-confirm-delete {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.StfOrd-add-modal {
+  width: 500px;
+  background: #edf3f8;
+
+  border: 2px solid #0b74d1;
+  border-radius: 8px;
+
+  padding: 20px;
+  position: relative;
+}
+
+.StfOrd-add-modal h2 {
+  font-size: 24px;
+  color: #003b73;
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.StfOrd-form-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 15px;
+  gap: 12px;
+}
+
+.StfOrd-form-group label {
+  width: 150px;
+
+  font-size: 14px;
+  font-weight: 700;
+  color: #003b73;
+}
+
+.StfOrd-form-group input,
+.StfOrd-form-group select {
+  flex: 1;
+  height: 32px;
+
+  border: 1px solid #6ea8d8;
+  border-radius: 5px;
+
+  padding: 0 10px;
+  font-size: 13px;
+
+  background: white;
+}
+
+.StfOrd-save-btn{
+  border-radius: 5px;
+}
+
+.StfOrdAdd-close-btn{
+  position: absolute;
+  top: 5px;
+  right: -200px;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #003b73;
+  background: transparent;
+  border: none;
+  z-index: 10001;
+}
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 12px 16px;
+  border-radius: 8px;
+
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+
+  z-index: 9999;
+
+  animation: fadeInUp 0.3s ease;
+}
+
+.toast.success {
+  background: #22c55e;
+}
+
+.toast.error {
+  background: #ef4444;
+}
+
+.toast-icon {
+  display: flex;
+  align-items: center;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

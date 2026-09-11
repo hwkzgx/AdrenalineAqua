@@ -1,0 +1,202 @@
+.forgot-pass-wrapper {
+  height: 100vh;
+  display: flex;
+  font-family: Arial, sans-serif;
+}
+.forgot-pass-left {
+  flex: 1;
+  background: linear-gradient(135deg, #0f172a, #1e3a8a, #0ea5e9);
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+.forgot-pass-left .overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+}
+.forgot-pass-branding {
+  position: relative;
+  text-align: center;
+  z-index: 2;
+}
+
+.forgot-pass-branding h1 {
+  font-size: 28px;
+  margin: 0;
+}
+
+.forgot-pass-branding p {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.forgot-pass-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.forgot-pass-right::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: radial-gradient(
+    circle at top,
+    rgba(255, 255, 255, 0.08),
+    transparent 60%
+  );
+
+  pointer-events: none;
+}
+
+.forgot-pass-card {
+  width: 350px;
+  padding: 35px;
+  border-radius: 18px;
+
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+
+  color: #1e3a8a;
+  text-align: center;
+}
+
+.forgot-pass-icon {
+  font-size: 45px;
+  color: #0ea5e9;
+  margin-bottom: 15px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.forgot-pass-card h2 {
+  margin-bottom: 5px;
+}
+
+.forgot-pass-subtitle {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-bottom: 20px;
+  color: #334155;
+}
+
+.forgot-pass-input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+
+  border-radius: 10px;
+  border: 1px solid #1e3a8a;
+
+  background: rgba(255,255,255,0.25);
+  color: #0f172a;
+
+  outline: none;
+}
+
+.forgot-pass-input::placeholder {
+  color: rgba(15, 23, 42, 0.6);
+}
+
+.forgot-pass-input:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 5px rgba(14,165,233,0.5);
+}
+
+.forgot-pass-btn {
+  width: 100%;
+  margin-top: 15px;
+
+  padding: 12px;
+  border-radius: 10px;
+
+  background: linear-gradient(135deg, #0f172a, #1e3a8a, #0ea5e9);
+  color: white;
+
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+
+  transition: 0.3s ease;
+}
+
+.forgot-pass-btn:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+}
+
+.forgot-pass-back-btn {
+  background: none;
+  border: none;
+  color: #1e3a8a;
+
+  cursor: pointer;
+  font-size: 13px;
+
+  margin-top: 10px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  transition: 0.2s;
+}
+
+.forgot-pass-back-btn:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .forgot-pass-wrapper {
+    flex-direction: column;
+  }
+
+  .forgot-pass-left {
+    height: 35vh;
+  }
+
+  .forgot-pass-right {
+    height: 65vh;
+  }
+}
+.forgot-pass-label {
+  display: block;
+  text-align: left;
+  margin-bottom: 5px;
+  color: #1e3a8a;
+}
+.email-input {
+  width: 95%;
+  padding: 12px;
+  margin: 10px 0;
+  margin-left: -5px;
+  border-radius: 10px;
+  border: 1px solid #1e3a8a;
+
+  background: rgba(255,255,255,0.25);
+  color: #0f172a;
+
+  outline: none;
+}
+.email-input::placeholder {
+  color: rgba(15, 23, 42, 0.6);
+}
+.email-input:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 5px rgba(14,165,233,0.5);
+}

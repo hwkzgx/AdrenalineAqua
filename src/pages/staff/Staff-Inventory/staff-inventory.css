@@ -1,0 +1,767 @@
+/* ==========================================
+   INVENTORY PAGE LAYOUT & HEADERS
+   ========================================== */
+.staffinventory-page {
+  padding: 24px;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+.stafforders-header {
+  margin-bottom: 24px;
+}
+
+.stafforders-header h1 {
+  font-size: 28px;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+  font-weight: 700;
+}
+
+.stafforders-header p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ==========================================
+   SUMMARY DASHBOARD CARDS
+   ========================================== */
+.staffinventory-summary-cards {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.staffsummary-card {
+  flex: 1;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.staffsummary-card .card-icon {
+  width: 48px;
+  height: 48px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.staffsummary-card h3 {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.staffsummary-card h2 {
+  font-size: 24px;
+  color: #0f172a;
+  margin: 0;
+  font-weight: 700;
+}
+
+/* Card Specific Theme Styles */
+.stafftotal-val .card-icon {
+  background-color: #f0fdf4;
+  color: #16a34a;
+}
+
+.stafflow-alert.active {
+  border-color: #fef08a;
+  background-color: #fffde7;
+}
+.stafflow-alert .card-icon {
+  background-color: #fef9c3;
+  color: #ca8a04;
+}
+
+.staffout-alert.active {
+  border-color: #fecaca;
+  background-color: #fff5f5;
+}
+.staffout-alert .card-icon {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* ==========================================
+   CONTROLS, FILTERS & BUTTONS
+   ========================================== */
+.staffcontrols-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.staffleft-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.staffright-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-end; /* Palaging nakadikit sa kanan si Add Product */
+  position: relative;        /* Basehan para sa paglutang ni Bulk Delete */
+  min-width: 250px;
+}
+
+.staffsearch-input {
+  width: 500px;
+  max-width: 320px;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.staffsearch-input:focus {
+  border-color: #0ea5e9;
+}
+
+.stafffilter-select {
+  width: 200px;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: white;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Sorting Options Dropdown Utilities */
+.staffsort-menu {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.staffsort-trigger-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px 0 0 8px;
+  font-size: 14px;
+  color: #475569;
+  border-right: none;
+}
+
+.staffsort-menu .filter-select {
+  border-radius: 0 8px 8px 0;
+}
+
+/* Action Buttons (Add & Bulk Delete) */
+.staffadd-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 150px;
+  background-color: #0ea5e9;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.staffadd-btn:hover {
+  background-color: #0284c7;
+}
+
+.staffbulk-delete-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 200px;
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 10px 14px;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  position: absolute;
+  right: 160px;
+}
+
+.staffbulk-delete-btn:hover {
+  background-color: #fca5a5;
+  color: #b91c1c;
+}
+
+/* ==========================================
+   TABLE COMPONENT INTEGRATION STYLES
+   ========================================== */
+.staffinventory-table {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+/* Checkbox column lang ang liliit */
+.staffinventory-table table th:has(input[type="checkbox"]),
+.staffinventory-table table td:has(input[type="checkbox"]),
+.staffinventory-table th:first-child,
+.staffinventory-table td:first-child {
+  width: 15px;
+  max-width: 40px;
+  min-width: 40px;
+  text-align: center;
+  padding: 8px;
+  margin-top: 10px;
+}
+
+/* Checkbox styling */  
+.staffinventory-table input[type="checkbox"] {
+  appearance: checkbox;
+  -webkit-appearance: checkbox;
+  -moz-appearance: checkbox;
+  width: 20px;
+  height: 15px;
+  max-width: 16px;
+  max-height: 16px;
+  cursor: pointer;
+  margin: 0 auto;
+  display: block;
+}
+
+/* Action column */
+.staffinventory-table th:last-child,
+.staffinventory-table td:last-child {
+  width: 120px;
+  min-width: 120px;
+  text-align: center;
+}
+
+/* Status Pill Indicators inside Table Row */
+.staffstatus-pill {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  min-width: 90px;
+}
+
+.staffstatus-pill.in {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 2, black;
+}
+
+.staffstatus-pill.low {
+  background-color: #fef9c3;
+  color: #a16207;
+  border: 2, black;
+}
+
+.staffstatus-pill.out {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 2, black;
+}
+
+/* Row Action Buttons inside Table */
+/* Container para sa tatlong icons */
+.staffaction-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Permanenteng distansya ng mga buttons */
+}
+
+/* Uniform styling para sa lahat ng icon buttons sa table */
+.staffrestock-icon-btn,
+.staffedit-icon-btn,
+.staffdelete-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;  /* Fix ang lapad */
+  height: 32px; /* Fix ang taas para hindi umusod ang katabi */
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Kulay para sa Stock In/Restock Icon Button */
+.staffrestock-icon-btn {
+  color: #059669; /* Green icon text */
+  border-color: #a7f3d0;
+  background-color: #ecfdf5;
+}
+
+.staffrestock-icon-btn:hover {
+  background-color: #d1fae5;
+  color: #047857;
+}
+
+/* Siguraduhing naka-fix ang width ng column sa table para iwas galaw */
+.stafftable-container th:last-child,
+.stafftable-container td:last-child {
+  width: 120px;
+  min-width: 120px;
+  text-align: center;
+}
+
+.staffedit-icon-btn, .delete-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.staffedit-icon-btn {
+  background-color: #f0f9ff;
+  color: #0284c7;
+}
+.staffedit-icon-btn:hover {
+  background-color: #e0f2fe;
+}
+
+.staffdelete-icon-btn {
+  background-color: #fff5f5;
+  color: #e11d48;
+}
+.staffdelete-icon-btn:hover {
+  background-color: #ffe4e6;
+}
+
+/* ==========================================
+   MODAL DIALOGS OVERLAY & INPUT GROUPS
+   ========================================== */
+.staffInvmodal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.staffmodal-content {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: modalScaleUp 0.2s ease-out;
+}
+
+.staffmodal-content.small-modal {
+  max-width: 380px;
+}
+
+@keyframes modalScaleUp {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.staffmodal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.staffmodal-header h2 {
+  font-size: 16px;
+  color: #0f172a;
+  margin: 0;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.staffclose-x {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  margin-left: 257px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  margin-top: -5px;
+}
+.staffclose-x:hover {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+.staffAddclose-x {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  margin-left: 271px;
+  display: flex;
+  align-items: center;
+  margin-top: -5px;
+}
+.staffAddclose-x:hover{
+  background-color: #f1f5f9;
+  color: #475569;
+}
+.staffStockclose-x {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  margin-left: 185px;
+  display: flex;
+  align-items: center;
+  margin-top: -5px;
+}
+.staffStockclose-x:hover{
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.staffmodal-body {
+  padding: 24px;
+}
+
+.staffitem-badge-id {
+  font-size: 12px;
+  background-color: #f1f5f9;
+  color: #64748b;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin: 0 0 16px 0;
+  font-weight: 500;
+}
+
+.staffrestock-item-title {
+  font-size: 16px;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.staffinput-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.staffinput-row {
+  display: flex;
+  gap: 16px;
+}
+
+.staffinput-row .input-group {
+  flex: 1;
+}
+
+.staffinput-group label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  margin-top: 30px;
+}
+
+.staffinput-group input,
+.staffinput-group select {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  background-color: white;
+}
+
+.staffinput-group input:focus,
+.staffinput-group select:focus {
+  border-color: #0ea5e9;
+}
+
+/* Disabled Form Field Accent */
+.staffinput-group input:disabled {
+  background-color: #f8fafc;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.staffmodal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.staffcancel-action-btn {
+  padding: 10px 16px;
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.staffcancel-action-btn:hover {
+  background-color: #f8fafc;
+}
+
+.staffsave-action-btn {
+  padding: 10px 16px;
+  background-color: #0ea5e9;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.staffsave-action-btn:hover {
+  background-color: #0284c7;
+}
+
+/* ==========================================
+   USER-REQUESTED BOTTOM SECTION (METRICS)
+   ========================================== */
+.staffplaceholder-text {
+  color: #94a3b8;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.staffinventory-bottom {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.staffinventory-revenue,
+.staffinventory-graph {
+  flex: 1;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.staffinventory-revenue h3,
+.staffinventory-graph h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.staffrevenue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.staffrefresh-btn {
+  padding: 6px 10px;
+  border: none;
+  background: #0ea5e9;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.staffrefresh-btn:hover {
+  background-color: #0284c7;
+}
+
+.staffgraph-placeholder {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* ========================================================
+   🔥 DELETE ORDER STYLE MODAL FOR INVENTORY
+   ======================================================== */
+
+.staffdelete-order-style-modal {
+  max-width: 600px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  padding: 24px;
+  border: 1.5px solid #cbd5e1;
+}
+
+/* Header layout similar to uploaded design */
+.staffmodal-header-styled {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.staffmodal-header-styled h2 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #000000;
+  margin: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.staffclose-x-btn {
+  background: none;
+  margin-right: -250px;
+  border: none;
+  color: #1e3a8a;
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  margin-top: 5;
+}
+
+.staffmodal-subtitle {
+  text-align: center;
+  color: #1f2937;
+  font-size: 14px;
+  margin: 8px 0 20px 0;
+}
+
+/* Orange/Red Highlighted Warning Card */
+.staffdanger-warning-box {
+  background-color: #fff1f2; /* Light reddish-orange background */
+  border-left: 5px solid #f97316; /* Thick orange line on the left side */
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.staffwarning-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ea580c;
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+
+.staffdanger-warning-box p {
+  margin: 0;
+  color: #374151;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Grayish/Beige information container */
+.staffitem-details-display-box {
+  background-color: #f3f4f6; /* Light gray box background */
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.staffitem-details-display-box p {
+  margin: 0;
+  font-size: 14px;
+  color: #374151;
+}
+
+.staffitem-details-display-box b {
+  color: #111827;
+  display: inline-block;
+  width: 130px; /* Pantay-pantay ang column break ng labels */
+}
+
+/* Action Buttons Container at the bottom */
+.staffmodal-actions-styled-row {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+/* Left button: Dark Slate Gray */
+.staffno-cancel-btn {
+  flex: 1;
+  background-color: #4b5563;
+  color: #ffffff;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.staffno-cancel-btn:hover {
+  background-color: #374151;
+}
+
+/* Right button: Danger Red */
+.staffyes-delete-btn {
+  flex: 1;
+  background-color: #ef4444;
+  color: #ffffff;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.staffyes-delete-btn:hover {
+  background-color: #dc2626;
+}

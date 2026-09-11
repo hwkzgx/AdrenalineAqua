@@ -1,0 +1,254 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ABOUT HERO */
+.about-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 100px 8%;
+  min-height: 85vh;
+  background: url("../../../assets/AboutHeroImg.png") no-repeat center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(240, 248, 255, 0.75));
+  z-index: 1;
+}
+
+.about-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.about-text {
+  flex: 1;
+  max-width: 700px;
+}
+
+.about-text h1 {
+  font-size: 3rem;
+  color: #0077b6;
+  margin-bottom: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.about-text p {
+  color: #4b5563;
+  line-height: 1.7;
+  margin-bottom: 15px;
+  font-size: 1.05rem;
+}
+
+
+/* DIRECTORS SECTION */
+.directors-section {
+  padding: 90px 8%;
+  text-align: center;
+  background: #fdfdfd;
+}
+
+.directors-section h1 {
+  font-size: 2.5rem;
+  color: #0077b6;
+  margin-bottom: 50px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.directors-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+}
+
+.director-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 10px 30px rgba(0, 119, 182, 0.06);
+  border: 1px solid rgba(0, 119, 182, 0.08);
+  transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.director-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 35px rgba(0, 119, 182, 0.12);
+}
+
+.director-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+.director-card h2 {
+  color: #03045e;
+  font-size: 1.15rem;
+  margin-bottom: 5px;
+  font-weight: 700;
+}
+
+.director-card p {
+  font-size: 0.88rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+
+/* FOOTER (Left-aligned, compact fonts, mobile-friendly) */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 60px 8%;
+  color: white;
+  flex-wrap: wrap;
+  gap: 40px;
+  background: url("../../../assets/FooterImage.png") no-repeat center;
+  background-size: cover;
+  position: relative;
+  text-align: left;
+}
+
+.footer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 4, 94, 0.88);
+}
+
+.footer > * {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* ==========================================
+   RESPONSIVE DESIGN (TABLETS & PHONES)
+   ========================================== */
+
+@media (max-width: 1024px) {
+  .about-hero,
+  .directors-section,
+  .footer {
+    padding: 70px 6%;
+  }
+
+  .about-text h1 {
+    font-size: 2.3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-hero {
+    padding: 50px 5%;
+    min-height: auto;
+    text-align: center;
+  }
+
+  .about-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .about-text h1 {
+    font-size: 1.8rem;
+  }
+
+  .about-text p {
+    font-size: 0.9rem;
+  }
+
+  .directors-section {
+    padding: 50px 5%;
+  }
+
+  .directors-section h1 {
+    font-size: 1.7rem;
+    margin-bottom: 25px;
+  }
+
+  /* Directors Grid (2 columns on tablets/larger mobile) */
+  .directors-container {
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 15px;
+  }
+
+  .director-card {
+    padding: 12px;
+  }
+
+  .director-card img {
+    height: 140px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+
+  .director-card h2 {
+    font-size: 0.95rem;
+  }
+
+  .director-card p {
+    font-size: 0.78rem;
+  }
+
+  /* Footer Mobile Adjustment (Left Aligned & Smaller Fonts) */
+  .footer {
+    padding: 40px 6%;
+    flex-direction: column;
+    text-align: left !important;
+    align-items: flex-start;
+    gap: 25px;
+  }
+
+  .footer h2, 
+  .footer h3, 
+  .footer h4 {
+    font-size: 1.1rem !important;
+  }
+
+  .footer p, 
+  .footer a, 
+  .footer li {
+    font-size: 0.85rem !important;
+  }
+
+  .footer img {
+    max-width: 60px;
+  }
+}
+
+/* Very small mobile screens */
+@media (max-width: 480px) {
+  .directors-container {
+    grid-template-columns: 1fr;
+  }
+
+  .director-card img {
+    height: 180px;
+  }
+}
