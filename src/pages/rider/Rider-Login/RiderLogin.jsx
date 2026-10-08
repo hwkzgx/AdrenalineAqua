@@ -24,41 +24,60 @@ export default function RiderLogin() {
 
     setLoading(true);
 
-    // LOGIN USING SUPABASE AUTH
-    const { data: authData, error: authError } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    let riderData = null;
 
-    if (authError) {
-      setLoading(false);
-      setError("Invalid email or password.");
-      return;
+    // 1. Try Supabase Auth first
+    try {
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password: password.trim(),
+        });
+
+      if (!authError && authData?.user) {
+        const { data: userData } = await supabase
+          .from("users")
+          .select("*")
+          .eq("email", email.trim())
+          .eq("role", "rider")
+          .maybeSingle();
+
+        riderData = userData;
+      }
+    } catch (e) {
+      console.warn("Supabase auth check skipped:", e.message);
     }
 
-    // CHECK IF USER IS A RIDER
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("*")
-      .eq("email", email)
-      .eq("role", "rider")
-      .single();
+    // 2. Fallback to direct database check from public.users table
+    if (!riderData) {
+      const { data: dbUser, error: dbError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", email.trim())
+        .eq("password", password.trim())
+        .eq("role", "rider")
+        .maybeSingle();
 
-    if (userError || !userData) {
-      await supabase.auth.signOut();
-      setLoading(false);
-      setError("This account is not registered as a rider.");
-      return;
+      if (dbUser) {
+        riderData = dbUser;
+      }
     }
 
     setLoading(false);
 
-    // SAVE LOGGED IN RIDER
-    localStorage.setItem("user", JSON.stringify(userData));
+    if (!riderData) {
+      setError("Invalid email or password.");
+      return;
+    }
+
+    // Save logged in rider
+    localStorage.setItem("user", JSON.stringify(riderData));
+    localStorage.setItem("role", "rider");
 
     if (remember) {
       localStorage.setItem("rememberUser", "true");
+    } else {
+      localStorage.removeItem("rememberUser");
     }
 
     nav("/rider/home");

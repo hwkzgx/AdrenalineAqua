@@ -14,56 +14,73 @@ export default function CustomerLogin() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-const handleLogin = async () => {
-  setError("");
+  const handleLogin = async () => {
+    setError("");
 
-  if (!email || !password) {
-    setError("Please fill all fields");
-    return;
-  }
+    if (!email || !password) {
+      setError("Please fill all fields");
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  // Login using Supabase Authentication
-  const { data: authData, error: authError } =
-    await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    let customerData = null;
 
-  if (authError) {
+    // 1. Try Supabase Auth first
+    try {
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password: password.trim(),
+        });
+
+      if (!authError && authData?.user) {
+        const { data: userData } = await supabase
+          .from("users")
+          .select("*")
+          .eq("email", email.trim())
+          .eq("role", "customer")
+          .maybeSingle();
+
+        customerData = userData;
+      }
+    } catch (e) {
+      console.warn("Supabase auth check skipped:", e.message);
+    }
+
+    // 2. Fallback to direct database check from public.users table
+    if (!customerData) {
+      const { data: dbUser, error: dbError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", email.trim())
+        .eq("password", password.trim())
+        .eq("role", "customer")
+        .maybeSingle();
+
+      if (dbUser) {
+        customerData = dbUser;
+      }
+    }
+
     setLoading(false);
-    setError("Invalid email or password.");
-    return;
-  }
 
-  // Get customer information from users table
-  const { data: userData, error: userError } = await supabase
-    .from("users")
-    .select("*")
-    .eq("email", email)
-    .eq("role", "customer")
-    .single();
+    if (!customerData) {
+      setError("Invalid email or password.");
+      return;
+    }
 
-  setLoading(false);
+    // Save complete customer information
+    localStorage.setItem("user", JSON.stringify(customerData));
 
-  if (userError || !userData) {
-    await supabase.auth.signOut();
-    setError("Customer account information not found.");
-    return;
-  }
+    if (remember) {
+      localStorage.setItem("rememberUser", "true");
+    } else {
+      localStorage.removeItem("rememberUser");
+    }
 
-  // Save customer information
-  localStorage.setItem("user", JSON.stringify(userData));
-
-  if (remember) {
-    localStorage.setItem("rememberUser", "true");
-  } else {
-    localStorage.removeItem("rememberUser");
-  }
-
-  nav("/customer/dashboard");
-};
+    nav("/customer/dashboard");
+  };
 
   return (
     <div className="login-wrapper">

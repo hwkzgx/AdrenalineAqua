@@ -6,14 +6,31 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Supabase Configuration
-const SUPABASE_URL =
-  process.env.VITE_SUPABASE_URL ||
-  "https://xejgypblblaqtmeqgjfi.supabase.co";
+const envPath = path.resolve(__dirname, "../../.env");
+if (fs.existsSync(envPath)) {
+  if (typeof process.loadEnvFile === "function") {
+    process.loadEnvFile(envPath);
+  } else {
+    const envContent = fs.readFileSync(envPath, "utf8");
+    envContent.split("\n").forEach((line) => {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith("#")) {
+        const [key, ...vals] = trimmed.split("=");
+        if (key && vals.length) {
+          process.env[key.trim()] = vals.join("=").trim();
+        }
+      }
+    });
+  }
+}
 
-const SUPABASE_KEY =
-  process.env.VITE_SUPABASE_ANON_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhlamd5cGJsYmxhcXRtZXFnamZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMzg2NzEsImV4cCI6MjA5NDgxNDY3MX0.rcC22kV1MXd8eLzzCS0TPyDYw9m8Bf6PRoP57u7lXtQ";
+// Supabase Configuration from root .env
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  throw new Error("Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in root .env file.");
+}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 

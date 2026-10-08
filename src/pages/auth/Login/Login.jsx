@@ -13,111 +13,89 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-const handleLogin = async () => {
-  setErrorMessage("");
+  const handleLogin = async () => {
+    setErrorMessage("");
 
-  if (!email || !password) {
-    setErrorMessage("Please enter email and password.");
-    return;
-  }
+    if (!email || !password) {
+      setErrorMessage("Please enter email and password.");
+      return;
+    }
 
-  const selectedRole = localStorage.getItem("role");
+    const selectedRole = (localStorage.getItem("role") || "").toLowerCase();
 
-  if (!selectedRole) {
-    setErrorMessage("Please select a role first.");
-    return;
-  }
+    if (!selectedRole) {
+      setErrorMessage("Please select a role first.");
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  // STAFF - SUPABASE AUTH
-if (
-  selectedRole === "staff" ||
-  selectedRole === "co" ||
-  selectedRole === "admin"
-) {
-    const { error: authError } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    let userData = null;
 
-    if (authError) {
-      setLoading(false);
+    // 1. Try Supabase Auth first
+    try {
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password: password.trim(),
+        });
+
+      if (!authError && authData?.user) {
+        const { data } = await supabase
+          .from("users")
+          .select("*")
+          .eq("email", email.trim())
+          .eq("role", selectedRole)
+          .maybeSingle();
+
+        userData = data;
+      }
+    } catch (e) {
+      console.warn("Supabase auth check skipped:", e.message);
+    }
+
+    // 2. Fallback to direct database verification
+    if (!userData) {
+      const { data: dbUser, error: dbError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", email.trim())
+        .eq("password", password.trim())
+        .maybeSingle();
+
+      if (dbUser) {
+        if (dbUser.role?.toLowerCase() !== selectedRole) {
+          setLoading(false);
+          setErrorMessage(`This account is registered as ${dbUser.role}, not ${selectedRole}.`);
+          return;
+        }
+        userData = dbUser;
+      }
+    }
+
+    setLoading(false);
+
+    if (!userData) {
       setErrorMessage("Invalid email or password.");
       return;
     }
 
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("*")
-      .eq("email", email)
-      .eq("role", selectedRole)
-      .single();
+    // Persist complete user record
+    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("userRole", userData.role);
 
-    if (userError || !userData) {
-      await supabase.auth.signOut();
-      setLoading(false);
-      setErrorMessage("This account is not registered as staff.");
-      return;
+    if (userData.role === "staff") {
+      nav("/staff/dashboard");
+    } else if (userData.role === "co" || userData.role === "co_associate") {
+      nav("/co/dashboard");
+    } else if (userData.role === "admin") {
+      nav("/admin/dashboard");
+    } else if (userData.role === "rider") {
+      nav("/rider/home");
+    } else {
+      nav("/customer/dashboard");
     }
-
-    localStorage.setItem(
-      "user",
-      JSON.stringify({
-        name: userData.name,
-        role: userData.role,
-        email: userData.email,
-      })
-    );
-
-  setLoading(false);
-
-if (selectedRole === "staff") {
-  nav("/staff/dashboard");
-} else if (selectedRole === "co") {
-  nav("/co/dashboard");
-} else if (selectedRole === "admin") {
-  nav("/admin/dashboard");
-}
-
-return;
-  }
-
-  // ADMIN + CO - OLD LOGIN MUNA
-  const { data, error } = await supabase
-    .from("users")
-    .select("*")
-    .eq("email", email)
-    .eq("password", password)
-    .single();
-
-  setLoading(false);
-
-  if (error || !data) {
-    setErrorMessage("Account not found or incorrect credentials.");
-    return;
-  }
-
-  if (data.role !== selectedRole) {
-    setErrorMessage(
-      `This account is not registered as ${selectedRole}.`
-    );
-    return;
-  }
-
-  localStorage.setItem(
-    "user",
-    JSON.stringify({
-      name: data.name,
-      role: data.role,
-      email: data.email,
-    })
-  );
-
-  if (data.role === "admin") nav("/admin/dashboard");
-  else if (data.role === "co") nav("/co/dashboard");
-};
+  };
 
   return (
     <div className="login-wrapper">
