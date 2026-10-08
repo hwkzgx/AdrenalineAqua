@@ -30,3 +30,7 @@ dist-ssr
 
 # Spec and Local Dev
 spec/
+backups/
+src/scripts/backups/
+.temp/
+*.temp
