@@ -11,14 +11,14 @@
 
   color: white;
 
-  padding: 8px 8px 6px 8px; 
+  padding: 8px 8px 6px 8px;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 
   flex-shrink: 0;
-  box-sizing: border-box; 
+  box-sizing: border-box;
 }
 
 .sidebar-top {
@@ -27,7 +27,7 @@
 }
 
 .logo {
-  width: 85px; /* 🔥 smaller */
+  width: 85px;
   margin: 0 auto 12px;
 }
 
@@ -38,8 +38,8 @@
   color: #e5e7eb;
   text-align: left;
 
-  padding: 7px 9px; /* 🔥 tighter */
-  font-size: 12px; /* 🔥 smaller text */
+  padding: 7px 9px;
+  font-size: 12px;
 
   cursor: pointer;
   border-radius: 6px;
@@ -88,7 +88,7 @@
 }
 
 .admin-profile img {
-  width: 28px; 
+  width: 28px;
   height: 28px;
   border-radius: 50%;
 }

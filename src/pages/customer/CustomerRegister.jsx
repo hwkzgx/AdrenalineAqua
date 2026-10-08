@@ -86,9 +86,27 @@ export default function CustomerRegister() {
       return;
     }
 
-    setLoading(true);
+   setLoading(true);
 
-    const customerId = await generateCustomerId();
+// Create customer account in Supabase Authentication
+const { data: authData, error: authError } = await supabase.auth.signUp({
+  email,
+  password,
+  options: {
+    emailRedirectTo: `${window.location.origin}/customer/customerlogin`,
+  },
+});
+
+if (authError) {
+  setLoading(false);
+  console.log("AUTH ERROR:", authError);
+  setError(authError.message);
+  return;
+}
+
+console.log("AUTH DATA:", authData);
+
+const customerId = await generateCustomerId();
 
     const { error } = await supabase.from("users").insert([
       {
@@ -123,7 +141,6 @@ export default function CustomerRegister() {
         <div className="cusbranding">
           <img src={AquaLogo} className="cusbrand-logo" alt="Logo" />
           <h1>Welcome!</h1>
-          <p>Create your customer account</p>
         </div>
       </div>
 
@@ -132,12 +149,8 @@ export default function CustomerRegister() {
 
         <div className="register-card">
 
-          <button className="back-btn" onClick={() => nav(-1)}>
-            ← Back
-          </button>
-
           <h2>Create Account</h2>
-          <p className="subtitle">Please register an account</p>
+          <p className="subtitle">Please register/create a customer account</p>
 
           {/* NAME */}
           <input

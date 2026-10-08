@@ -35,7 +35,7 @@ body {
   margin-left: 5px;
 }
 
-.back-btn {
+.rddback-btn {
   color: #333;
   display: flex;
   align-items: center;
@@ -579,5 +579,141 @@ h3::after,
     align-items: center !important;
     width: 100% !important;
     padding: 8px 0;
+  }
+}
+
+/* ===============================
+   MAP PULSE ANIMATION (RADAR EFFECT)
+   =============================== */
+@keyframes mapPulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* ===============================
+   CUSTOM RIDER MARKER STYLES
+   =============================== */
+.custom-rider-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+}
+
+.custom-rider-pulse {
+  position: absolute;
+  width: 52px;
+  height: 52px;
+  background: rgba(37, 99, 235, 0.3);
+  border-radius: 50%;
+  animation: mapPulse 1.8s infinite ease-out;
+}
+
+.custom-rider-icon-box {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border: 3px solid white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+}
+
+/* ===============================
+   CUSTOM DESTINATION MARKER STYLES
+   =============================== */
+.custom-dest-icon-box {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border: 3px solid white;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 18px rgba(239, 68, 68, 0.4);
+}
+
+.custom-dest-inner {
+  transform: rotate(45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===============================
+   TOAST NOTIFICATION (lower right, compact)
+   (palitan ang dating .toast styles sa rider-deliverydetails.css)
+   =============================== */
+.toast {
+  position: fixed;
+  right: 16px;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: 8px 14px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  z-index: 20000;
+  animation: toastIn 0.25s ease;
+}
+
+.toast svg {
+  flex-shrink: 0;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.toast-success {
+  background: #059d00;
+}
+
+.toast-error {
+  background: #dc2626;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Maliliit na phone */
+@media (max-width: 480px) {
+  .toast {
+    right: 12px;
+    bottom: 14px;
+    padding: 7px 12px;
+    font-size: 12px;
+    border-radius: 9px;
+  }
+
+  .toast svg {
+    width: 14px !important;
+    height: 14px !important;
   }
 }

@@ -14,41 +14,56 @@ export default function CustomerLogin() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
-    setError("");
+const handleLogin = async () => {
+  setError("");
 
-    if (!email || !password) {
-      setError("Please fill all fields");
-      return;
-    }
+  if (!email || !password) {
+    setError("Please fill all fields");
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    // 🔥 CHECK USER IN SUPABASE
-    const { data, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("email", email)
-      .eq("password", password)
-      .eq("role", "customer")
-      .single();
+  // Login using Supabase Authentication
+  const { data: authData, error: authError } =
+    await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
+  if (authError) {
     setLoading(false);
+    setError("Invalid email or password.");
+    return;
+  }
 
-   if (error || !data) {
-  setError("Invalid email or password. Maybe this user is not registered as customer");
-  return;
-}
+  // Get customer information from users table
+  const { data: userData, error: userError } = await supabase
+    .from("users")
+    .select("*")
+    .eq("email", email)
+    .eq("role", "customer")
+    .single();
 
-// save logged in user
-localStorage.setItem("user", JSON.stringify(data));
+  setLoading(false);
 
-if (remember) {
-  localStorage.setItem("rememberUser", "true");
-}
+  if (userError || !userData) {
+    await supabase.auth.signOut();
+    setError("Customer account information not found.");
+    return;
+  }
 
-nav("/customer/dashboard");
-  };
+  // Save customer information
+  localStorage.setItem("user", JSON.stringify(userData));
+
+  if (remember) {
+    localStorage.setItem("rememberUser", "true");
+  } else {
+    localStorage.removeItem("rememberUser");
+  }
+
+  nav("/customer/dashboard");
+};
 
   return (
     <div className="login-wrapper">
@@ -67,11 +82,11 @@ nav("/customer/dashboard");
 
         <div className="login-card">
 
-          <div className="login-header">
-            <button className="cuslogback-btn" onClick={() => nav(-1)}>
-              ← Back
-            </button>
-          </div>
+        <div className="login-header">
+        <button className="cuslogback-btn" onClick={() => nav('/customer/home', { replace: true })}>
+          ← Back
+        </button>
+        </div>
 
           <div className="login-body">
 
@@ -125,6 +140,14 @@ nav("/customer/dashboard");
             >
               {loading ? "Logging in..." : "Login"}
             </button>
+
+            <div className="role-login-container">
+              <div className="login-divider">or</div>
+              
+              <button onClick={() => nav("/roles")} className="role-login-btn">
+                Sign in with your role
+              </button>
+            </div>
 
             <p className="signup-text">
               Don’t have an account?{" "}

@@ -315,3 +315,400 @@
   color: #555;
   margin: 0;
 }
+
+/* ===============================
+   MAP PULSE ANIMATION
+   =============================== */
+@keyframes mapPulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* ===============================
+   CUSTOM LEAFLET MARKERS (CSS CLASSES)
+   =============================== */
+.custom-rider-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+}
+
+.custom-rider-pulse {
+  position: absolute;
+  width: 52px;
+  height: 52px;
+  background: rgba(37, 99, 235, 0.3);
+  border-radius: 50%;
+  animation: mapPulse 1.8s infinite ease-out;
+}
+
+.custom-rider-icon-box {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border: 3px solid white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+}
+
+.custom-dest-icon-box {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border: 3px solid white;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 18px rgba(239, 68, 68, 0.4);
+}
+
+.custom-dest-inner {
+  transform: rotate(45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===============================================================
+   ================  RESPONSIVE (MOBILE LANG)  ===================
+   Lahat ng nasa baba ay nasa loob ng media query, kaya HINDI
+   nito binabago ang desktop design mo.
+   =============================================================== */
+
+/* ---------- TABLET (<= 900px): isang column ---------- */
+@media (max-width: 900px) {
+  .track-order-page {
+    padding: 20px;
+  }
+
+  .track-order-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+
+  .track-order-left,
+  .track-order-right {
+    flex: none;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .leaflet-container,
+  .leaflet-map {
+    height: 400px;
+  }
+
+  .track-order-right .map-card {
+    height: 400px !important;
+  }
+}
+
+/* ---------- MOBILE (<= 600px): MODERN STYLE ---------- */
+@media (max-width: 600px) {
+  .track-order-page,
+  .track-order-page *,
+  .track-order-page *::before,
+  .track-order-page *::after {
+    box-sizing: border-box;
+  }
+
+  /* Page background */
+  .track-order-page {
+    padding: 12px 12px 28px;
+    background-image: none;
+    background: linear-gradient(180deg, #e3f0ff 0%, #f3f7fc 45%);
+  }
+
+  .track-order-container {
+    gap: 14px;
+  }
+
+  /* Wala nang malaking puting panel; bawat bahagi ay sariling card */
+  .track-order-left {
+    padding: 0;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-radius: 0;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* ----- Header = blue banner ----- */
+  .track-header {
+    gap: 12px;
+    padding: 20px 18px;
+    background: linear-gradient(135deg, #2aa0ff, #0050b8);
+    border-radius: 24px;
+    box-shadow: 0 14px 30px rgba(0, 80, 184, 0.3);
+  }
+
+  .track-icon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .track-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .track-header h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .track-header p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  /* ----- Order ID + Search = isang card ----- */
+  .order-top {
+    margin: 0;
+    padding: 18px 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 4px 16px rgba(15, 31, 61, 0.06);
+  }
+
+  .order-id-section {
+    margin: 0;
+  }
+
+  .order-id-section span {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: #5b6b88;
+  }
+
+  .order-id-section h3 {
+    margin: 4px 0 0;
+    font-size: 24px;
+    font-weight: 800;
+    word-break: break-all;
+  }
+
+  .track-search {
+    width: 100%;
+    height: 52px;
+    margin: 0;
+    padding: 0 16px;
+    border: 1.5px solid #e3e9f3;
+    border-radius: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .track-search:focus-within {
+    border-color: #0d7df2;
+    box-shadow: 0 0 0 4px rgba(13, 125, 242, 0.14);
+  }
+
+  /* Isang kahon lang: ang input mismo ay walang border/glow/background */
+  .track-search input,
+  .track-search input:hover,
+  .track-search input:focus {
+    min-width: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 16px; /* para hindi mag-zoom ang iOS */
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  /* ----- Delivery progress (div na may inline style) = card ----- */
+  .track-order-left > div:not([class]) {
+    margin: 0 !important;
+    padding: 18px 16px !important;
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 4px 16px rgba(15, 31, 61, 0.06);
+  }
+
+  .track-order-left > div:not([class]) > div:last-child span {
+    font-size: 10px !important;
+    text-align: center;
+  }
+
+  /* ----- ETA ----- */
+  .eta-card {
+    margin: 0;
+    padding: 18px 16px;
+    gap: 14px;
+    background: linear-gradient(135deg, #eaf4ff, #dcecff);
+    border: 1px solid #c4dcfb;
+    border-radius: 22px;
+  }
+
+  .eta-icon {
+    flex-shrink: 0;
+  }
+
+  .eta-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .eta-card h4 {
+    font-size: 13px;
+  }
+
+  .eta-card h2 {
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  /* ----- Driver ----- */
+  .driver-card {
+    margin: 0;
+    padding: 18px 16px;
+    border-radius: 22px;
+    box-shadow: 0 4px 16px rgba(15, 31, 61, 0.06);
+  }
+
+  .driver-left {
+    width: 100%;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .driver-left > div:last-child {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .driver-avatar {
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+  }
+
+  .driver-avatar svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .driver-card h3 {
+    font-size: 17px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  .driver-card p {
+    margin: 4px 0 0;
+    font-size: 13px;
+  }
+
+  .message-btn {
+    width: 100%;
+    height: 46px;
+    margin-top: 12px;
+    padding: 0 16px;
+    justify-content: center;
+    font-size: 14px;
+    color: #fff;
+    background: linear-gradient(135deg, #2aa0ff, #0062d6);
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(13, 125, 242, 0.3);
+  }
+
+  /* ----- Pickup ----- */
+  .pickup-card {
+    margin: 0;
+    padding: 18px 16px;
+    border-radius: 22px;
+    box-shadow: 0 4px 16px rgba(15, 31, 61, 0.06);
+  }
+
+  /* ----- Map / right side ----- */
+  .track-order-right {
+    padding: 12px;
+    background: #fff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-radius: 24px;
+    box-shadow: 0 4px 16px rgba(15, 31, 61, 0.06);
+  }
+
+  .track-order-right .map-card {
+    height: 340px !important;
+    border-radius: 18px !important;
+  }
+
+  .leaflet-container,
+  .leaflet-map {
+    height: 340px;
+  }
+
+  /* Placeholder / error / delivered cards (may inline minHeight) */
+  .track-order-right .map-card-placeholder {
+    min-height: 220px !important;
+    padding: 24px 16px !important;
+    border-radius: 18px !important;
+  }
+
+  .delivery-card h3 {
+    font-size: 20px;
+  }
+
+  .delivery-card p {
+    font-size: 15px;
+  }
+}
+
+/* ---------- MALIIT NA PHONE (<= 360px) ---------- */
+@media (max-width: 360px) {
+  .track-order-page {
+    padding: 10px 10px 24px;
+  }
+
+  .track-header h2 {
+    font-size: 20px;
+  }
+
+  .order-id-section h3 {
+    font-size: 21px;
+  }
+
+  .eta-card h2 {
+    font-size: 18px;
+  }
+
+  .track-order-left > div:not([class]) > div:last-child span {
+    font-size: 9px !important;
+  }
+}

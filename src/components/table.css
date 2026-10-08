@@ -2,11 +2,14 @@
   background: white;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
-  overflow: hidden;
+  overflow-x: auto; /* 🔥 Ito ang magbibigay ng horizontal scrollbar kapag sumikip */
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
 }
 
 .main-table {
   width: 100%;
+  min-width: 1100px; /* 🔥 Sinisigurong hindi magsisiksikan ang mga column at lalabas ang scroll */
   border-collapse: collapse;
 }
 
@@ -15,15 +18,17 @@
   color: white;
   padding: 14px;
   font-size: 12px;
-  text-align: left;
+  text-align: center;
+  white-space: nowrap; /* 🔥 Pinipigilan pumutok pababa ang mga header */
 }
 
 .main-table td {
   padding: 14px;
   border-bottom: 1px solid #f1f5f9;
-  font-size: 14px;
-   position: relative;
+  font-size: 12px;
+  position: relative;
   z-index: 1;
+  white-space: nowrap; /* 🔥 Pinapanatiling nakalinya ang mga teksto para hindi magpatong-patong */
 }
 
 .main-table tr:hover {
@@ -35,6 +40,7 @@
   padding: 40px;
   color: #64748b;
 }
+
 .main-table button {
   position: relative;
   z-index: 10;

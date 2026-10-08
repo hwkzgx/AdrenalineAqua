@@ -1,10 +1,24 @@
 .customer-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 15px 50px;
   background: white;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  border-bottom: 1px solid #e8eff7;
+  box-shadow: 0 6px 20px rgba(2, 62, 138, 0.05);
+}
+
+/* Sa desktop, parang wala ang wrapper (same layout pa rin) */
+.navbar-menu {
+  display: contents;
+}
+
+/* logo sa loob ng drawer - mobile lang */
+.navbar-menu-head {
+  display: none;
 }
 
 /* LOGO */
@@ -12,84 +26,289 @@
   width: 70px;
   height: auto;
   object-fit: contain;
+  display: block;
 }
 
 /* NAV LINKS */
+/* desktop: pill-style links (kapareho ng sa mobile drawer) */
 .navbar-links {
   display: flex;
-  gap: 40px;
+  align-items: center;
+  gap: 6px;
 }
 
 .navbar-links a {
   text-decoration: none;
   color: #004a99;
+  font-size: 0.95rem;
   font-weight: 600;
-  transition: 0.3s;
-  position: relative;
-  padding-bottom: 5px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  transition: color 0.25s ease, background 0.25s ease;
 }
 
-/* hover */
 .navbar-links a:hover {
   color: #1e90ff;
-}
-
-/* underline animation */
-.navbar-links a::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 0%;
-  height: 2px;
-  background: #1e90ff;
-  transition: 0.3s;
-}
-
-.navbar-links a:hover::after {
-  width: 100%;
+  background: #f1f7fd;
 }
 
 /* ACTIVE PAGE */
 .navbar-links a.active {
   color: #1e90ff;
+  background: #eaf4ff;
 }
 
-.navbar-links a.active::after {
-  width: 100%;
-}
 /* BUTTONS */
 .navbar-buttons {
   display: flex;
   gap: 15px;
 }
 
-/* SIGN IN BUTTON */
-.signin-btn {
-  background: #1e90ff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 10px;
+.signin-btn,
+.register-btn {
+  padding: 10px 22px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  border-radius: 999px;
   cursor: pointer;
-  transition: 0.3s;
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.2s ease,
+    box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+/* SIGN IN: outline (soft) */
+.signin-btn {
+  color: #0077b6;
+  background: transparent;
+  border: 1.5px solid #bfdcf0;
 }
 
 .signin-btn:hover {
-  background: #0d6efd;
+  background: #eaf4ff;
+  border-color: #0077b6;
+  transform: translateY(-1px);
 }
 
-/* REGISTER BUTTON */
+/* REGISTER: solid gradient (main action) */
 .register-btn {
-  background: #2dbd2d;
   color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.3s;
+  background: linear-gradient(135deg, #0077b6, #00a8e8);
+  border: 1.5px solid transparent;
+  box-shadow: 0 6px 16px rgba(0, 119, 182, 0.28);
 }
 
 .register-btn:hover {
-  background: #1f9d1f;
+  transform: translateY(-1px);
+  filter: brightness(0.95);
+  box-shadow: 0 10px 22px rgba(2, 62, 138, 0.32);
+}
+
+.signin-btn:active,
+.register-btn:active {
+  transform: translateY(0);
+}
+
+.signin-btn:focus-visible,
+.register-btn:focus-visible {
+  outline: 2px solid #1e90ff;
+  outline-offset: 2px;
+}
+
+/* HAMBURGER (nakatago sa desktop) - SAME ANIMATION: nagiging X */
+.navbar-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  transition: background 0.2s ease;
+}
+
+.navbar-toggle:hover {
+  background: #eaf4ff;
+}
+
+.navbar-toggle:focus-visible {
+  outline: 2px solid #1e90ff;
+  outline-offset: 2px;
+}
+
+.navbar-toggle span {
+  display: block;
+  width: 22px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: #004a99;
+  transition: transform 0.3s ease, opacity 0.2s ease;
+}
+
+.navbar-toggle.open span:nth-child(1) {
+  transform: translateY(7.5px) rotate(45deg);
+}
+
+.navbar-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar-toggle.open span:nth-child(3) {
+  transform: translateY(-7.5px) rotate(-45deg);
+}
+
+.navbar-backdrop {
+  display: none;
+}
+
+/* ===== TABLET: konting liit ng spacing ===== */
+@media (max-width: 1100px) {
+  .customer-navbar {
+    padding: 15px 30px;
+  }
+
+  .navbar-links {
+    gap: 2px;
+  }
+
+  .navbar-links a {
+    padding: 9px 14px;
+  }
+}
+
+/* ===== MOBILE: side drawer ===== */
+@media (max-width: 900px) {
+  .customer-navbar {
+    height: 68px;
+    padding: 0 20px;
+  }
+
+  .customer-navbar-logo img {
+    width: 48px;
+  }
+
+  /* laging nasa ibabaw ng drawer para siya ang X */
+  .navbar-toggle {
+    display: flex;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* DRAWER: full height, lumalabas mula sa kanan */
+  .navbar-menu {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    width: min(250px, 100%);
+    background: white;
+    box-shadow: -16px 0 40px rgba(15, 23, 42, 0.16);
+
+    /* HIDDEN by default */
+    transform: translateX(100%);
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.35s;
+  }
+
+  .navbar-menu.open {
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  /* taas ng drawer: logo (yung X ay galing sa hamburger button) */
+  .navbar-menu-head {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    height: 68px;
+    padding: 0 20px;
+    border-bottom: 1px solid #eef3f9;
+  }
+
+  .navbar-menu-head img {
+    width: 48px;
+    height: auto;
+    object-fit: contain;
+    display: block;
+  }
+
+  /* links */
+  .navbar-links {
+    flex: 1;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .navbar-links a {
+    padding: 14px 20px;
+    font-size: 1rem;
+    border-radius: 16px;
+  }
+
+  .navbar-links a::after {
+    display: none;
+  }
+
+  .navbar-links a:hover,
+  .navbar-links a.active {
+    background: #eaf4ff;
+    color: #1e90ff;
+  }
+
+  /* buttons nasa ilalim ng drawer */
+  .navbar-buttons {
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px 20px calc(18px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid #eef3f9;
+  }
+
+  .signin-btn,
+  .register-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 0.95rem;
+    border-radius: 999px;
+  }
+
+  /* blur sa likod, pindutin para isara */
+  .navbar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(15, 23, 42, 0.3);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    animation: backdropIn 0.3s ease;
+  }
+}
+
+@keyframes backdropIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar-menu,
+  .navbar-toggle span,
+  .navbar-backdrop {
+    transition: none;
+    animation: none;
+  }
 }

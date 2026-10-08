@@ -7,7 +7,6 @@ import {
   Home,
   Truck,
   History,
-  User,
   Package,
   CheckCircle2,
   Wallet,
@@ -30,14 +29,19 @@ export default function RiderHome() {
   });
 
   useEffect(() => {
-    // Kunin ang nakelogin na rider mula sa localStorage
-    const loggedInRider = localStorage.getItem("userName") || "Mark";
-    setRiderName(loggedInRider);
+    // Kunin ang nakalogin na rider mula sa localStorage ("user" object)
+    const user = JSON.parse(localStorage.getItem("user") || "null");
 
-    fetchDeliveries(loggedInRider);
+    setRiderName(user?.name || "Rider");
+    fetchDeliveries(user);
   }, []);
 
-  const fetchDeliveries = async (currentRider) => {
+  const fetchDeliveries = async (currentUser) => {
+    if (!currentUser) {
+      setLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase
       .from("orders")
       .select(`
@@ -49,7 +53,8 @@ export default function RiderHome() {
         delivery_schedule(
           delivery_code,
           delivery_status,
-          assigned_rider
+          assigned_rider,
+          assigned_rider_id
         )
       `)
       .eq("order_type", "Delivery")
@@ -61,10 +66,22 @@ export default function RiderHome() {
       return;
     }
 
-    // 1. Salain muna ang data para sa nakelogin na rider lang
-    const riderOrders = data.filter((item) => {
-      const assignedRider = item.delivery_schedule?.[0]?.assigned_rider;
-      return assignedRider && assignedRider.toLowerCase() === currentRider.toLowerCase();
+    const myName = (currentUser.name || "").trim().toLowerCase();
+    const myId = currentUser.users_id;
+
+    // 1. Salain para sa nakalogin na rider LANG
+    const riderOrders = (data || []).filter((item) => {
+      const d = item.delivery_schedule?.[0];
+      if (!d) return false;
+
+      // May assigned_rider_id? ID lang ang basehan (hindi na titingin sa pangalan)
+      if (d.assigned_rider_id != null) {
+        return myId != null && String(d.assigned_rider_id) === String(myId);
+      }
+
+      // Walang ID (lumang records): exact na pangalan lang ang tatanggapin
+      const assigned = (d.assigned_rider || "").trim().toLowerCase();
+      return assigned !== "" && assigned === myName;
     });
 
     // 2. I-format ang mga nakasalang orders
@@ -74,23 +91,26 @@ export default function RiderHome() {
       customer: item.full_name,
       address: item.delivery_address,
       date: item.delivery_date,
-      // Ginawa nating "Pending" kung sakaling naka-assign na pero wala pang status, o sundin ang status sa DB
       status: item.delivery_schedule?.[0]?.delivery_status || "Pending",
     }));
 
     setDeliveries(formatted);
 
-    // 3. Bilangin ang mga estatistika base sa tamang status (Pending, Out for Delivery/In Progress, Completed)
+    // 3. Bilangin ang mga estatistika base sa status
     const assigned = formatted.filter(
       (d) => d.status.toLowerCase() === "pending"
     ).length;
 
     const progress = formatted.filter(
-      (d) => d.status.toLowerCase() === "out for delivery" || d.status.toLowerCase() === "in progress"
+      (d) =>
+        d.status.toLowerCase() === "out for delivery" ||
+        d.status.toLowerCase() === "in progress"
     ).length;
 
     const completed = formatted.filter(
-      (d) => d.status.toLowerCase() === "completed" || d.status.toLowerCase() === "delivered"
+      (d) =>
+        d.status.toLowerCase() === "completed" ||
+        d.status.toLowerCase() === "delivered"
     ).length;
 
     setStats({

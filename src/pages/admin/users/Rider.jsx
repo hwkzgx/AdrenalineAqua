@@ -1,20 +1,21 @@
-import { useEffect, useState } from "react";
-import { CheckCircle, XCircle } from "lucide-react";
-import "../../../styles/user-management.css";
-import Table from "../../../components/Table";
-import "./staff.css";
-import { supabase } from "../../../supabase";
-
+import { useEffect, useRef, useState } from "react";
 import {
-  Eye,
+  CheckCircle,
+  XCircle,
+  Plus,
   Pencil,
   Trash2,
   X,
+  AlertTriangle,
+  Search,
 } from "lucide-react";
+import "../../../styles/user-management.css";
+import "./staff.css";
+import Table from "../../../components/Table";
+import { supabase } from "../../../supabase";
 
 function Rider() {
-
-  const [rider, setRider] = useState([]);
+  const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
 
   // MODALS
@@ -22,14 +23,9 @@ function Rider() {
   const [showDelete, setShowDelete] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [passwordError, setPasswordError] = useState("");
-  const [toast, setToast] = useState({
-    message: "",
-    type: "",
-    show: false,
-  });
 
-  // SELECTED RIDER
-  const [selectedRider, setSelectedRider] = useState(null);
+  // SELECTED
+  const [selected, setSelected] = useState(null);
 
   // EDIT FORM DATA
   const [editData, setEditData] = useState({
@@ -40,33 +36,39 @@ function Rider() {
   });
 
   // ADD FORM DATA
-  const [addData, setAddData] = useState({
+  const emptyAddData = {
     name: "",
     email: "",
     password: "",
     address: "",
     contact_number: "",
+  };
+  const [addData, setAddData] = useState(emptyAddData);
+
+  // ===============================
+  // TOAST
+  // ===============================
+  const [toast, setToast] = useState({
+    message: "",
+    type: "success",
+    show: false,
   });
+  const toastTimer = useRef(null);
 
   const showToast = (message, type = "success") => {
-    setToast({
-      message,
-      type,
-      show: true,
-    });
-
-    setTimeout(() => {
-      setToast({
-        message: "",
-        type: "",
-        show: false,
-      });
-    }, 2500);
+    clearTimeout(toastTimer.current);
+    setToast({ message, type, show: true });
+    toastTimer.current = setTimeout(() => {
+      setToast({ message: "", type: "success", show: false });
+    }, 3000);
   };
 
-  // FETCH RIDER
   useEffect(() => {
-    fetchRider();
+    return () => clearTimeout(toastTimer.current);
+  }, []);
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
   const validatePassword = (pass) => {
@@ -83,7 +85,7 @@ function Rider() {
     return "";
   };
 
-  const fetchRider = async () => {
+  const fetchData = async () => {
     const { data, error } = await supabase
       .from("users")
       .select("*")
@@ -91,21 +93,32 @@ function Rider() {
 
     if (error) {
       console.log(error.message);
+      showToast("Failed to load riders: " + error.message, "error");
     } else {
-      setRider(data);
+      setItems(data || []);
     }
   };
 
   // SEARCH FILTER
-  const filtered = rider.filter((r) => {
+  const filtered = items.filter((i) => {
     return (
-      r.name?.toLowerCase().includes(search.toLowerCase()) ||
-      r.user_id?.toLowerCase().includes(search.toLowerCase())
+      i.name?.toLowerCase().includes(search.toLowerCase()) ||
+      i.user_id?.toLowerCase().includes(search.toLowerCase())
     );
   });
 
-  // SAVE EDIT
+  const closeAdd = () => {
+    setShowAdd(false);
+    setPasswordError("");
+  };
+
+  // UPDATE
   const handleSaveChanges = async () => {
+    if (!editData.name.trim() || !editData.email.trim()) {
+      showToast("Name and email are required.", "error");
+      return;
+    }
+
     const { error } = await supabase
       .from("users")
       .update({
@@ -114,44 +127,50 @@ function Rider() {
         address: editData.address,
         contact_number: editData.contact_number,
       })
-      .eq("users_id", selectedRider.users_id);
+      .eq("users_id", selected.users_id);
 
     if (error) {
       showToast(error.message, "error");
     } else {
       showToast("Rider updated successfully!", "success");
       setShowEdit(false);
-      fetchRider();
+      fetchData();
     }
   };
 
-  // DELETE RIDER
+  // DELETE
   const handleDelete = async () => {
     const { error } = await supabase
       .from("users")
       .delete()
-      .eq("users_id", selectedRider.users_id);
+      .eq("users_id", selected.users_id);
 
     if (error) {
       showToast(error.message, "error");
     } else {
       showToast("Rider deleted successfully!", "success");
       setShowDelete(false);
-      fetchRider();
+      fetchData();
     }
   };
 
-  // ADD RIDER
-  const handleAddRider = async () => {
+  // ADD
+  const handleAdd = async () => {
+    if (!addData.name.trim() || !addData.email.trim()) {
+      showToast("Name and email are required.", "error");
+      return;
+    }
+
     const passError = validatePassword(addData.password);
 
     if (passError) {
       setPasswordError(passError);
+      showToast(passError, "error");
       return;
     }
 
-    // GET LAST RIDER ID
-    const { data: lastRider } = await supabase
+    // GET LAST ID
+    const { data: lastItem } = await supabase
       .from("users")
       .select("user_id")
       .eq("role", "rider")
@@ -161,52 +180,56 @@ function Rider() {
 
     let nextNumber = 1;
 
-    // IF MAY EXISTING RIDER
-    if (lastRider?.user_id) {
-      // RDR2026001 -> 001
-      const numberPart = lastRider.user_id.slice(-3);
+    if (lastItem?.user_id) {
+      const numberPart = lastItem.user_id.slice(-3);
       nextNumber = parseInt(numberPart) + 1;
     }
 
-    // GENERATE USER ID
     const generatedUserId = `RDR2026${String(nextNumber).padStart(3, "0")}`;
 
-    // INSERT
-    const { error } = await supabase
-      .from("users")
-      .insert([
-        {
-          user_id: generatedUserId,
-          name: addData.name,
-          email: addData.email,
-          password: addData.password,
-          address: addData.address,
-          contact_number: addData.contact_number,
-          role: "rider",
-        },
-      ]);
+   const { data: authData, error: authError } =
+  await supabase.auth.signUp({
+    email: addData.email,
+    password: addData.password,
+    options: {
+      emailRedirectTo: `${window.location.origin}/rider/riderlogin`,
+    },
+  });
+
+if (authError) {
+  showToast(authError.message, "error");
+  return;
+}
+
+    const { error } = await supabase.from("users").insert([
+      {
+        user_id: generatedUserId,
+        name: addData.name,
+        email: addData.email,
+        password: addData.password,
+        address: addData.address,
+        contact_number: addData.contact_number,
+        role: "rider",
+      },
+    ]);
 
     if (error) {
       showToast(error.message, "error");
     } else {
       showToast("Rider added successfully!", "success");
-      setShowAdd(false);
-
-      setAddData({
-        name: "",
-        email: "",
-        password: "",
-        address: "",
-        contact_number: "",
-      });
-
-      fetchRider();
+      closeAdd();
+      setAddData(emptyAddData);
+      fetchData();
     }
   };
 
   // TABLE COLUMNS
   const columns = [
-    { key: "user_id", label: "Rider ID" },
+    {
+      key: "user_id",
+      label: "Rider ID",
+      render: (row) => <span className="um-id-chip">{row.user_id}</span>,
+    },
     { key: "name", label: "Name" },
     { key: "email", label: "Email" },
     { key: "address", label: "Address" },
@@ -216,12 +239,12 @@ function Rider() {
       key: "actions",
       label: "Actions",
       render: (row) => (
-        <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
-
-          {/* EDIT */}
+        <div className="um-actions">
           <button
+            className="um-icon-btn edit"
+            title="Edit"
             onClick={() => {
-              setSelectedRider(row);
+              setSelected(row);
               setEditData({
                 name: row.name || "",
                 email: row.email || "",
@@ -230,185 +253,172 @@ function Rider() {
               });
               setShowEdit(true);
             }}
-            style={{
-              padding: "6px 10px",
-              border: "none",
-              borderRadius: "6px",
-              backgroundColor: "#f59e0b",
-              color: "white",
-              cursor: "pointer",
-              width: "40px",
-            }}
           >
-            <Pencil size={18} />
+            <Pencil size={16} />
           </button>
 
-          {/* DELETE */}
           <button
+            className="um-icon-btn delete"
+            title="Delete"
             onClick={() => {
-              setSelectedRider(row);
+              setSelected(row);
               setShowDelete(true);
             }}
-            style={{
-              padding: "6px 10px",
-              border: "none",
-              borderRadius: "6px",
-              backgroundColor: "#ef4444",
-              color: "white",
-              cursor: "pointer",
-              width: "40px",
-            }}
           >
-            <Trash2 size={18} />
+            <Trash2 size={16} />
           </button>
-
         </div>
       ),
     },
   ];
 
   return (
-    <div className="page">
-      
+    <div className="page um-page">
+      {/* TOAST */}
       {toast.show && (
-        <div className={`toast ${toast.type} show`}>
-          <div className="toast-icon">
+        <div className={`um-toast ${toast.type}`}>
+          <div className="um-toast-icon">
             {toast.type === "success" ? (
-              <CheckCircle size={18} />
+              <CheckCircle size={20} />
             ) : (
-              <XCircle size={18} />
+              <XCircle size={20} />
             )}
           </div>
-          <div className="toast-text">
-            {toast.message}
-          </div>
+          <div className="um-toast-text">{toast.message}</div>
         </div>
       )}
 
-      <div className="page-header">
-        <h1>Riders</h1>
+      <div className="um-page-header">
+        <div>
+          <h1>Riders</h1>
+          <p>Manage rider accounts and contact details.</p>
+        </div>
       </div>
 
-      <div className="controls-row">
-        <div className="controls-left"></div>
-        <div className="controls-right">
+      <div className="um-toolbar">
+        <div className="um-search">
+          <Search size={16} />
           <input
             placeholder="Search rider..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <button className="rideradd-btn" onClick={() => setShowAdd(true)}>
-            + Add Rider
+        </div>
+
+        <div className="um-toolbar-right">
+          <span className="um-count">
+            {filtered.length} {filtered.length === 1 ? "record" : "records"}
+          </span>
+          <button className="um-add-btn" onClick={() => setShowAdd(true)}>
+            <Plus size={16} /> Add Rider
           </button>
         </div>
       </div>
 
-      <Table
-        columns={columns}
-        data={filtered}
-        emptyMessage="No riders found."
-      />
+      <div className="um-table-card">
+        <Table
+          columns={columns}
+          data={filtered}
+          emptyMessage="No riders found."
+        />
+      </div>
 
-      {/* EDIT MODAL */}
+      {/* ========================================== */}
+      {/* EDIT MODAL                                 */}
+      {/* ========================================== */}
       {showEdit && (
-        <div className="modal-overlay">
-          <div className="edit-modal">
-            <span className="close-btn" onClick={() => setShowEdit(false)}>✕</span>
-            <h2>Profile</h2>
-
-            <div className="form-group">
-              <label>Name</label>
-              <input
-                value={editData.name}
-                onChange={(e) =>
-                  setEditData({ ...editData, name: e.target.value })
-                }
-              />
+        <div className="um-modal-overlay" onClick={() => setShowEdit(false)}>
+          <div className="um-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="um-modal-header">
+              <div className="um-modal-icon primary">
+                <Pencil size={20} />
+              </div>
+              <div className="um-modal-titles">
+                <h2>Edit Rider</h2>
+                <p>{selected?.user_id}</p>
+              </div>
+              <button className="um-modal-close" onClick={() => setShowEdit(false)}>
+                <X size={18} />
+              </button>
             </div>
 
-            <div className="form-group">
-              <label>Email</label>
-              <input
-                value={editData.email}
-                onChange={(e) =>
-                  setEditData({ ...editData, email: e.target.value })
-                }
-              />
+            <div className="um-modal-body">
+              <div className="um-field">
+                <label>Name</label>
+                <input
+                  value={editData.name}
+                  onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                />
+              </div>
+
+              <div className="um-field">
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={editData.email}
+                  onChange={(e) => setEditData({ ...editData, email: e.target.value })}
+                />
+              </div>
+
+              <div className="um-field">
+                <label>Address</label>
+                <input
+                  value={editData.address}
+                  onChange={(e) => setEditData({ ...editData, address: e.target.value })}
+                />
+              </div>
+
+              <div className="um-field">
+                <label>Contact No.</label>
+                <input
+                  value={editData.contact_number}
+                  onChange={(e) => setEditData({ ...editData, contact_number: e.target.value })}
+                />
+              </div>
             </div>
 
-            <div className="form-group">
-              <label>Address</label>
-              <input
-                value={editData.address}
-                onChange={(e) =>
-                  setEditData({ ...editData, address: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Contact No.</label>
-              <input
-                value={editData.contact_number}
-                onChange={(e) =>
-                  setEditData({ ...editData, contact_number: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="modal-actions">
-              <button className="Stfcancel-btn" onClick={() => setShowEdit(false)}>
+            <div className="um-modal-footer">
+              <button className="um-btn ghost" onClick={() => setShowEdit(false)}>
                 Cancel
               </button>
-              <button className="Stfsave-btn" onClick={handleSaveChanges}>
-                Save
+              <button className="um-btn primary" onClick={handleSaveChanges}>
+                Save Changes
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* DELETE MODAL */}
+      {/* ========================================== */}
+      {/* DELETE MODAL                               */}
+      {/* ========================================== */}
       {showDelete && (
-        <div className="modal-overlay">
-          <div className="delete-modal">
-            <span
-              className="close-btn"
-              onClick={() => setShowDelete(false)}
-            >
-              ✕
-            </span>
-            <h1>Delete Rider</h1>
-            <p className="delete-subtitle">
-              Are you sure you want to delete this rider record?
-            </p>
-
-            <div className="warning-box">
-              <h3>⚠ Warning</h3>
-              <p>
-                 This will permanently delete the rider record and all related data. This action cannot be undone.
+        <div className="um-modal-overlay" onClick={() => setShowDelete(false)}>
+          <div className="um-modal sm" onClick={(e) => e.stopPropagation()}>
+            <div className="um-delete-body">
+              <div className="um-delete-icon">
+                <AlertTriangle size={28} />
+              </div>
+              <h2>Delete Rider</h2>
+              <p className="um-delete-text">
+                Are you sure you want to delete this rider record? This will permanently
+                delete the record and all related data. This action cannot be undone.
               </p>
-              <hr />
-              <div className="delete-info">
-                <p><b>Rider ID:</b> {selectedRider?.user_id}</p>
-                <p><b>Name:</b> {selectedRider?.name}</p>
-                <p><b>Email:</b> {selectedRider?.email}</p>
-                <p><b>Address:</b> {selectedRider?.address}</p>
-                <p><b>Contact:</b> {selectedRider?.contact_number}</p>
+
+              <div className="um-details-box">
+                <div className="um-detail-row"><span>Rider ID</span><b>{selected?.user_id}</b></div>
+                <div className="um-detail-row"><span>Name</span><b>{selected?.name}</b></div>
+                <div className="um-detail-row"><span>Email</span><b>{selected?.email}</b></div>
+                <div className="um-detail-row"><span>Address</span><b>{selected?.address || "-"}</b></div>
+                <div className="um-detail-row"><span>Contact</span><b>{selected?.contact_number || "-"}</b></div>
               </div>
             </div>
 
-            <div className="modal-actions">
-              <button
-                className="cancel-dark"
-                onClick={() => setShowDelete(false)}
-              >
+            <div className="um-modal-footer split">
+              <button className="um-btn ghost" onClick={() => setShowDelete(false)}>
                 No, Cancel
               </button>
-              <button
-                className="delete-btn"
-                onClick={handleDelete}
-              >
+              <button className="um-btn danger" onClick={handleDelete}>
                 Delete Rider
               </button>
             </div>
@@ -416,88 +426,86 @@ function Rider() {
         </div>
       )}
 
-      {/* ADD MODAL */}
+      {/* ========================================== */}
+      {/* ADD MODAL                                  */}
+      {/* ========================================== */}
       {showAdd && (
-        <div className="modal-overlay">
-          <div className="edit-modal">
-            <span className="close-btn" onClick={() => setShowAdd(false)}>✕</span>
-            <h2>Add Rider</h2>
-
-            <div className="form-group">
-              <label>Name</label>
-              <input
-                value={addData.name}
-                onChange={(e) =>
-                  setAddData({ ...addData, name: e.target.value })
-                }
-              />
+        <div className="um-modal-overlay" onClick={closeAdd}>
+          <div className="um-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="um-modal-header">
+              <div className="um-modal-icon primary">
+                <Plus size={22} />
+              </div>
+              <div className="um-modal-titles">
+                <h2>Add Rider</h2>
+                <p>Create a new rider account.</p>
+              </div>
+              <button className="um-modal-close" onClick={closeAdd}>
+                <X size={18} />
+              </button>
             </div>
 
-            <div className="form-group">
-              <label>Email</label>
-              <input
-                value={addData.email}
-                onChange={(e) =>
-                  setAddData({ ...addData, email: e.target.value })
-                }
-              />
-            </div>
+            <div className="um-modal-body">
+              <div className="um-field">
+                <label>Name</label>
+                <input
+                  value={addData.name}
+                  onChange={(e) => setAddData({ ...addData, name: e.target.value })}
+                />
+              </div>
 
-            <div className="form-group">
-              <label>Password</label>
-              <div className="input-wrapper">
+              <div className="um-field">
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={addData.email}
+                  onChange={(e) => setAddData({ ...addData, email: e.target.value })}
+                />
+              </div>
+
+              <div className="um-field">
+                <label>Password</label>
                 <input
                   type="password"
+                  className={passwordError ? "invalid" : ""}
                   value={addData.password}
                   onChange={(e) => {
                     const value = e.target.value;
-                    setAddData({
-                      ...addData,
-                      password: value
-                    });
+                    setAddData({ ...addData, password: value });
                     setPasswordError(validatePassword(value));
                   }}
                 />
-                {passwordError && (
-                  <p className="error-message">
-                    {passwordError}
-                  </p>
-                )}
+                {passwordError && <span className="um-error">{passwordError}</span>}
+              </div>
+
+              <div className="um-field">
+                <label>Address</label>
+                <input
+                  value={addData.address}
+                  onChange={(e) => setAddData({ ...addData, address: e.target.value })}
+                />
+              </div>
+
+              <div className="um-field">
+                <label>Contact No.</label>
+                <input
+                  value={addData.contact_number}
+                  onChange={(e) => setAddData({ ...addData, contact_number: e.target.value })}
+                />
               </div>
             </div>
 
-            <div className="form-group">
-              <label>Address</label>
-              <input
-                value={addData.address}
-                onChange={(e) =>
-                  setAddData({ ...addData, address: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Contact No.</label>
-              <input
-                value={addData.contact_number}
-                onChange={(e) =>
-                  setAddData({ ...addData, contact_number: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="modal-actions">
-              <button className="Stfcancel-btn" onClick={() => setShowAdd(false)}>
+            <div className="um-modal-footer">
+              <button className="um-btn ghost" onClick={closeAdd}>
                 Cancel
               </button>
-              <button className="Stfsave-btn" onClick={handleAddRider}>
+              <button className="um-btn primary" onClick={handleAdd}>
                 Add Rider
               </button>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }

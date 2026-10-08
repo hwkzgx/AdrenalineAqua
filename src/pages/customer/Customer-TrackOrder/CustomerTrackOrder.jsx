@@ -4,6 +4,7 @@ import { Truck, MapPin, User, MessageCircle, Clock3, Search, PackageCheck, Alert
 import { useState, useEffect } from "react";
 import LeafletDeliveryMap from "./LeafletDeliveryMap";
 import { supabase } from "../../../supabase";
+import Chat from "../../../components/Chat";
 
 function calculateETA(lat1, lon1, lat2, lon2) {
   if (!lat1 || !lon1 || !lat2 || !lon2) return null;
@@ -37,6 +38,9 @@ export default function CustomerTrackOrder() {
   const [mapCoordinates, setMapCoordinates] = useState([14.8311, 120.7358]);
   const [isRiderMoving, setIsRiderMoving] = useState(false);
 
+  const [riderId, setRiderId] = useState(null);
+  const [showChat, setShowChat] = useState(false);
+
   const [riderPosition, setRiderPosition] = useState(null);
   const [destinationPosition, setDestinationPosition] = useState(null);
 
@@ -47,6 +51,7 @@ export default function CustomerTrackOrder() {
       .from("delivery_schedule")
       .select(`
         assigned_rider,
+        assigned_rider_id,
         delivery_status,
         rider_lat,
         rider_lng
@@ -63,6 +68,7 @@ export default function CustomerTrackOrder() {
     } else {
       setRiderName("No driver assigned yet");
     }
+    setRiderId(schedData?.assigned_rider_id || null);
 
     setDeliveryStatus(schedData?.delivery_status || orderData.status);
     
@@ -112,7 +118,15 @@ export default function CustomerTrackOrder() {
     setOrder(orderData);
     await fetchOrderDetails(orderData);
 
-    if (orderData.delivery_address) {
+    if (orderData.destination_lat && orderData.destination_lng) {
+      const destination = [
+        Number(orderData.destination_lat),
+        Number(orderData.destination_lng),
+      ];
+
+      setDestinationPosition(destination);
+      setMapCoordinates(destination);
+    } else if (orderData.delivery_address) {
       setMapQuery(orderData.delivery_address);
     } else {
       setMapQuery(hagonoyDefaultCenter);
@@ -318,7 +332,15 @@ export default function CustomerTrackOrder() {
                       <h3>{riderName}</h3>
                       <p>Delivery Driver</p>
 
-                      <button className="message-btn" disabled={!activeDriver} style={{ opacity: activeDriver ? 1 : 0.6, cursor: activeDriver ? "pointer" : "not-allowed" }}>
+                      <button
+                        className="message-btn"
+                        disabled={!activeDriver || !riderId}
+                        onClick={() => setShowChat(true)}
+                        style={{
+                          opacity: activeDriver && riderId ? 1 : 0.6,
+                          cursor: activeDriver && riderId ? "pointer" : "not-allowed"
+                        }}
+                      >
                         <MessageCircle size={16} /> Message
                       </button>
                     </div>
@@ -431,6 +453,42 @@ export default function CustomerTrackOrder() {
 
         </div>
       </div>
+      {showChat && order && riderId && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              padding: "20px",
+              borderRadius: "16px",
+              width: "500px",
+              maxWidth: "90%",
+              position: "relative"
+            }}
+          >
+            <Chat
+              orderId={order.order_id}
+              currentUserId={
+                JSON.parse(localStorage.getItem("user"))?.users_id ||
+                JSON.parse(localStorage.getItem("user"))?.id
+              }
+              otherUserId={riderId}
+              otherUserName={riderName}
+              otherUserRole="Delivery Rider"
+              onClose={() => setShowChat(false)}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }

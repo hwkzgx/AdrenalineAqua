@@ -1,26 +1,33 @@
-import { useEffect, useState } from "react";
-import "../../../styles/user-management.css";
-import Table from "../../../components/Table";
-import "./staff-customer.css";
-import { supabase } from "../../../supabase";
-
+import { useEffect, useRef, useState } from "react";
 import {
+  CheckCircle,
+  XCircle,
   Eye,
+  Plus,
   Pencil,
   Trash2,
   X,
+  AlertTriangle,
+  Search,
 } from "lucide-react";
+import "../../../styles/user-management.css";
+import "./staff-customer.css";
+import Table from "../../../components/Table";
+import { supabase } from "../../../supabase";
+
+const ID_PLACEHOLDER = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
 
 function StaffCustomers() {
-
   const [customers, setCustomers] = useState([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
   // MODALS
+  const [showView, setShowView] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
 
   // SELECTED
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -35,22 +42,57 @@ function StaffCustomers() {
   });
 
   // ADD DATA
-  const [addData, setAddData] = useState({
+  const emptyAddData = {
     name: "",
     email: "",
     password: "",
     address: "",
     contact_number: "",
     status: "Pending",
-  });
+  };
+  const [addData, setAddData] = useState(emptyAddData);
 
-  // FETCH CUSTOMERS
+  // ===============================
+  // TOAST
+  // ===============================
+  const [toast, setToast] = useState({
+    message: "",
+    type: "success",
+    show: false,
+  });
+  const toastTimer = useRef(null);
+
+  const showToast = (message, type = "success") => {
+    clearTimeout(toastTimer.current);
+    setToast({ message, type, show: true });
+    toastTimer.current = setTimeout(() => {
+      setToast({ message: "", type: "success", show: false });
+    }, 3000);
+  };
+
+  useEffect(() => {
+    return () => clearTimeout(toastTimer.current);
+  }, []);
+
   useEffect(() => {
     fetchCustomers();
   }, []);
 
-  const fetchCustomers = async () => {
+  const validatePassword = (pass) => {
+    const minLength = pass.length >= 8;
+    const hasUpper = /[A-Z]/.test(pass);
+    const hasLower = /[a-z]/.test(pass);
+    const hasNumber = /[0-9]/.test(pass);
 
+    if (!minLength) return "Password must be at least 8 characters.";
+    if (!hasUpper) return "Must contain 1 uppercase letter.";
+    if (!hasLower) return "Must contain 1 lowercase letter.";
+    if (!hasNumber) return "Must contain 1 number.";
+
+    return "";
+  };
+
+  const fetchCustomers = async () => {
     const { data, error } = await supabase
       .from("users")
       .select("*")
@@ -58,26 +100,33 @@ function StaffCustomers() {
 
     if (error) {
       console.log(error.message);
+      showToast("Failed to load customers: " + error.message, "error");
     } else {
-      setCustomers(data);
+      setCustomers(data || []);
     }
   };
 
-  // FILTER
   const filtered = customers.filter((c) => {
-
     const matchSearch =
       c.name?.toLowerCase().includes(search.toLowerCase()) ||
       c.user_id?.toLowerCase().includes(search.toLowerCase());
 
-    const matchStatus =
-      statusFilter === "All" || c.status === statusFilter;
+    const matchStatus = statusFilter === "All" || c.status === statusFilter;
 
     return matchSearch && matchStatus;
   });
 
+  const closeAdd = () => {
+    setShowAdd(false);
+    setPasswordError("");
+  };
+
   // UPDATE
   const handleSaveChanges = async () => {
+    if (!editData.name.trim() || !editData.email.trim()) {
+      showToast("Name and email are required.", "error");
+      return;
+    }
 
     const { error } = await supabase
       .from("users")
@@ -91,12 +140,9 @@ function StaffCustomers() {
       .eq("users_id", selectedCustomer.users_id);
 
     if (error) {
-
-      alert(error.message);
-
+      showToast(error.message, "error");
     } else {
-
-      alert("Updated successfully!");
+      showToast("Customer updated successfully!", "success");
       setShowEdit(false);
       fetchCustomers();
     }
@@ -104,19 +150,15 @@ function StaffCustomers() {
 
   // DELETE
   const handleDelete = async () => {
-
     const { error } = await supabase
       .from("users")
       .delete()
       .eq("users_id", selectedCustomer.users_id);
 
     if (error) {
-
-      alert(error.message);
-
+      showToast(error.message, "error");
     } else {
-
-      alert("Deleted successfully!");
+      showToast("Customer deleted successfully!", "success");
       setShowDelete(false);
       fetchCustomers();
     }
@@ -124,6 +166,18 @@ function StaffCustomers() {
 
   // ADD CUSTOMER
   const handleAddCustomer = async () => {
+    if (!addData.name.trim() || !addData.email.trim()) {
+      showToast("Name and email are required.", "error");
+      return;
+    }
+
+    const passError = validatePassword(addData.password);
+
+    if (passError) {
+      setPasswordError(passError);
+      showToast(passError, "error");
+      return;
+    }
 
     const { data: lastCustomer } = await supabase
       .from("users")
@@ -136,56 +190,37 @@ function StaffCustomers() {
     let nextNumber = 1;
 
     if (lastCustomer?.user_id) {
-
       const numberPart = lastCustomer.user_id.slice(-3);
-
       nextNumber = parseInt(numberPart) + 1;
     }
 
-    const generatedUserId =
-      `CUS2026${String(nextNumber).padStart(3, "0")}`;
+    const generatedUserId = `CUS2026${String(nextNumber).padStart(3, "0")}`;
 
-    const { error } = await supabase
-      .from("users")
-      .insert([
-        {
-          user_id: generatedUserId,
-          name: addData.name,
-          email: addData.email,
-          password: addData.password,
-          address: addData.address,
-          contact_number: addData.contact_number,
-          role: "customer",
-          status: "Pending",
-        },
-      ]);
+    const { error } = await supabase.from("users").insert([
+      {
+        user_id: generatedUserId,
+        name: addData.name,
+        email: addData.email,
+        password: addData.password,
+        address: addData.address,
+        contact_number: addData.contact_number,
+        role: "customer",
+        status: "Pending",
+      },
+    ]);
 
     if (error) {
-
-      alert(error.message);
-
+      showToast(error.message, "error");
     } else {
-
-      alert("Customer added successfully!");
-
-      setShowAdd(false);
-
-      setAddData({
-        name: "",
-        email: "",
-        password: "",
-        address: "",
-        contact_number: "",
-        status: "Pending",
-      });
-
+      showToast("Customer added successfully!", "success");
+      closeAdd();
+      setAddData(emptyAddData);
       fetchCustomers();
     }
   };
 
-  // UPDATE STATUS
+  // VERIFY / REJECT
   const handleUpdateStatus = async (status) => {
-
     if (!selectedCustomer) return;
 
     const { error } = await supabase
@@ -194,18 +229,29 @@ function StaffCustomers() {
       .eq("users_id", selectedCustomer.users_id);
 
     if (error) {
-
-      alert(error.message);
+      showToast(error.message, "error");
       return;
     }
 
+    showToast(
+      status === "Verified"
+        ? "Customer approved successfully!"
+        : "Customer rejected successfully!",
+      "success"
+    );
     setShowView(false);
     fetchCustomers();
   };
 
-  // TABLE COLUMNS
+  const statusLabel = (status) =>
+    status === "Unverified" ? "Rejected" : status || "Pending";
+
   const columns = [
-    { key: "user_id", label: "Customer ID" },
+    {
+      key: "user_id",
+      label: "Customer ID",
+      render: (row) => <span className="um-id-chip">{row.user_id}</span>,
+    },
     { key: "name", label: "Name" },
     { key: "email", label: "Email" },
     { key: "address", label: "Address" },
@@ -215,8 +261,8 @@ function StaffCustomers() {
       key: "status",
       label: "Status",
       render: (row) => (
-        <span className={`status ${row.status?.toLowerCase()}`}>
-          {row.status}
+        <span className={`um-status ${(row.status || "pending").toLowerCase()}`}>
+          {statusLabel(row.status)}
         </span>
       ),
     },
@@ -224,24 +270,24 @@ function StaffCustomers() {
     {
       key: "actions",
       label: "Actions",
-
       render: (row) => (
-
-        <div
-          style={{
-            display: "flex",
-            gap: "6px",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          {/* EDIT */}
+        <div className="um-actions">
           <button
-            type="button"
+            className="um-icon-btn view"
+            title="View / Verify"
             onClick={() => {
-
               setSelectedCustomer(row);
+              setShowView(true);
+            }}
+          >
+            <Eye size={16} />
+          </button>
 
+          <button
+            className="um-icon-btn edit"
+            title="Edit"
+            onClick={() => {
+              setSelectedCustomer(row);
               setEditData({
                 name: row.name || "",
                 email: row.email || "",
@@ -249,381 +295,402 @@ function StaffCustomers() {
                 contact_number: row.contact_number || "",
                 status: row.status || "Pending",
               });
-
               setShowEdit(true);
             }}
-            style={{
-              padding: "4px 8px",
-              fontSize: "12px",
-              border: "none",
-              borderRadius: "4px",
-              backgroundColor: "#f59e0b",
-              color: "white",
-              cursor: "pointer",
-              width: "40px",
-              pointerEvents: "auto",
-              zIndex: 999,
-              position: "relative",
-            }}
           >
-            <Pencil size={18} />
+            <Pencil size={16} />
           </button>
 
-          {/* DELETE */}
           <button
-            type="button"
+            className="um-icon-btn delete"
+            title="Delete"
             onClick={() => {
               setSelectedCustomer(row);
               setShowDelete(true);
             }}
-            style={{
-              padding: "4px 8px",
-              fontSize: "12px",
-              border: "none",
-              borderRadius: "4px",
-              backgroundColor: "#ef4444",
-              color: "white",
-              cursor: "pointer",
-              width: "40px",
-              pointerEvents: "auto",
-              zIndex: 999,
-              position: "relative",
-            }}
           >
-            <Trash2 size={18} />
+            <Trash2 size={16} />
           </button>
-
         </div>
       ),
     },
   ];
 
   return (
+    <div className="page um-page">
+      {/* TOAST */}
+      {toast.show && (
+        <div className={`um-toast ${toast.type}`}>
+          <div className="um-toast-icon">
+            {toast.type === "success" ? (
+              <CheckCircle size={20} />
+            ) : (
+              <XCircle size={20} />
+            )}
+          </div>
+          <div className="um-toast-text">{toast.message}</div>
+        </div>
+      )}
 
-    <div className="page">
-
-      <div className="page-header">
-        <h1>Customers</h1>
+      <div className="um-page-header">
+        <div>
+          <h1>Customers</h1>
+          <p>Manage customer accounts and verify uploaded valid IDs.</p>
+        </div>
       </div>
 
-      <div className="controls-row">
-
-        <div className="controls-left"></div>
-
-        <div className="controls-right">
-
+      <div className="um-toolbar">
+        <div className="um-search">
+          <Search size={16} />
           <input
             placeholder="Search customer..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+        </div>
 
+        <div className="um-toolbar-right">
           <select
+            className="um-select"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
             <option value="All">All Status</option>
             <option value="Pending">Pending</option>
             <option value="Verified">Verified</option>
-            <option value="Rejected">Rejected</option>
+            <option value="Unverified">Rejected</option>
           </select>
 
-          <button
-            className="cusadd-btn"
-            onClick={() => setShowAdd(true)}
-          >
-            + Add Customer
+          <span className="um-count">
+            {filtered.length} {filtered.length === 1 ? "record" : "records"}
+          </span>
+
+          <button className="um-add-btn" onClick={() => setShowAdd(true)}>
+            <Plus size={16} /> Add Customer
           </button>
-
         </div>
-
       </div>
 
-      <Table
-        columns={columns}
-        data={filtered}
-        emptyMessage="No customers found."
-      />
+      <div className="um-table-card">
+        <Table
+          columns={columns}
+          data={filtered}
+          emptyMessage="No customers found."
+        />
+      </div>
 
-      {/* EDIT MODAL */}
-      {showEdit && (
-        <div className="StfCusmodal-overlay">
-
-          <div className="StfCusedit-modal">
-
-            <span
-              className="StfCusclose-btn"
-              onClick={() => setShowEdit(false)}
-            >
-              ✕
-            </span>
-
-            <h2>Edit Customer</h2>
-
-            <div className="StfCusform-group">
-              <label>Name</label>
-
-              <input
-                value={editData.name}
-                onChange={(e) =>
-                  setEditData({
-                    ...editData,
-                    name: e.target.value
-                  })
-                }
-              />
-            </div>
-
-            <div className="StfCusform-group">
-              <label>Email</label>
-
-              <input
-                value={editData.email}
-                onChange={(e) =>
-                  setEditData({
-                    ...editData,
-                    email: e.target.value
-                  })
-                }
-              />
-            </div>
-
-            <div className="StfCusform-group">
-              <label>Address</label>
-
-              <input
-                value={editData.address}
-                onChange={(e) =>
-                  setEditData({
-                    ...editData,
-                    address: e.target.value
-                  })
-                }
-              />
-            </div>
-
-            <div className="StfCusform-group">
-              <label>Contact</label>
-
-              <input
-                value={editData.contact_number}
-                onChange={(e) =>
-                  setEditData({
-                    ...editData,
-                    contact_number: e.target.value
-                  })
-                }
-              />
-            </div>
-
-            <div className="StfCusmodal-actions">
-
-              <button
-                className="StfCuscancel-dark"
-                onClick={() => setShowEdit(false)}
-              >
-                Cancel
+      {/* ========================================== */}
+      {/* VIEW / VERIFICATION MODAL                  */}
+      {/* ========================================== */}
+      {showView && (
+        <div className="um-modal-overlay" onClick={() => setShowView(false)}>
+          <div className="um-modal lg" onClick={(e) => e.stopPropagation()}>
+            <div className="um-modal-header">
+              <div className="um-modal-icon primary">
+                <Eye size={20} />
+              </div>
+              <div className="um-modal-titles">
+                <h2>User Verification</h2>
+                <p>Review the uploaded valid ID and verify the user account.</p>
+              </div>
+              <button className="um-modal-close" onClick={() => setShowView(false)}>
+                <X size={18} />
               </button>
+            </div>
 
+            <div className="um-modal-body">
+              <div className="um-split">
+                <div className="um-id-panel">
+                  <span className="um-id-title">
+                    Uploaded Valid ID {selectedCustomer?.id_type ? `(${selectedCustomer.id_type})` : ""}
+                  </span>
+                  <div className="um-id-card">
+                    <img
+                      src={selectedCustomer?.valid_id || ID_PLACEHOLDER}
+                      alt="Valid ID"
+                    />
+                  </div>
+                  {selectedCustomer?.valid_id && (
+                    <a
+                      href={selectedCustomer.valid_id}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="um-btn ghost sm"
+                    >
+                      View Full Size
+                    </a>
+                  )}
+                </div>
+
+                <div className="um-split-fields">
+                  <div className="um-field">
+                    <label>Customer ID</label>
+                    <input value={selectedCustomer?.user_id || ""} readOnly />
+                  </div>
+                  <div className="um-field">
+                    <label>Name</label>
+                    <input value={selectedCustomer?.name || ""} readOnly />
+                  </div>
+                  <div className="um-field">
+                    <label>Email</label>
+                    <input value={selectedCustomer?.email || ""} readOnly />
+                  </div>
+                  <div className="um-field">
+                    <label>Contact No.</label>
+                    <input value={selectedCustomer?.contact_number || ""} readOnly />
+                  </div>
+                  <div className="um-field">
+                    <label>Address</label>
+                    <input value={selectedCustomer?.address || ""} readOnly />
+                  </div>
+                  <div className="um-field">
+                    <label>ID Type</label>
+                    <input value={selectedCustomer?.id_type || "Not submitted"} readOnly />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="um-modal-footer split">
               <button
-                className="StfCussave-btn"
-                onClick={handleSaveChanges}
+                className="um-btn danger"
+                disabled={selectedCustomer?.status === "Verified"}
+                onClick={() => handleUpdateStatus("Unverified")}
               >
+                Reject
+              </button>
+              <button
+                className="um-btn success"
+                disabled={selectedCustomer?.status === "Unverified" || !selectedCustomer?.valid_id}
+                onClick={() => handleUpdateStatus("Verified")}
+              >
+                Approve
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================== */}
+      {/* EDIT MODAL                                 */}
+      {/* ========================================== */}
+      {showEdit && (
+        <div className="um-modal-overlay" onClick={() => setShowEdit(false)}>
+          <div className="um-modal lg" onClick={(e) => e.stopPropagation()}>
+            <div className="um-modal-header">
+              <div className="um-modal-icon primary">
+                <Pencil size={20} />
+              </div>
+              <div className="um-modal-titles">
+                <h2>Edit Customer</h2>
+                <p>Update the customer information and click save changes.</p>
+              </div>
+              <button className="um-modal-close" onClick={() => setShowEdit(false)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="um-modal-body">
+              <div className="um-split">
+                <div className="um-id-panel">
+                  <span className="um-id-title">
+                    Valid ID {selectedCustomer?.id_type ? `(${selectedCustomer.id_type})` : ""}
+                  </span>
+                  <div className="um-id-card">
+                    <img
+                      src={selectedCustomer?.valid_id || ID_PLACEHOLDER}
+                      alt="Valid ID"
+                    />
+                  </div>
+                  {selectedCustomer?.valid_id && (
+                    <a
+                      href={selectedCustomer.valid_id}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="um-btn ghost sm"
+                    >
+                      View Full Size
+                    </a>
+                  )}
+                </div>
+
+                <div className="um-split-fields">
+                  <div className="um-field">
+                    <label>Customer ID</label>
+                    <input value={selectedCustomer?.user_id || ""} readOnly />
+                  </div>
+                  <div className="um-field">
+                    <label>Name</label>
+                    <input
+                      value={editData.name}
+                      onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                    />
+                  </div>
+                  <div className="um-field">
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      value={editData.email}
+                      onChange={(e) => setEditData({ ...editData, email: e.target.value })}
+                    />
+                  </div>
+                  <div className="um-field">
+                    <label>Contact No.</label>
+                    <input
+                      value={editData.contact_number}
+                      onChange={(e) =>
+                        setEditData({ ...editData, contact_number: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="um-field">
+                    <label>Address</label>
+                    <input
+                      value={editData.address}
+                      onChange={(e) => setEditData({ ...editData, address: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="um-modal-footer split">
+              <button className="um-btn ghost" onClick={() => setShowEdit(false)}>
+                Discard Changes
+              </button>
+              <button className="um-btn primary" onClick={handleSaveChanges}>
                 Save Changes
               </button>
-
             </div>
-
           </div>
-
         </div>
       )}
 
-      {/* DELETE MODAL */}
+      {/* ========================================== */}
+      {/* DELETE MODAL                               */}
+      {/* ========================================== */}
       {showDelete && (
-
-        <div className="StfCusmodal-overlay">
-
-          <div className="StfCusdelete-modal">
-
-            <span
-              className="StfCusclose-btn"
-              onClick={() => setShowDelete(false)}
-            >
-              ✕
-            </span>
-
-            <h1>Delete Customer</h1>
-            <h6>Are you sure you want to delete this customer record?</h6>
-
-            <div className="StfCuswarning-box">
-
-              <h3>⚠ Warning</h3>
-
-              <p>
-                This will permanently delete the staff record and all related data. This action cannot be undone.
+        <div className="um-modal-overlay" onClick={() => setShowDelete(false)}>
+          <div className="um-modal sm" onClick={(e) => e.stopPropagation()}>
+            <div className="um-delete-body">
+              <div className="um-delete-icon">
+                <AlertTriangle size={28} />
+              </div>
+              <h2>Delete Customer</h2>
+              <p className="um-delete-text">
+                Are you sure you want to delete this customer record? This will permanently
+                delete the record and all related data. This action cannot be undone.
               </p>
 
-              <hr />
-
-              <div className="StfCusdelete-info">
-
-                <p>
-                  <b>ID:</b> {selectedCustomer?.user_id}
-                </p>
-
-                <p>
-                  <b>Name:</b> {selectedCustomer?.name}
-                </p>
-
-                 <p>
-                  <b>Email:</b> {selectedCustomer?.email}
-                </p>
-
-                 <p>
-                  <b>Address:</b> {selectedCustomer?.address}
-                </p>
-
-                 <p>
-                  <b>Contact No.:</b> {selectedCustomer?.contact_number}
-                </p>
-
+              <div className="um-details-box">
+                <div className="um-detail-row"><span>Customer ID</span><b>{selectedCustomer?.user_id}</b></div>
+                <div className="um-detail-row"><span>Name</span><b>{selectedCustomer?.name}</b></div>
+                <div className="um-detail-row"><span>Email</span><b>{selectedCustomer?.email}</b></div>
+                <div className="um-detail-row"><span>Address</span><b>{selectedCustomer?.address || "-"}</b></div>
+                <div className="um-detail-row"><span>Contact No.</span><b>{selectedCustomer?.contact_number || "-"}</b></div>
               </div>
-
             </div>
 
-            <div className="StfCusmodal-actions">
-
-              <button
-                className="StfCuscancel-dark"
-                onClick={() => setShowDelete(false)}
-              >
+            <div className="um-modal-footer split">
+              <button className="um-btn ghost" onClick={() => setShowDelete(false)}>
                 Cancel
               </button>
-
-              <button
-                className="StfCusdelete-btn"
-                onClick={handleDelete}
-              >
-                Delete
+              <button className="um-btn danger" onClick={handleDelete}>
+                Delete Customer
               </button>
-
             </div>
-
           </div>
-
         </div>
       )}
 
-      {/* ADD MODAL */}
-{showAdd && (
-  <div className="StfCusmodal-overlay">
+      {/* ========================================== */}
+      {/* ADD MODAL                                  */}
+      {/* ========================================== */}
+      {showAdd && (
+        <div className="um-modal-overlay" onClick={closeAdd}>
+          <div className="um-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="um-modal-header">
+              <div className="um-modal-icon primary">
+                <Plus size={22} />
+              </div>
+              <div className="um-modal-titles">
+                <h2>Add Customer</h2>
+                <p>Create a new customer account.</p>
+              </div>
+              <button className="um-modal-close" onClick={closeAdd}>
+                <X size={18} />
+              </button>
+            </div>
 
-    <div className="StfCusadd-modal">
+            <div className="um-modal-body">
+              <div className="um-field">
+                <label>Name</label>
+                <input
+                  value={addData.name}
+                  onChange={(e) => setAddData({ ...addData, name: e.target.value })}
+                />
+              </div>
 
-      <span
-        className="StfCusclose-btn"
-        onClick={() => setShowAdd(false)}
-      >
-        ✕
-      </span>
+              <div className="um-field">
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={addData.email}
+                  onChange={(e) => setAddData({ ...addData, email: e.target.value })}
+                />
+              </div>
 
-      <h2>Add Customer</h2>
+              <div className="um-field">
+                <label>Password</label>
+                <input
+                  type="password"
+                  className={passwordError ? "invalid" : ""}
+                  value={addData.password}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setAddData({ ...addData, password: value });
+                    setPasswordError(validatePassword(value));
+                  }}
+                />
+                {passwordError && <span className="um-error">{passwordError}</span>}
+              </div>
 
-      <div className="StfCusform-group">
-        <label>Name</label>
+              <div className="um-field">
+                <label>Address</label>
+                <input
+                  value={addData.address}
+                  onChange={(e) => setAddData({ ...addData, address: e.target.value })}
+                />
+              </div>
 
-        <input
-          value={addData.name}
-          onChange={(e) =>
-            setAddData({
-              ...addData,
-              name: e.target.value,
-            })
-          }
-        />
-      </div>
+              <div className="um-field-row">
+                <div className="um-field">
+                  <label>Contact No.</label>
+                  <input
+                    value={addData.contact_number}
+                    onChange={(e) =>
+                      setAddData({ ...addData, contact_number: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="um-field">
+                  <label>Status</label>
+                  <input value="Pending" disabled />
+                </div>
+              </div>
+            </div>
 
-      <div className="StfCusform-group">
-        <label>Email</label>
-
-        <input
-          value={addData.email}
-          onChange={(e) =>
-            setAddData({
-              ...addData,
-              email: e.target.value,
-            })
-          }
-        />
-      </div>
-
-      <div className="StfCusform-group">
-        <label>Password</label>
-
-        <input
-          type="password"
-          value={addData.password}
-          onChange={(e) =>
-            setAddData({
-              ...addData,
-              password: e.target.value,
-            })
-          }
-        />
-      </div>
-
-      <div className="StfCusform-group">
-        <label>Address</label>
-
-        <input
-          value={addData.address}
-          onChange={(e) =>
-            setAddData({
-              ...addData,
-              address: e.target.value,
-            })
-          }
-        />
-      </div>
-
-      <div className="StfCusform-group">
-        <label>Contact Number</label>
-
-        <input
-          value={addData.contact_number}
-          onChange={(e) =>
-            setAddData({
-              ...addData,
-              contact_number: e.target.value,
-            })
-          }
-        />
-      </div>
-
-      <div className="StfCusmodal-actions">
-
-        <button
-          className="StfCuscancel-dark"
-          onClick={() => setShowAdd(false)}
-        >
-          Cancel
-        </button>
-
-        <button
-          className="StfCussave-btn"
-          onClick={handleAddCustomer}
-        >
-          Add Customer
-        </button>
-
-      </div>
-
-    </div>
-
-  </div>
-)}
-
+            <div className="um-modal-footer">
+              <button className="um-btn ghost" onClick={closeAdd}>
+                Cancel
+              </button>
+              <button className="um-btn primary" onClick={handleAddCustomer}>
+                Add Customer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

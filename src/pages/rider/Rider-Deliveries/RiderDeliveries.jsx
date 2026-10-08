@@ -7,7 +7,6 @@ import {
   Home,
   Truck,
   History,
-  User,
   MapPin,
   Clock,
   Calendar,
@@ -23,9 +22,18 @@ export default function RiderDeliveries() {
   }, []);
 
   const fetchRiderDeliveries = async () => {
-    // 1. Kunin ang pangalan ng nakelogin na rider mula sa localStorage
-    // (I-adjust ang key kung iba ang ginamit mo, halimbawa "riderName" o "user")
-    const loggedInRiderName = localStorage.getItem("userName") || "Mark"; 
+    // 1. Kunin ang nakalogin na rider (parehong "user" object gaya ng sa Home)
+    const currentUser = JSON.parse(localStorage.getItem("user") || "null");
+
+    // Walang nakalogin = walang ipapakita (wala nang "Mark" na fallback)
+    if (!currentUser) {
+      setDeliveries([]);
+      setLoading(false);
+      return;
+    }
+
+    const myName = (currentUser.name || "").trim().toLowerCase();
+    const myId = currentUser.users_id;
 
     const { data, error } = await supabase
       .from("orders")
@@ -39,7 +47,8 @@ export default function RiderDeliveries() {
           order_id,
           delivery_code,
           delivery_status,
-          assigned_rider
+          assigned_rider,
+          assigned_rider_id
         )
       `)
       .eq("order_type", "Delivery")
@@ -51,12 +60,20 @@ export default function RiderDeliveries() {
       return;
     }
 
-    // 2. I-format at i-filter agad na para lamang sa nakelogin na rider
-    const formatted = data
+    // 2. Salain para sa nakalogin na rider LANG, tapos i-format
+    const formatted = (data || [])
       .filter((item) => {
-        const assignedRider = item.delivery_schedule?.[0]?.assigned_rider;
-        // Sinisigurong tugma ang pangalan ng nakelogin sa assigned_rider (case-insensitive)
-        return assignedRider && assignedRider.toLowerCase() === loggedInRiderName.toLowerCase();
+        const d = item.delivery_schedule?.[0];
+        if (!d) return false;
+
+        // May assigned_rider_id? ID lang ang basehan
+        if (d.assigned_rider_id != null) {
+          return myId != null && String(d.assigned_rider_id) === String(myId);
+        }
+
+        // Walang ID (lumang records): exact na pangalan lang
+        const assigned = (d.assigned_rider || "").trim().toLowerCase();
+        return assigned !== "" && assigned === myName;
       })
       .map((item) => ({
         id: item.order_id,
@@ -73,7 +90,7 @@ export default function RiderDeliveries() {
     setLoading(false);
   };
 
-  // 🔥 Filter logic batay sa activeTab (All, Pending, Out for Delivery)
+  // Filter logic batay sa activeTab (All, Pending, Out for Delivery)
   const filteredDeliveries = deliveries.filter((item) => {
     if (activeTab === "All") return true;
     return item.status.toLowerCase() === activeTab.toLowerCase();
@@ -86,21 +103,21 @@ export default function RiderDeliveries() {
 
       {/* Tabs */}
       <div className="tabs">
-        <button 
+        <button
           className={`all-tab ${activeTab === "All" ? "active" : ""}`}
           onClick={() => setActiveTab("All")}
         >
           All
         </button>
-        
-        <button 
+
+        <button
           className={`pending-tab ${activeTab === "Pending" ? "active" : ""}`}
           onClick={() => setActiveTab("Pending")}
         >
           Pending
         </button>
-        
-        <button 
+
+        <button
           className={`out-tab ${activeTab === "Out for Delivery" ? "active" : ""}`}
           onClick={() => setActiveTab("Out for Delivery")}
         >
@@ -132,7 +149,11 @@ export default function RiderDeliveries() {
               </div>
 
               <div className="right-content">
-                <span className={`delivery-status ${item.status?.toLowerCase().replace(/\s+/g, '-')}`}>
+                <span
+                  className={`delivery-status ${item.status
+                    ?.toLowerCase()
+                    .replace(/\s+/g, "-")}`}
+                >
                   {item.status}
                 </span>
               </div>
@@ -149,7 +170,10 @@ export default function RiderDeliveries() {
             </div>
 
             <div className="buttons">
-              <Link to={`/rider/delivery-details/${item.id}`} className="details-link">
+              <Link
+                to={`/rider/delivery-details/${item.id}`}
+                className="details-link"
+              >
                 <button className="details-btn">View Details</button>
               </Link>
             </div>

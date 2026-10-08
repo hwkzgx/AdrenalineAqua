@@ -494,3 +494,818 @@ select option {
 .toast.error {
   background-color: #ef4444;
 }
+
+/* ===============================
+   GCASH PAYMENT MODAL
+   =============================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+  background: #ffffff;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  animation: slideUp 0.25s ease;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-content h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.modal-desc {
+  font-size: 13.5px;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* GCash Info Box */
+.gcash-info-box {
+  background: linear-gradient(135deg, #eef4ff, #e6f0ff);
+  border: 1px solid #cfe0fd;
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+
+.gcash-info-box p {
+  font-size: 13.5px;
+  color: #334155;
+  margin: 4px 0;
+}
+
+.gcash-info-box .gcash-number {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0d6efd;
+  letter-spacing: 0.3px;
+  margin: 8px 0;
+}
+
+.gcash-info-box p b {
+  color: #0f172a;
+}
+
+/* Receipt Upload Section */
+.receipt-upload-section {
+  margin-bottom: 22px;
+}
+
+.receipt-upload-section label {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.receipt-upload-section .required {
+  color: #ef4444;
+}
+
+.receipt-upload-section input[type="file"] {
+  width: 100%;
+  font-size: 13px;
+  padding: 10px;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #475569;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.receipt-upload-section input[type="file"]:hover {
+  border-color: #0d6efd;
+  background: #f0f6ff;
+}
+
+.receipt-preview-container {
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column; /* 👈 Ito ang mag-aayos para pumunta sa ibaba ang button */
+  align-items: center;
+}
+
+.receipt-preview-container img {
+  width: 100%;
+  max-width: 220px;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Modal Buttons */
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 46px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s ease;
+}
+
+.cancel-btn {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.cancel-btn:hover {
+  background: #e2e8f0;
+}
+
+.confirm-btn {
+  background: linear-gradient(135deg, #0d6efd, #0ea5e9);
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(13, 110, 253, 0.3);
+}
+
+.confirm-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(13, 110, 253, 0.4);
+}
+
+.confirm-btn:active,
+.cancel-btn:active {
+  transform: translateY(0);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ===============================
+   REMOVE PHOTO BUTTON STYLE
+   =============================== */
+.remove-photo-btn {
+  width: 200px;
+  margin-top: 15px;
+  padding: 5px 10px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.remove-photo-btn:hover {
+  background-color: #c82333;
+}
+
+/* ===============================================================
+   ================  RESPONSIVE (MOBILE LANG)  ===================
+   Lahat ng nasa baba ay nasa loob ng media query, kaya HINDI
+   nito binabago ang desktop design mo.
+   =============================================================== */
+
+/* ---------- TABLET (<= 900px): isang column ---------- */
+@media (max-width: 900px) {
+  .make-order-page {
+    padding: 20px;
+  }
+
+  .make-order-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+
+  .make-order-left,
+  .make-order-right {
+    flex: none;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .field select {
+    width: 60%;
+  }
+}
+
+/* ---------- MOBILE (<= 600px): MODERN STYLE ---------- */
+@media (max-width: 600px) {
+  .make-order-page,
+  .make-order-page *,
+  .make-order-page *::before,
+  .make-order-page *::after,
+  .modal-overlay,
+  .modal-overlay *,
+  .modal-overlay *::before,
+  .modal-overlay *::after {
+    box-sizing: border-box;
+  }
+
+  /* GCash modal: huwag lumampas sa screen */
+  .modal-overlay {
+    overflow: hidden;
+  }
+
+  .modal-content {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-content .gcash-info-box {
+    overflow-wrap: anywhere;
+  }
+
+  .modal-content .receipt-upload-section input[type="file"] {
+    height: auto;
+    padding: 12px;
+    font-size: 14px;
+    border-radius: 14px;
+  }
+
+  .modal-content .receipt-preview-container img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Modal buttons: pantay, parehong laki, hindi pisot */
+  .modal-content .modal-buttons {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .modal-content .modal-buttons .modal-btn {
+    flex: none !important;
+    width: 100% !important;
+    height: 52px !important;
+    min-height: 52px;
+    margin: 0;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    border: none;
+    border-radius: 14px;
+  }
+
+  .modal-content .modal-buttons .cancel-btn {
+    color: #475569 !important;
+    background: #f1f5f9 !important;
+    box-shadow: none;
+  }
+
+  .modal-content .modal-buttons .confirm-btn {
+    color: #fff !important;
+    background: linear-gradient(135deg, #2aa0ff, #0062d6) !important;
+    box-shadow: 0 8px 18px rgba(13, 125, 242, 0.35);
+  }
+
+  /* "Choose File" button, mas maayos tignan */
+  .modal-content .receipt-upload-section input[type="file"]::file-selector-button {
+    margin-right: 12px;
+    padding: 10px 14px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0062d6;
+    background: #eaf4ff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  .modal-content .receipt-upload-section label {
+    font-size: 13px;
+  }
+
+  /* Page background */
+  .make-order-page {
+    padding: 12px 12px 28px;
+    background-image: none;
+    background: linear-gradient(180deg, #e3f0ff 0%, #f3f7fc 45%);
+  }
+
+  .make-order-container {
+    gap: 14px;
+  }
+
+  /* Wala nang malaking puting panel; bawat section ay sariling card */
+  .make-order-left {
+    padding: 0;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-radius: 0;
+    box-shadow: none;
+    counter-reset: step;
+  }
+
+  /* ----- Header = blue banner ----- */
+  .makeOrd-header {
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 20px 18px;
+    background: linear-gradient(135deg, #2aa0ff, #0050b8);
+    border-radius: 24px;
+    box-shadow: 0 14px 30px rgba(0, 80, 184, 0.3);
+  }
+
+  .makeOrd-header .icon {
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    flex-shrink: 0;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 14px;
+  }
+
+  .makeOrd-header h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .makeOrd-header p {
+    margin-bottom: 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  /* ----- Cards ----- */
+  .section,
+  .make-order-left > .field {
+    margin-bottom: 14px;
+    padding: 18px 16px;
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 4px 16px rgba(15, 31, 61, 0.06);
+  }
+
+  /* pantay na espasyo sa lahat ng fields; tanggal lang sa pinakadulo ng card */
+  .section .field {
+    margin-bottom: 16px;
+  }
+
+  .section > .field:last-child,
+  .section > .grid-2:last-child .field:last-child {
+    margin-bottom: 0;
+  }
+
+  .section h3 {
+    margin-bottom: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    counter-increment: step;
+  }
+
+  .section h3::before {
+    content: counter(step);
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #2aa0ff, #0062d6);
+    box-shadow: 0 4px 10px rgba(13, 125, 242, 0.3);
+  }
+
+  /* ----- Form: isang column ----- */
+  .grid-2 {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .row {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .field label {
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: #5b6b88;
+  }
+
+  /* 16px para hindi mag-zoom ang iOS kapag nag-focus */
+  input,
+  select,
+  .input-icon input {
+    font-size: 16px;
+  }
+
+  input,
+  select,
+  .input-icon {
+    height: 52px;
+    border: 1.5px solid #e3e9f3;
+    border-radius: 14px;
+  }
+
+  .field select {
+    width: 100%;
+    padding: 0 44px 0 16px;
+    border: 1.5px solid #e3e9f3;
+    border-radius: 14px;
+  }
+
+  .field input[readonly] {
+    width: 100% !important; /* override ng inline width */
+    font-weight: 600;
+    color: #0062d6;
+    background: #eaf4ff;
+    border-color: transparent;
+  }
+
+  .field input[type="text"],
+  .field input[type="date"],
+  .field select {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+  }
+
+  /* iOS date input minsan mas maliit/iba ang itsura */
+  .field input[type="date"] {
+    -webkit-appearance: none;
+    appearance: none;
+    min-height: 52px;
+    text-align: left;
+  }
+
+  .input-icon input[type="date"] {
+    min-height: 0;
+  }
+
+  input:focus,
+  select:focus,
+  .input-icon:focus-within {
+    border-color: #0d7df2;
+    box-shadow: 0 0 0 4px rgba(13, 125, 242, 0.14);
+  }
+
+  .input-icon {
+    padding: 0 16px;
+  }
+
+  .input-icon input {
+    height: 100%;
+    border: none;
+    box-shadow: none;
+  }
+
+  .input-icon input:focus {
+    box-shadow: none;
+  }
+
+  /* ----- Quantity ----- */
+  /* Quantity: [  -  ][   0   ][  +  ] pantay ang dalawang button */
+  .qty-box {
+    display: grid;
+    grid-template-columns: 52px 1fr 52px;
+    align-items: stretch;
+    gap: 6px;
+    width: 100%;
+    max-width: none;
+    height: 52px;
+    padding: 4px;
+    background: #f4f7fc;
+    border: 1.5px solid #e3e9f3;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .qty-box button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    line-height: 1;
+    color: #0062d6;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(15, 31, 61, 0.08);
+  }
+
+  .qty-box span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .qty-box button:hover,
+  .qty-box button:active {
+    color: #fff;
+    background: #0d7df2;
+  }
+
+  /* ----- Payment cards ----- */
+  /* grid: dalawang card, pantay ang taas at lapad */
+  .payment-options {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-rows: 1fr;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .payment-card {
+    flex: none;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+  }
+
+  /* grid: bilog sa kaliwa, text sa kanan; pantay ang taas ng dalawang card */
+  .payment-card {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 14px;
+    row-gap: 2px;
+    align-content: center;
+    align-items: center;
+    min-height: 76px;
+    padding: 14px 16px;
+    border: 1.5px solid #e3e9f3;
+    border-radius: 16px;
+  }
+
+  .payment-card::before {
+    content: "";
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border: 2px solid #c3cee0;
+    border-radius: 50%;
+  }
+
+  .payment-card h4 {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+    align-self: end;
+  }
+
+  .payment-card p {
+    grid-column: 2;
+    grid-row: 2;
+    margin: 0;
+    align-self: start;
+  }
+
+  .payment-card:hover {
+    transform: none;
+  }
+
+  .payment-card.active {
+    border: 1.5px solid #0d7df2;
+    background: #eaf4ff;
+    box-shadow: 0 8px 22px rgba(13, 125, 242, 0.16);
+  }
+
+  .payment-card.active::before {
+    border-color: #0d7df2;
+    background: radial-gradient(circle, #0d7df2 45%, #fff 50%);
+  }
+
+  /* ----- Logo upload ----- */
+  .note {
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    color: #b45309;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 12px;
+  }
+
+  .logo-upload-box {
+    padding: 20px 16px;
+    background: #f8fbff;
+    border: 2px dashed #bcd3f2;
+    border-radius: 18px;
+  }
+
+  .logo-upload-box img {
+    max-width: 100%;
+    height: auto !important;
+  }
+
+  .upload-btn {
+    width: 100%;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #2aa0ff, #0062d6);
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(13, 125, 242, 0.3);
+  }
+
+  .upload-btn.remove {
+    background: linear-gradient(135deg, #f87171, #dc2626);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.28);
+  }
+
+  /* ----- Footer (parehong pwesto, naka-stack lang) ----- */
+  .footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 12px;
+    margin-top: 6px;
+    padding: 4px 4px 0;
+    text-align: center;
+  }
+
+  .place-order {
+    width: 100%;
+    height: 54px;
+    font-size: 16px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #2aa0ff, #0062d6);
+    border-radius: 16px;
+    box-shadow: 0 12px 26px rgba(0, 98, 214, 0.35);
+  }
+
+  /* ----- Order Summary ----- */
+  .make-order-right {
+    padding: 20px 16px;
+    background: linear-gradient(160deg, #0b84ff 0%, #0050b8 100%);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-radius: 24px;
+    box-shadow: 0 14px 30px rgba(0, 80, 184, 0.3);
+  }
+
+  .make-order-right h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .makeOrd-summary-card {
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: 20px;
+    box-shadow: 0 12px 28px rgba(0, 20, 70, 0.25);
+  }
+
+  .item {
+    gap: 12px;
+    border-bottom: 1px dashed #e3e9f3;
+  }
+
+  .item h4 {
+    font-size: 16px;
+  }
+
+  .img-box {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+    border-radius: 14px;
+  }
+
+  .img-box::before {
+    font-size: 26px;
+  }
+
+  .summary-details p {
+    font-size: 14px;
+    color: #5b6b88;
+  }
+
+  .total {
+    margin-top: 6px;
+    padding-top: 14px;
+    border-top: 1px dashed #e3e9f3;
+  }
+
+  .total h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    color: #0062d6;
+  }
+
+  /* ----- Toast: full width sa baba ----- */
+  .toast {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    min-width: 0;
+    max-width: none;
+    border-radius: 16px;
+  }
+
+  /* ----- GCash modal = bottom sheet ----- */
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .modal-content {
+    max-width: 100%;
+    max-height: 92vh;
+    padding: 22px 18px calc(18px + env(safe-area-inset-bottom));
+    border-radius: 24px 24px 0 0;
+  }
+
+  .modal-content h3 {
+    font-size: 19px;
+  }
+
+  .modal-buttons {
+    flex-direction: column-reverse;
+  }
+
+  .modal-btn {
+    height: 50px;
+    border-radius: 14px;
+  }
+
+  .remove-photo-btn {
+    width: 100%;
+    max-width: 220px;
+    padding: 9px 10px;
+  }
+}
+
+/* ---------- MALIIT NA PHONE (<= 360px) ---------- */
+@media (max-width: 360px) {
+  .make-order-page {
+    padding: 10px 10px 24px;
+  }
+
+  .section,
+  .make-order-left > .field {
+    padding: 16px 12px;
+  }
+
+  .make-order-right {
+    padding: 18px 12px;
+  }
+
+  .makeOrd-header h2 {
+    font-size: 20px;
+  }
+
+  .gcash-info-box {
+    padding: 12px;
+  }
+}

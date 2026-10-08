@@ -459,13 +459,13 @@
   padding: 8px 36px 8px 14px; /* May space sa kanan para sa arrow */
   
   /* Font styling */
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   color: #1e40af; /* Dark blue text para madaling basahin */
   
   cursor: pointer;
   width: 100%;
-  min-width: 50px;
+  min-width: 130px;
 
   /* Custom modern arrow icon (kulay blue) */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%231e40af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
@@ -499,4 +499,28 @@
   color: #1e293b;
   font-weight: 500;
   padding: 10px;
+}
+
+/* Export PDF Button Styling */
+.export-pdf-btn {
+  margin-top: 0;
+  width: 130px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #02457A;
+  color: white;
+  border: none;
+  padding: 0 16px;
+  height: 48px;
+  borderRadius: 12px; /* Kung standard CSS, 'border-radius' dapat */
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.export-pdf-btn:hover {
+  background-color: #013259;
 }

@@ -11,28 +11,28 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 // ===============================
-// RIDER ICON 🛺
+// RIDER ICON (KOLONG-KOLONG SVG - CSS BASED)
 // ===============================
 const riderIcon = L.divIcon({
   className: "custom-rider-marker",
   html: `
-    <div style="
-      width: 42px;
-      height: 42px;
-      background: #2563eb;
-      border: 3px solid white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-      font-size: 22px;
-    ">
-      🛺
+    <div class="custom-rider-container">
+      <div class="custom-rider-pulse"></div>
+      <div class="custom-rider-icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="5" cy="19" r="2"></circle>
+          <circle cx="16" cy="19" r="2"></circle>
+          <circle cx="19" cy="13" r="1.5"></circle>
+          <path d="M3 17V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v9"></path>
+          <path d="M15 9h3l2 4v4"></path>
+          <path d="M3 13h12"></path>
+          <path d="M5 6V4h6v2"></path>
+        </svg>
+      </div>
     </div>
   `,
-  iconSize: [42, 42],
-  iconAnchor: [21, 21],
+  iconSize: [52, 52],
+  iconAnchor: [26, 26],
 });
 
 // ===============================
@@ -41,43 +41,36 @@ const riderIcon = L.divIcon({
 const destinationIcon = L.divIcon({
   className: "custom-destination-marker",
   html: `
-    <div style="
-      width: 38px;
-      height: 38px;
-      background: #ef4444;
-      border: 3px solid white;
-      border-radius: 50% 50% 50% 0;
-      transform: rotate(-45deg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-    ">
-      <div style="
-        transform: rotate(45deg);
-        color: white;
-        font-size: 19px;
-      ">
-        📍
+    <div class="custom-dest-icon-box">
+      <div class="custom-dest-inner">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
       </div>
     </div>
   `,
-  iconSize: [38, 38],
-  iconAnchor: [19, 38],
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
 });
 
 // ===============================
-// AUTO FIT MAP
+// MAP UPDATER
 // ===============================
 function MapUpdater({
   center,
   riderPosition,
   destinationPosition,
+  isTracking,
 }) {
   const map = useMap();
 
   useEffect(() => {
-    if (riderPosition && destinationPosition) {
+    if (
+      isTracking &&
+      riderPosition &&
+      destinationPosition
+    ) {
       const bounds = L.latLngBounds([
         riderPosition,
         destinationPosition,
@@ -91,13 +84,8 @@ function MapUpdater({
       return;
     }
 
-    if (riderPosition) {
-      map.setView(riderPosition, 15);
-      return;
-    }
-
     if (destinationPosition) {
-      map.setView(destinationPosition, 15);
+      map.setView(destinationPosition, 18);
       return;
     }
 
@@ -109,6 +97,7 @@ function MapUpdater({
     center,
     riderPosition,
     destinationPosition,
+    isTracking,
   ]);
 
   return null;
@@ -121,13 +110,11 @@ export default function RiderLeafletMap({
   center,
   riderPosition,
   destinationPosition,
+  isTracking,
 }) {
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [routeLoading, setRouteLoading] = useState(false);
 
-  // ===============================
-  // GET ROAD ROUTE FROM OSRM
-  // ===============================
   useEffect(() => {
     if (!riderPosition || !destinationPosition) {
       setRouteCoordinates([]);
@@ -183,11 +170,7 @@ export default function RiderLeafletMap({
     getRoute();
   }, [riderPosition, destinationPosition]);
 
-  // ===============================
-  // DEFAULT CENTER
-  // ===============================
-  const defaultCenter =
-    center || [14.8311, 120.7358];
+  const defaultCenter = center || [14.8311, 120.7358];
 
   return (
     <div
@@ -210,20 +193,19 @@ export default function RiderLeafletMap({
           minHeight: "350px",
         }}
       >
-        {/* OPENSTREETMAP */}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {/* AUTO ZOOM */}
         <MapUpdater
           center={center}
           riderPosition={riderPosition}
           destinationPosition={destinationPosition}
+          isTracking={isTracking}
         />
 
-        {/* ================= RIDER ================= */}
+        {/* RIDER */}
         {riderPosition && (
           <Marker
             position={riderPosition}
@@ -237,7 +219,7 @@ export default function RiderLeafletMap({
           </Marker>
         )}
 
-        {/* ================= DESTINATION ================= */}
+        {/* DESTINATION */}
         {destinationPosition && (
           <Marker
             position={destinationPosition}
@@ -251,10 +233,9 @@ export default function RiderLeafletMap({
           </Marker>
         )}
 
-        {/* ================= ROUTE ================= */}
+        {/* ROUTE */}
         {routeCoordinates.length > 0 && (
           <>
-            {/* White outline */}
             <Polyline
               positions={routeCoordinates}
               pathOptions={{
@@ -263,8 +244,6 @@ export default function RiderLeafletMap({
                 opacity: 0.9,
               }}
             />
-
-            {/* Blue route */}
             <Polyline
               positions={routeCoordinates}
               pathOptions={{
@@ -277,7 +256,6 @@ export default function RiderLeafletMap({
         )}
       </MapContainer>
 
-      {/* ROUTE LOADING */}
       {routeLoading && (
         <div
           style={{
@@ -287,8 +265,7 @@ export default function RiderLeafletMap({
             background: "white",
             padding: "8px 12px",
             borderRadius: "8px",
-            boxShadow:
-              "0 2px 8px rgba(0,0,0,0.15)",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
             fontSize: "12px",
             fontWeight: "600",
             color: "#475569",

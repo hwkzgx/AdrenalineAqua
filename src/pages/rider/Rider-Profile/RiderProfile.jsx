@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./rider-profile.css";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../../supabase";
@@ -6,12 +6,35 @@ import {
   ArrowLeft,
   Camera,
   Save,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
+
+const DEFAULT_PICTURE = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
 
 export default function RiderProfile() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  // TOAST
+  const [toast, setToast] = useState(null); // { message, type: "success" | "error" }
+  const toastTimer = useRef(null);
+
+  const showToast = (message, type = "success") => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast({ message, type });
+    toastTimer.current = setTimeout(() => setToast(null), 30000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+    };
+  }, []);
+
+  // Dito itatago kung anong column/value ang ginamit ng row sa users table
+  const userKey = useRef(null);
 
   const [originalRider, setOriginalRider] = useState({
     name: "",
@@ -19,7 +42,7 @@ export default function RiderProfile() {
     contact: "",
     address: "",
     role: "Delivery Rider",
-    profile_picture: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+    profile_picture: DEFAULT_PICTURE,
   });
 
   const [rider, setRider] = useState({
@@ -28,7 +51,7 @@ export default function RiderProfile() {
     contact: "",
     address: "",
     role: "Delivery Rider",
-    profile_picture: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+    profile_picture: DEFAULT_PICTURE,
   });
 
   useEffect(() => {
@@ -49,9 +72,6 @@ export default function RiderProfile() {
       const userId = parsedUser?.user_id || parsedUser?.id;
       const userEmail = parsedUser?.email;
 
-      let data = null;
-      let error = null;
-
       // 1. Hanapin sa `users` table gamit ang user_id o email
       let query = supabase.from("users").select("*");
 
@@ -60,21 +80,25 @@ export default function RiderProfile() {
       } else if (userEmail) {
         query = query.eq("email", userEmail);
       } else {
-        alert("Invalid user session data.");
+        showToast("Invalid user session data.", "error");
         setLoading(false);
         return;
       }
 
-      const res = await query.maybeSingle();
-      data = res.data;
-      error = res.error;
+      const { data, error } = await query.maybeSingle();
 
       if (error || !data) {
         console.log("Error fetching profile from users table:", error?.message);
-        alert("Hindi makita ang profile ng rider na ito sa database.");
+        showToast("Hindi makita ang profile ng rider na ito sa database.", "error");
         setLoading(false);
         return;
       }
+
+      // Tandaan kung anong key column ang meron ang row na ito (para sa Save)
+      const keyCol = ["users_id", "user_id", "id"].find(
+        (c) => data[c] !== undefined && data[c] !== null
+      );
+      userKey.current = keyCol ? { col: keyCol, value: data[keyCol] } : null;
 
       // I-load ang data mula sa `users` table
       const fetchedData = {
@@ -83,7 +107,7 @@ export default function RiderProfile() {
         contact: data.contact_number || data.phone || data.contact || "",
         address: data.address || "",
         role: data.role || "Delivery Rider",
-        profile_picture: data.profile_picture || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+        profile_picture: data.profile_picture || DEFAULT_PICTURE,
       };
 
       setOriginalRider(fetchedData);
@@ -115,7 +139,7 @@ export default function RiderProfile() {
 
     if (uploadError) {
       console.log("Upload error:", uploadError.message);
-      alert("Failed to upload image to storage bucket.");
+      showToast("Failed to upload image.", "error");
       setSaving(false);
       return;
     }
@@ -126,9 +150,10 @@ export default function RiderProfile() {
 
     setRider((prev) => ({ ...prev, profile_picture: publicUrlData.publicUrl }));
     setSaving(false);
+    showToast("Photo uploaded. Tap Save Changes to apply.");
   };
 
-  const hasChanges = 
+  const hasChanges =
     rider.name !== originalRider.name ||
     rider.email !== originalRider.email ||
     rider.contact !== originalRider.contact ||
@@ -138,13 +163,15 @@ export default function RiderProfile() {
   const handleSave = async () => {
     if (!hasChanges) return;
 
-    setSaving(true);
-    const storedUser = localStorage.getItem("user");
-    const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-    const userId = parsedUser?.user_id || parsedUser?.id;
+    if (!userKey.current) {
+      showToast("Hindi mahanap ang account na i-uupdate.", "error");
+      return;
+    }
 
-    // I-update sa `users` table
-    const { error } = await supabase
+    setSaving(true);
+
+    // I-update sa `users` table gamit ang mismong key ng row na nakuha
+    const { data: updatedRows, error } = await supabase
       .from("users")
       .update({
         name: rider.name,
@@ -153,30 +180,50 @@ export default function RiderProfile() {
         address: rider.address,
         profile_picture: rider.profile_picture,
       })
-      .eq("user_id", userId); // Gamitin ang tamang ID column (user_id o id)
+      .eq(userKey.current.col, userKey.current.value)
+      .select();
 
     setSaving(false);
 
     if (error) {
       console.log("Error updating profile:", error.message);
-      alert("Failed to save changes to database.");
+      showToast("Failed to save changes.", "error");
+    } else if (!updatedRows || updatedRows.length === 0) {
+      // Walang na-update na row (maling ID, o hinaharangan ng database policy)
+      showToast("Walang na-save. Subukan ulit.", "error");
     } else {
-      alert("Profile updated successfully!");
+      showToast("Profile updated successfully!");
       setOriginalRider(rider);
     }
   };
 
   if (loading) {
-    return <p style={{ padding: "20px", textAlign: "center" }}>Loading profile from database...</p>;
+    return (
+      <p style={{ padding: "20px", textAlign: "center" }}>
+        Loading profile from database...
+      </p>
+    );
   }
 
   return (
-    <div className="profile-container">
+    <div className="riderprofile-container">
+      {/* TOAST */}
+      {toast && (
+        <div className={`toast toast-${toast.type}`} role="status">
+          {toast.type === "success" ? (
+            <CheckCircle2 size={20} />
+          ) : (
+            <XCircle size={20} />
+          )}
+          <span>{toast.message}</span>
+        </div>
+      )}
+
       <div className="header">
         <div className="header-left">
           <ArrowLeft
             size={40}
-            className="back-btn"
+            className="rpfpback-btn"
             onClick={() => navigate(-1)}
           />
           <h2>Profile</h2>
@@ -184,7 +231,10 @@ export default function RiderProfile() {
       </div>
 
       <div className="profile-section">
-        <div className="image-upload-wrapper" style={{ position: "relative", cursor: "pointer" }}>
+        <div
+          className="image-upload-wrapper"
+          style={{ position: "relative", cursor: "pointer" }}
+        >
           <img
             src={rider.profile_picture}
             alt="Profile"
@@ -265,13 +315,13 @@ export default function RiderProfile() {
           />
         </div>
 
-        <button 
-          className="save-profile-btn" 
+        <button
+          className="save-profile-btn"
           onClick={handleSave}
           disabled={!hasChanges || saving}
-          style={{ 
-            opacity: !hasChanges ? 0.5 : 1, 
-            cursor: !hasChanges ? "not-allowed" : "pointer" 
+          style={{
+            opacity: !hasChanges ? 0.5 : 1,
+            cursor: !hasChanges ? "not-allowed" : "pointer",
           }}
         >
           <Save size={18} /> {saving ? "Saving..." : "Save Changes"}

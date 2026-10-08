@@ -24,24 +24,38 @@ export default function RiderLogin() {
 
     setLoading(true);
 
-    // 🔥 CHECK USER IN SUPABASE
-    const { data, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("email", email)
-      .eq("password", password)
-      .eq("role", "rider")
-      .single();
+    // LOGIN USING SUPABASE AUTH
+    const { data: authData, error: authError } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    setLoading(false);
-
-    if (error || !data) {
-      setError("Invalid email or password. Maybe this user is not registered as rider");
+    if (authError) {
+      setLoading(false);
+      setError("Invalid email or password.");
       return;
     }
 
-    // save logged in user
-    localStorage.setItem("user", JSON.stringify(data));
+    // CHECK IF USER IS A RIDER
+    const { data: userData, error: userError } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .eq("role", "rider")
+      .single();
+
+    if (userError || !userData) {
+      await supabase.auth.signOut();
+      setLoading(false);
+      setError("This account is not registered as a rider.");
+      return;
+    }
+
+    setLoading(false);
+
+    // SAVE LOGGED IN RIDER
+    localStorage.setItem("user", JSON.stringify(userData));
 
     if (remember) {
       localStorage.setItem("rememberUser", "true");
@@ -66,6 +80,18 @@ export default function RiderLogin() {
       <div className="login-right">
 
         <div className="login-card">
+
+          {/* BACK BUTTON */}
+          <div className="login-header">
+            <button
+              type="button"
+              className="riderlogback-btn"
+              onClick={() => nav(-1)}
+            >
+              ← Back
+            </button>
+          </div>
+
           <div className="login-body">
 
             <h2>Login to your rider account</h2>
@@ -95,6 +121,18 @@ export default function RiderLogin() {
                 />
                 Remember me
               </label>
+
+              <span
+                className="forgot"
+                onClick={() =>
+                  nav("/ForgotPass", {
+                    state: { userType: "rider" },
+                  })
+                }
+              >
+                Forgot Password?
+              </span>
+
             </div>
 
             {error && (

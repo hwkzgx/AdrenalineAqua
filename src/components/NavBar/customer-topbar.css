@@ -14,6 +14,8 @@
   padding: 15px 50px;
   background: white;
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  position: relative;
+  z-index: 500;
 }
 
 .customer-topbar-logo img {
@@ -22,7 +24,7 @@
   object-fit: contain;
 }
 
-/* NAV LINKS */
+/* NAV LINKS (desktop) */
 .ctopbar-links {
   display: flex;
   gap: 40px;
@@ -84,12 +86,25 @@
   transition: 0.3s ease;
   color: #374151;
   font-size: 18px;
+  position: relative;
 }
 
 .icon-btn:hover {
   background: #00a8cc;
   color: white;
   transform: translateY(-2px);
+}
+
+/* HAMBURGER BUTTON - hidden on desktop by default */
+/* mas malakas na selector para hindi ma-override ng ibang CSS file */
+.customer-topbar .ctopbar-buttons .hamburger-btn {
+  display: none;
+}
+
+/* nakatago rin ang drawer at backdrop sa desktop */
+.mobile-nav-panel,
+.mobile-nav-backdrop {
+  display: none;
 }
 
 /* PROFILE WRAPPER */
@@ -240,6 +255,80 @@
   }
 }
 
+/* ==========================================
+   MOBILE NAV DRAWER (modern)
+   ========================================== */
+.mobile-nav-panel {
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 280px;
+  height: 100vh;
+  background: #ffffff;
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-nav-panel.open {
+  left: 0;
+}
+
+.mobile-nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px 20px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.mobile-nav-brand img {
+  width: 40px;
+  height: auto;
+  object-fit: contain;
+}
+
+.mobile-nav-brand span {
+  font-size: 15px;
+  font-weight: 700;
+  color: #004a99;
+  line-height: 1.3;
+}
+
+.mobile-nav-panel a {
+  text-decoration: none;
+  color: #374151;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.mobile-nav-panel a:hover {
+  background: #f3f6f9;
+  color: #00a8cc;
+}
+
+.mobile-nav-panel a.active {
+  background: #e0f7fc;
+  color: #00a8cc;
+}
+
+.mobile-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
 /* RESPONSIVE */
 @media (max-width: 1100px) {
   .customer-topbar .ctopbar-links {
@@ -254,10 +343,24 @@
 @media (max-width: 900px) {
   .customer-topbar {
     padding: 0 20px;
+    height: 64px;
   }
 
   .customer-topbar .ctopbar-links {
     display: none;
+  }
+
+  /* hamburger at drawer: sa mobile/tablet lang */
+  .customer-topbar .ctopbar-buttons .hamburger-btn {
+    display: flex;
+  }
+
+  .mobile-nav-panel {
+    display: flex;
+  }
+
+  .mobile-nav-backdrop {
+    display: block;
   }
 }
 
@@ -327,8 +430,25 @@
   transition: 0.2s ease;
 }
 
-/* 🔴 CANCEL */
+/* CANCEL - neutral */
 .cus-modal-cancel-btn {
+  background: #e5e7eb;
+  color: #374151;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.cus-modal-cancel-btn:hover {
+  background: #d1d5db;
+  transform: scale(1.05);
+}
+
+/* LOGOUT - danger */
+.cus-modal-logout-btn {
   background: #ff3b30;
   color: white;
   border: none;
@@ -339,25 +459,8 @@
   transition: 0.2s;
 }
 
-.cus-modal-cancel-btn:hover {
-  background: #e02f26;
-  transform: scale(1.05);
-}
-
-/* 🔵 CONFIRM */
-.cus-modal-logout-btn {
-  background: #005b9f;
-  color: white;
-  border: none;
-  padding: 12px 28px;
-  border-radius: 30px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.2s;
-}
-
 .cus-modal-logout-btn:hover {
-  background: #004a82;
+  background: #e02f26;
   transform: scale(1.05);
 }
 
@@ -411,4 +514,3 @@
   font-size: 11px;
   color: #94a3b8;
 }
-

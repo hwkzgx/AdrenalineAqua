@@ -32,6 +32,7 @@
   display: flex;
   gap: 20px;
   margin-bottom: 24px;
+  margin-top: 10px;
 }
 
 .staffsummary-card {
@@ -108,6 +109,7 @@
   align-items: center;
   gap: 12px;
   flex: 1;
+  margin-left: 0;
 }
 
 .staffright-controls {
@@ -120,7 +122,7 @@
 }
 
 .staffsearch-input {
-  width: 500px;
+  flex: 1;
   max-width: 320px;
   padding: 10px 14px;
   border: 1px solid #cbd5e1;
@@ -135,7 +137,6 @@
 }
 
 .stafffilter-select {
-  width: 200px;
   padding: 10px 14px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
@@ -165,12 +166,13 @@
   border-right: none;
 }
 
-.staffsort-menu .filter-select {
+.staffsort-menu .stafffilter-select {
   border-radius: 0 8px 8px 0;
 }
 
 /* Action Buttons (Add & Bulk Delete) */
 .staffadd-btn {
+  margin-top: 0;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -207,6 +209,8 @@
 
   position: absolute;
   right: 160px;
+  margin-right: 150px;
+  margin-top: 0;
 }
 
 .staffbulk-delete-btn:hover {
@@ -221,7 +225,7 @@
   background: white;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
-  overflow: hidden;
+  overflow-x: auto;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
@@ -262,7 +266,6 @@
 
 /* Status Pill Indicators inside Table Row */
 .staffstatus-pill {
-  display: inline-flex;
   padding: 4px 10px;
   border-radius: 5px;
   font-size: 12px;
@@ -333,7 +336,7 @@
   text-align: center;
 }
 
-.staffedit-icon-btn, .delete-icon-btn {
+.staffedit-icon-btn, .staffdelete-icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -492,7 +495,7 @@
   gap: 16px;
 }
 
-.staffinput-row .input-group {
+.staffinput-row .staffinput-group {
   flex: 1;
 }
 
@@ -764,4 +767,381 @@
 
 .staffyes-delete-btn:hover {
   background-color: #dc2626;
+}
+
+/* Export PDF Button Styling */
+.export-pdf-btn {
+  margin-top: 0;
+  width: 130px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #02457A;
+  color: white;
+  border: none;
+  padding: 0 16px;
+  height: 48px;
+  borderRadius: 12px; /* Kung standard CSS, 'border-radius' dapat */
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.export-pdf-btn:hover {
+  background-color: #013259;
+}
+
+/* ==========================================================
+   MODERN MODALS + TOAST (staffinv-*)
+   Used by the Add / Edit / Stock In / Delete modals and toast
+   in StaffInventory.jsx (copied from the admin JSX).
+   ========================================================== */
+
+/* ---------- TOAST ---------- */
+.staffinv-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10000;
+  min-width: 280px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  animation: staffinvToastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.staffinv-toast.success { background: #16a34a; }
+.staffinv-toast.error { background: #dc2626; }
+
+.staffinv-toast-icon {
+  display: flex;
+  align-items: center;
+}
+
+.staffinv-toast-text {
+  flex: 1;
+}
+
+@keyframes staffinvToastIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- OVERLAY + CARD ---------- */
+.staffinv-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.staffinv-modal {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 500px;
+  max-height: calc(100vh - 40px);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: modalScaleUp 0.2s ease-out;
+}
+
+.staffinv-modal.sm {
+  max-width: 420px;
+}
+
+/* ---------- HEADER ---------- */
+.staffinv-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.staffinv-modal-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+
+.staffinv-modal-icon.primary { background: #e0f2fe; color: #0284c7; }
+.staffinv-modal-icon.success { background: #dcfce7; color: #16a34a; }
+
+.staffinv-modal-titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.staffinv-modal-titles h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.staffinv-modal-titles p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.staffinv-modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.staffinv-modal-close:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* ---------- BODY / FIELDS ---------- */
+.staffinv-modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+.staffinv-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.staffinv-field:last-child {
+  margin-bottom: 0;
+}
+
+.staffinv-field-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.staffinv-field-row .staffinv-field {
+  margin-bottom: 0;
+}
+
+.staffinv-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.staffinv-field input,
+.staffinv-field select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.staffinv-field input:focus,
+.staffinv-field select:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+}
+
+.staffinv-hint {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+/* ---------- FOOTER / BUTTONS ---------- */
+.staffinv-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.staffinv-modal-footer.split .staffinv-btn {
+  flex: 1;
+}
+
+.staffinv-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+
+.staffinv-btn.ghost {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+}
+.staffinv-btn.ghost:hover { background: #f1f5f9; }
+
+.staffinv-btn.primary { background: #0ea5e9; color: #fff; }
+.staffinv-btn.primary:hover { background: #0284c7; }
+
+.staffinv-btn.success { background: #16a34a; color: #fff; }
+.staffinv-btn.success:hover { background: #15803d; }
+
+.staffinv-btn.danger { background: #dc2626; color: #fff; }
+.staffinv-btn.danger:hover { background: #b91c1c; }
+
+/* ---------- STOCK IN ---------- */
+.staffinv-stock-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.staffinv-stock-card span {
+  display: block;
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.staffinv-stock-card b {
+  font-size: 18px;
+  color: #0f172a;
+}
+
+.staffinv-stock-card b.after {
+  color: #16a34a;
+}
+
+.staffinv-stock-arrow {
+  font-size: 20px;
+  color: #94a3b8;
+}
+
+/* ---------- DELETE ---------- */
+.staffinv-delete-body {
+  padding: 28px 24px 8px;
+  text-align: center;
+  overflow-y: auto;
+}
+
+.staffinv-delete-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.staffinv-delete-body h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.staffinv-delete-text {
+  margin: 0 0 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+.staffinv-details-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.staffinv-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 13.5px;
+}
+
+.staffinv-detail-row span {
+  font-size: 11px;
+  font-weight: 700;
+  color: #b91c1c;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.staffinv-detail-row b {
+  color: #0f172a;
+  text-align: right;
+}
+
+.staffinv-code-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.staffinv-code-chip {
+  padding: 3px 8px;
+  background: #fff;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #b91c1c;
+}
+
+@media (max-width: 520px) {
+  .staffinv-field-row { flex-direction: column; gap: 16px; }
 }

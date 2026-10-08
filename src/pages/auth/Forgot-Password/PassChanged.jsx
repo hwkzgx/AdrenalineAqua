@@ -1,10 +1,12 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 import "./forgot-pass.css";
 
 export default function PassChanged() {
   const navigate = useNavigate();
+  const location = useLocation();
+const userType = location.state?.userType;
 
   return (
     <div className="login-wrapper">
@@ -12,7 +14,7 @@ export default function PassChanged() {
       <div className="login-left">
         <div className="overlay"></div>
         <div className="branding">
-          <h1>AQUA SYSTEM</h1>
+          <h1>ADRENALINE AQUA WATER</h1>
           <p>Secure & Smart Access</p>
         </div>
       </div>
@@ -35,7 +37,13 @@ export default function PassChanged() {
 
             <button
               className="login-btn"
-              onClick={() => navigate("/login")}
+             onClick={() =>
+  navigate(
+    userType === "rider"
+      ? "/rider/riderlogin"
+      : "/login"
+  )
+}
             >
               Login Now
             </button>

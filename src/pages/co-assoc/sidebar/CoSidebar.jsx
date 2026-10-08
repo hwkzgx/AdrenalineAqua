@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import "./co-sidebar.css";
 
@@ -11,53 +11,62 @@ import {
   faMoneyBill,
   faChartPie,
   faBox,
-  faArrowRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function CoSidebar() {
   const navigate = useNavigate();
-    const [openProfile, setOpenProfile] = useState(false);
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const location = useLocation();
+  const [openProfile, setOpenProfile] = useState(false);
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-
-    const toggleProfile = () => {
+  const toggleProfile = () => {
     setOpenProfile(!openProfile);
   };
+
+  // naka-highlight ang kasalukuyang page
+  const isActive = (path) =>
+    location.pathname === path || location.pathname.startsWith(path + "/");
+
   return (
     <div className="sidebar">
-
-    
       <img src={AquaLogo} alt="Aqua Logo" className="logo" />
 
-      
-      <button onClick={() => navigate("/co/dashboard")}>
+      <button
+        className={isActive("/co/dashboard") ? "active" : ""}
+        onClick={() => navigate("/co/dashboard")}
+      >
         <FontAwesomeIcon icon={faChartLine} /> Dashboard
       </button>
 
-      <button onClick={() => navigate("/co/expenses")}>
+      <button
+        className={isActive("/co/expenses") ? "active" : ""}
+        onClick={() => navigate("/co/expenses")}
+      >
         <FontAwesomeIcon icon={faMoneyBill} /> Expenses
       </button>
 
-      <button onClick={() => navigate("/co/sales")}>
+      <button
+        className={isActive("/co/sales") ? "active" : ""}
+        onClick={() => navigate("/co/sales")}
+      >
         <FontAwesomeIcon icon={faChartPie} /> Sales
       </button>
 
-      <button onClick={() => navigate("/co/inventory")}>
+      <button
+        className={isActive("/co/inventory") ? "active" : ""}
+        onClick={() => navigate("/co/inventory")}
+      >
         <FontAwesomeIcon icon={faBox} /> Inventory
       </button>
 
-     
       <div className="sidebar-bottom">
-
-      
         <div className="admin-profile" onClick={toggleProfile}>
           <img src={Profile} alt="Admin Profile" />
-        
-          <div>
-         <p className="name"> {user?.name || "User"} </p>
 
-        <p className="role">Co-Associate</p>
-      </div>
+          <div>
+            <p className="name">{user?.name || "User"}</p>
+            <p className="role">Co-Associate</p>
+          </div>
         </div>
       </div>
     </div>

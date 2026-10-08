@@ -1,120 +1,631 @@
-/* --- PAGE LAYOUT --- */
+/* ========================================================
+   CO-ASSOCIATE EXPENSES (view-only)
+   Para sa kasalukuyang co-expenses.jsx.
+   Lahat ng rule ay nasa ilalim ng .coexpenses-page para hindi
+   tumagos sa ibang page o matalo ng ibang CSS file.
+   ======================================================== */
+
+/* ========================================================
+   PAGE LAYOUT
+   ======================================================== */
 .coexpenses-page {
   padding: 30px;
   background-color: #f8fafc;
   min-height: 100vh;
 }
 
-.coexpenses-header {
-  margin-bottom: 24px;
+.coexpenses-page,
+.coexpenses-page *,
+.coexpenses-page *::before,
+.coexpenses-page *::after {
+  box-sizing: border-box;
 }
 
-.coexpenses-header h1 {
-  font-size: 28px;
-  color: #0f172a;
-  margin: 0 0 4px 0;
+.coexpenses-page .coexpenses-header {
+  margin-bottom: 20px;
+}
+
+.coexpenses-page .coexpenses-header h1 {
+  margin: 0;
+  font-size: 24px;
   font-weight: 700;
+  color: #1e293b;
 }
 
-.coexpenses-header p {
-  color: #64748b;
+.coexpenses-page .coexpenses-header p {
+  margin: 4px 0 0;
   font-size: 14px;
+  color: #64748b;
 }
 
-/* --- SUMMARY CARDS --- */
-.inventory-summary-cards {
+/* ========================================================
+   SUMMARY CARDS
+   Pantay ang lapad ng 3 cards, isang linya lang ang labels
+   ======================================================== */
+.coexpenses-page .inventory-summary-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-bottom: 25px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 22px;
 }
 
-.summary-card {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
+.coexpenses-page .summary-card {
   display: flex;
   align-items: center;
   gap: 16px;
+  min-width: 0;
+  padding: 18px 20px;
+  background: #ffffff;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
-.card-icon { color: #0f766e; width: 24px; height: 24px; }
-.summary-card h3 { font-size: 13px; color: #64748b; margin: 0; }
-.summary-card h2 { font-size: 22px; color: #1e293b; margin: 4px 0 0 0; }
+.coexpenses-page .summary-card > div:not(.card-icon-box) {
+  min-width: 0;
+}
 
-/* --- CONTROLS --- */
-.coexpenses-controls {
+.coexpenses-page .card-icon-box {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
   display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
   align-items: center;
+  justify-content: center;
+  background: #e8f7ee;
+  border-radius: 14px;
+}
+
+.coexpenses-page .card-icon {
+  width: 22px;
+  height: 22px;
+  color: #16a34a;
+}
+
+.coexpenses-page .summary-card h3 {
+  margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #334155;
+}
+
+.coexpenses-page .summary-card h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  white-space: nowrap;
+  color: #0f172a;
+}
+
+/* ========================================================
+   CONTROLS: filter, search, filter  ........  [Export PDF]
+   Pareho ang taas (44px) ng lahat, nasa kanan ang Export PDF
+   Pantay ang lapad ng 2 filters at Export PDF (190px)
+   ======================================================== */
+.coexpenses-page .coexpenses-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   width: 100%;
+  margin-bottom: 20px;
 }
 
-.coexpenses-search {
-   width: 500px;
-  padding: 12px 16px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+.coexpenses-page .coexpenses-search,
+.coexpenses-page .coexpenses-filter {
+  height: 44px;
+  padding: 0 14px;
+  font-family: inherit;
   font-size: 14px;
+  color: #334155;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
   outline: none;
-  transition: 0.3s;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.coexpenses-filter{
-  width: 200px;
-  padding: 12px 16px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background-color: white;
-  font-size: 14px;
+.coexpenses-page .coexpenses-search {
+  flex: 0 1 360px;
+  width: 360px;
+  min-width: 0;
+}
+
+.coexpenses-page .coexpenses-search::placeholder {
+  color: #94a3b8;
+}
+
+.coexpenses-page .coexpenses-filter {
+  flex: 0 0 190px;
+  width: 190px;
   cursor: pointer;
-  outline: none;
- 
 }
 
-.coexpenses-search { width: 400px; }
-.coexpenses-search:focus { border-color: #0ea5e9; box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
+.coexpenses-page .coexpenses-search:focus,
+.coexpenses-page .coexpenses-filter:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
+}
 
-/* --- TABLE CONTAINER --- */
-.coexpenses-table-container {
-  background: white;
-  border-radius: 12px;
+/* Export PDF: kapantay ng search at filters, pantay ang lapad sa filters, nasa kanan */
+.coexpenses-page .coexpenses-controls .coexpenses-export-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 0 0 190px !important;
+  width: 190px !important;
+  min-width: 0 !important;
+  height: 44px !important;
+  margin: 0 0 0 auto !important;
+  padding: 0 18px !important;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  color: #ffffff !important;
+  background: #02457A !important;
+  border: none !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 10px rgba(2, 69, 122, 0.25);
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.coexpenses-page .coexpenses-controls .coexpenses-export-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: #ffffff;
+}
+
+.coexpenses-page .coexpenses-controls .coexpenses-export-btn:hover:not(:disabled) {
+  background: #013259 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(2, 69, 122, 0.32);
+}
+
+.coexpenses-page .coexpenses-controls .coexpenses-export-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.coexpenses-page .coexpenses-controls .coexpenses-export-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ========================================================
+   TABLE CONTAINER
+   ======================================================== */
+.coexpenses-page .coexpenses-table-container {
+  margin-bottom: 24px;
+  background: #ffffff;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   overflow: hidden;
-  margin-bottom: 30px;
 }
 
-/* --- BOTTOM LAYOUT (LOGS & CHARTS) --- */
-.expenses-bottom-layout {
+/* ========================================================
+   BOTTOM LAYOUT (LOGS & CHART)
+   ======================================================== */
+.coexpenses-page .expenses-bottom-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 24px;
 }
 
-.expense-analysis-box {
-  background: white;
+.coexpenses-page .expense-analysis-box {
+  min-width: 0;
   padding: 20px;
-  border-radius: 12px;
+  background: #ffffff;
   border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.expense-analysis-box h3 { margin-top: 0; font-size: 16px; color: #334155; }
+.coexpenses-page .expense-analysis-box h3 {
+  margin: 0 0 16px;
+  padding-bottom: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  border-bottom: 1px solid #f1f5f9;
+}
 
-/* --- CHART & TIMELINE STYLES --- */
-.chart-bar-row { margin-bottom: 12px; }
-.chart-label-group { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
-.progress-bar-bg { background: #f1f5f9; height: 8px; border-radius: 4px; overflow: hidden; }
-.progress-bar-fill { height: 100%; background: #0f766e; }
+/* --- RECENT ACTIVITY --- */
+.coexpenses-page .activity-timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 280px;
+  overflow-y: auto;
+}
 
-.activity-timeline-container { max-height: 250px; overflow-y: auto; }
-.timeline-log-details { padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+.coexpenses-page .activity-timeline-item {
+  display: flex;
+  gap: 12px;
+}
 
-/* --- RESPONSIVE --- */
+.coexpenses-page .timeline-dot {
+  width: 10px;
+  height: 10px;
+  margin-top: 5px;
+  flex-shrink: 0;
+  background-color: #3b82f6;
+  border-radius: 50%;
+}
+
+.coexpenses-page .timeline-log-details {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  font-size: 14px;
+  color: #374151;
+}
+
+.coexpenses-page .timeline-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.coexpenses-page .timeline-code {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.coexpenses-page .timeline-date {
+  color: #94a3b8;
+}
+
+.coexpenses-page .timeline-log-details p {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.coexpenses-page .timeline-empty {
+  margin: 0;
+  padding: 20px;
+  font-size: 14px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+/* --- CATEGORY CHART --- */
+.coexpenses-page .chart-bars-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.coexpenses-page .chart-bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+
+.coexpenses-page .chart-label-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.coexpenses-page .chart-label-group span:first-child {
+  color: #4b5563;
+}
+
+.coexpenses-page .chart-label-group span:last-child {
+  font-weight: 600;
+  color: #111827;
+}
+
+.coexpenses-page .progress-bar-bg {
+  width: 100%;
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.coexpenses-page .progress-bar-fill {
+  height: 100%;
+  background: #0f766e;
+  border-radius: 9999px;
+  transition: width 0.5s ease-in-out;
+}
+
+/* ===============================================================
+   ================  RESPONSIVE (MOBILE LANG)  ===================
+   Lahat ng nasa baba ay nasa loob ng media query, kaya HINDI
+   nito binabago ang desktop design.
+   =============================================================== */
+
+/* ---------- LAPTOP (<= 1100px): pwedeng bumaba ang button ---------- */
+@media (max-width: 1100px) {
+  .coexpenses-page .coexpenses-controls {
+    flex-wrap: wrap;
+  }
+
+  .coexpenses-page .coexpenses-search {
+    flex: 1 1 240px;
+    width: auto;
+  }
+}
+
+/* ---------- TABLET (<= 900px) ----------
+   Summary cards: 1st = buong lapad, 2 pa = magkatabi at pantay */
 @media (max-width: 900px) {
-  .inventory-summary-cards, .expenses-bottom-layout { grid-template-columns: 1fr; }
-  .coexpenses-search { width: 100%; }
+  .coexpenses-page {
+    padding: 20px;
+  }
+
+  .coexpenses-page .expenses-bottom-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .coexpenses-page .inventory-summary-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .coexpenses-page .inventory-summary-cards .summary-card:first-child {
+    grid-column: 1 / -1;
+  }
+
+  /* kung hindi kasya ang table, mag-scroll pakaliwa/kanan */
+  .coexpenses-page .coexpenses-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .coexpenses-page .coexpenses-table-container table {
+    min-width: 560px;
+  }
+}
+
+/* ---------- MOBILE LAYOUT (<= 768px) ----------
+   May sariling padding na ang .main (12-14px) sa mobile layout,
+   kaya tinatanggal dito ang padding ng page para hindi doble. */
+@media (max-width: 768px) {
+  .coexpenses-page {
+    padding: 4px 0 24px;
+    min-height: 0;
+    background: transparent;
+  }
+}
+
+/* ---------- MOBILE (<= 600px): MODERN STYLE ---------- */
+@media (max-width: 600px) {
+  .coexpenses-page {
+    padding: 0 0 28px;
+    background: transparent;
+  }
+
+  /* ----- Header = banner ----- */
+  .coexpenses-page .coexpenses-header {
+    margin-bottom: 14px;
+    padding: 22px 18px;
+    background: linear-gradient(135deg, #2aa0ff, #0050b8);
+    border-radius: 24px;
+    box-shadow: 0 14px 30px rgba(0, 80, 184, 0.3);
+  }
+
+  .coexpenses-page .coexpenses-header h1 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .coexpenses-page .coexpenses-header p {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  /* ----- Summary cards -----
+     1st card = buong lapad sa taas
+     2 cards sa baba = magkatabi, pantay, mas maliit ang fonts para kasya */
+  .coexpenses-page .inventory-summary-cards {
+    margin-bottom: 14px;
+  }
+
+  .coexpenses-page .summary-card {
+    gap: 14px;
+    padding: 16px;
+    border: none;
+    border-radius: 22px;
+    box-shadow: 0 4px 16px rgba(15, 31, 61, 0.06);
+  }
+
+  .coexpenses-page .card-icon-box {
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+  }
+
+  .coexpenses-page .card-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .coexpenses-page .inventory-summary-cards .summary-card:not(:first-child) {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .coexpenses-page .inventory-summary-cards .summary-card:not(:first-child) .card-icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .coexpenses-page .inventory-summary-cards .summary-card:not(:first-child) .card-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .coexpenses-page .inventory-summary-cards .summary-card:not(:first-child) h3 {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+
+  .coexpenses-page .inventory-summary-cards .summary-card:not(:first-child) h2 {
+    font-size: 20px;
+  }
+
+  /* ----- Filters + search + export = isang card -----
+     Search = buong lapad sa taas
+     2 filters = magkatabi, pantay
+     Export PDF = buong lapad sa baba */
+  .coexpenses-page .coexpenses-controls {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 16px;
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 4px 16px rgba(15, 31, 61, 0.06);
+  }
+
+  .coexpenses-page .coexpenses-search {
+    grid-column: 1 / -1 !important;
+    order: -1;                        /* laging nasa taas ang search */
+  }
+
+  .coexpenses-page .coexpenses-search,
+  .coexpenses-page .coexpenses-filter {
+    display: block;
+    flex: none;
+    width: 100% !important;
+    min-width: 0;
+    height: 52px;
+    margin: 0;
+    padding: 0 16px;
+    font-size: 16px; /* para hindi mag-zoom ang iOS */
+    border: 1.5px solid #e3e9f3;
+    border-radius: 14px;
+  }
+
+  .coexpenses-page .coexpenses-filter {
+    padding-right: 40px;
+    font-weight: 500;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%230d7df2' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px;
+  }
+
+  .coexpenses-page .coexpenses-search:focus,
+  .coexpenses-page .coexpenses-filter:focus {
+    border-color: #0d7df2;
+    box-shadow: 0 0 0 4px rgba(13, 125, 242, 0.14);
+  }
+
+  /* sa phone lang: buong lapad, kapantay ng search at filters (52px) */
+  .coexpenses-page .coexpenses-controls .coexpenses-export-btn {
+    grid-column: 1 / -1 !important;
+    flex: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 52px !important;
+    margin: 0 !important;
+    font-size: 16px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #2aa0ff, #0062d6) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 12px 26px rgba(0, 98, 214, 0.35);
+  }
+
+  /* ----- Table ----- */
+  .coexpenses-page .coexpenses-table-container {
+    margin-bottom: 14px;
+    border: none;
+    border-radius: 22px;
+    box-shadow: 0 4px 16px rgba(15, 31, 61, 0.06);
+  }
+
+  /* ----- Recent activity + chart ----- */
+  .coexpenses-page .expenses-bottom-layout {
+    gap: 14px;
+  }
+
+  .coexpenses-page .expense-analysis-box {
+    padding: 18px 16px 22px;
+    border: none;
+    border-radius: 22px;
+    box-shadow: 0 4px 16px rgba(15, 31, 61, 0.06);
+  }
+
+  .coexpenses-page .expense-analysis-box h3 {
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .coexpenses-page .activity-timeline-container {
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .coexpenses-page .chart-label-group {
+    flex-wrap: wrap;
+    gap: 2px 12px;
+  }
+
+  .coexpenses-page .progress-bar-bg {
+    height: 10px;
+  }
+}
+
+/* ---------- MALIIT NA PHONE (<= 360px) ---------- */
+@media (max-width: 360px) {
+  .coexpenses-page {
+    padding: 0 0 24px;
+  }
+
+  .coexpenses-page .coexpenses-header h1 {
+    font-size: 21px;
+  }
+
+  .coexpenses-page .coexpenses-controls,
+  .coexpenses-page .expense-analysis-box {
+    padding: 14px 12px;
+  }
+
+  /* mas maliit para kasya ang laman ng filters sa kalahating lapad */
+  .coexpenses-page .coexpenses-filter {
+    font-size: 14px;
+    padding: 0 28px 0 12px;
+    background-position: right 10px center;
+  }
+
+  .coexpenses-page .inventory-summary-cards .summary-card:not(:first-child) {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .coexpenses-page .inventory-summary-cards .summary-card:not(:first-child) .card-icon-box {
+    width: 34px;
+    height: 34px;
+  }
+
+  .coexpenses-page .inventory-summary-cards .summary-card:not(:first-child) h3 {
+    font-size: 10px;
+    letter-spacing: 0;
+  }
 }

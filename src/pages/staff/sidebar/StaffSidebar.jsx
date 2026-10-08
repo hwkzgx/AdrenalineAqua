@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./staff-sidebar.css";
 
 import AquaLogo from "../../../assets/AquaLogo.png";
@@ -19,8 +19,27 @@ import {
 
 export default function StaffSidebar() {
   const navigate = useNavigate();
-    const [openProfile, setOpenProfile] = useState(false);
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const [openProfile, setOpenProfile] = useState(false);
+
+const [user, setUser] = useState(() =>
+  JSON.parse(localStorage.getItem("user") || "{}")
+);
+
+useEffect(() => {
+  const handleUserUpdated = () => {
+    const updatedUser = JSON.parse(
+      localStorage.getItem("user") || "{}"
+    );
+
+    setUser(updatedUser);
+  };
+
+  window.addEventListener("userUpdated", handleUserUpdated);
+
+  return () => {
+    window.removeEventListener("userUpdated", handleUserUpdated);
+  };
+}, []);
 
     const toggleProfile = () => {
     setOpenProfile(!openProfile);

@@ -6,6 +6,7 @@ import {
   faUserShield,
   faUsers,
   faUserTie,
+  faMotorcycle,
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function RoleSelection() {
@@ -15,7 +16,8 @@ export default function RoleSelection() {
   const roles = [
     { name: "Admin", path: "/login", state: "admin", icon: faUserShield },
     { name: "Co-Associate", path: "/register", state: "co", icon: faUsers },
-    { name: "Staff", path: "/register", state: "staff", icon: faUserTie }
+    { name: "Staff", path: "/register", state: "staff", icon: faUserTie },
+    { name: "Rider", path: "/rider/Riderlogin", state: "rider", icon: faMotorcycle },
   ];
 
   const handleContinue = () => {
@@ -33,7 +35,7 @@ export default function RoleSelection() {
       <div className="role-card">
 
         <div className="rsheader">
-          <span className="back" onClick={() => nav("/")}>
+          <span className="back" onClick={() => nav("/customer/customerlogin")}>
             ← Back
           </span>
           <h2>Please select Your Role</h2>

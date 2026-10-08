@@ -22,7 +22,7 @@ export default function GetStarted() {
           “The water that keeps you going.”
         </p>
 
-        <button onClick={() => nav("/roles")} className="start-btn">
+        <button onClick={() => nav("/customer/home")} className="start-btn">
           Get Started
         </button>
       </div>

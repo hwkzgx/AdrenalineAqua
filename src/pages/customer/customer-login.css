@@ -59,7 +59,7 @@
   min-height: 100vh;
   background: white;
   height: 100vh;
-  padding-top: 40px; /* Dinagdagan para mas bumaba ang container mula sa taas */
+  padding-top: 40px;
 }
 
 .login-right::before {
@@ -84,9 +84,9 @@
   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
   color: #1e3a8a;
   margin: auto;
-  margin-top: 50px; /* Siniguradong may allowance sa itaas para hindi pumantong sa text */
+  margin-top: 50px;
   position: relative;
-  text-align: left; 
+  text-align: left;
 }
 
 /* BACK BUTTON */
@@ -177,71 +177,6 @@
   100% { transform: translateY(0); }
 }
 
-/* MOBILE */
-@media (max-width: 768px) {
-  .login-wrapper {
-    position: relative;
-    display: block;
-  }
-
-  .cuslogin-left {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    align-items: flex-start;
-    padding-top: 30px;
-  }
-
-  .brand-logo {
-    margin-top: 20px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 5px;
-    width: 70px;
-  }
-
-  .branding h1 {
-    font-size: 18px;
-  }
-
-  .branding p {
-    font-size: 11px;
-  }
-
-  .login-right {
-    position: relative;
-    z-index: 2;
-    background: transparent;
-    height: 100vh;
-    min-height: 100vh;
-    padding-top: 50px; /* Binigyan ng sapat na espasyo sa mobile para hindi tumapat sa logo */
-  }
-
-  .login-right::before {
-    display: none;
-  }
-
-  .login-card {
-    width: 90%;
-    max-width: 350px;
-    padding: 22px;
-    margin-top: 20px;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-  }
-}
-
-@media (max-width: 480px) {
-  .login-card {
-    padding: 18px;
-  }
-
-  .login-input {
-    font-size: 16px;
-  }
-}
-
 .remember {
   display: flex;
   align-items: center;
@@ -249,7 +184,7 @@
   cursor: pointer;
   color: #0ea5e9;
   font-size: 13px;
-  white-space: nowrap; 
+  white-space: nowrap;
 }
 
 .remember input {
@@ -289,4 +224,253 @@
 
 .login-body {
   text-align: center;
+}
+
+/* Container para sa role login section sa ilalim ng pangunahing login button */
+.role-login-container {
+  margin-top: 15px;
+  text-align: center;
+  width: 100%;
+}
+
+/* Divider na may "or" sa gitna */
+.login-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  margin: 15px 0;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #ddd;
+}
+
+.login-divider::before {
+  margin-right: 10px;
+}
+
+.login-divider::after {
+  margin-left: 10px;
+}
+
+.role-login-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #2E7D32;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.role-login-btn:hover {
+  background-color: #1B5E20;
+}
+
+
+/* =====================================================
+   MOBILE ONLY (desktop hindi nagagalaw)
+   Flat form, maliit na header, naka-gitna
+   ===================================================== */
+@media (max-width: 768px) {
+  .login-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+    padding: 24px 0 32px !important;
+    background: #fbfaf9 !important;
+  }
+
+  /* ----- Header: logo at pangalan lang, pinaliit gamit ang zoom ----- */
+  .login-wrapper .cuslogin-left {
+    position: relative !important;
+    inset: auto !important;
+    flex: none !important;
+    z-index: 1;
+    align-items: center !important;
+    padding: 0 20px 6px !important;
+    background: none !important;
+    color: #0f172a !important;
+    zoom: 0.8 !important;            /* baguhin dito: 0.55 mas maliit, 0.65 mas malaki */
+  }
+
+  .login-wrapper .cuslogin-left .overlay {
+    display: none !important;
+  }
+
+  .login-wrapper .brand-logo {
+    width: 130px !important;
+    margin: 0 auto 14px !important;
+    animation: none !important;
+  }
+
+  .login-wrapper .branding h1 {
+    font-size: 28px !important;
+    line-height: 1.2 !important;
+    color: #1e3a8a !important;
+  }
+
+  .login-wrapper .branding p {
+    font-size: 15px !important;
+    margin: 6px 0 0 !important;
+    color: #64748b !important;
+    opacity: 1 !important;
+  }
+
+  /* ----- Form area: flat, walang card ----- */
+  .login-wrapper .login-right {
+    flex: none !important;
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    background: #fbfaf9 !important;
+    padding: 4px 20px 0 !important;
+  }
+
+  .login-wrapper .login-right::before {
+    display: none !important;
+  }
+
+  .login-wrapper .login-card {
+    width: 100% !important;
+    max-width: 360px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    text-align: left;
+  }
+
+  .login-wrapper .login-body {
+    text-align: left;
+  }
+
+  .login-wrapper .login-header {
+    margin-bottom: 6px !important;
+  }
+
+  .login-wrapper .cuslogback-btn,
+  .login-wrapper .back-btn {
+    color: #64748b !important;
+    font-size: 13px !important;
+  }
+
+  .login-wrapper .login-card h2 {
+    margin: 0 0 4px !important;
+    font-size: 16px !important;
+    font-weight: 800;
+    color: #1e3a8a !important;
+    text-align: center !important;
+  }
+
+  .login-wrapper .subtitle {
+    font-size: 13px;
+    color: #64748b;
+    opacity: 1;
+    text-align: left !important;
+  }
+
+  /* ----- Pill inputs ----- */
+  .login-wrapper .login-input {
+    height: 48px !important;
+    margin: 7px 0 !important;
+    padding: 0 18px !important;
+    font-size: 15px !important;
+    border-radius: 999px !important;
+    border: 1px solid #e2e0dd !important;
+    background: #fff !important;
+  }
+
+  .login-wrapper .login-input:focus {
+    border-color: #0ea5e9 !important;
+    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15) !important;
+  }
+
+  /* ----- Remember me (kaliwa) at Forgot password (kanan) ----- */
+  .login-wrapper .login-card div:has(> .remember) {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin: 8px 0 0 !important;
+  }
+
+  .login-wrapper .remember {
+    color: #475569 !important;
+    font-size: 13px !important;
+  }
+
+  .login-wrapper .remember input {
+    accent-color: #1e3a8a;
+  }
+
+  .login-wrapper .forgot {
+    display: block;
+    text-align: right;
+    color: #1e3a8a !important;
+    font-size: 13px !important;
+    font-weight: 700;
+  }
+
+  /* ----- Buttons: pill, full width ----- */
+  .login-wrapper .login-btn,
+  .login-wrapper .role-login-btn {
+    height: 48px !important;
+    padding: 0 !important;
+    font-size: 15px !important;
+    border-radius: 999px !important;
+  }
+
+  .login-wrapper .login-btn {
+    margin-top: 16px !important;
+    box-shadow: 0 10px 22px -8px rgba(30, 58, 138, 0.55);
+  }
+
+  .login-wrapper .login-divider {
+    margin: 12px 0 !important;
+    font-size: 12px !important;
+  }
+
+  .login-wrapper .signup-text {
+    margin-top: 14px !important;
+    font-size: 13px !important;
+    color: #64748b;
+  }
+
+  .login-wrapper .signup-text span {
+    color: #1e3a8a;
+    font-weight: 700;
+  }
+}
+
+/* Landscape phones (maiksi ang taas): itago ang logo para magkasya */
+@media (max-width: 768px) and (max-height: 500px) {
+  .login-wrapper {
+    padding: 8px 0 !important;
+  }
+
+  .login-wrapper .brand-logo,
+  .login-wrapper .branding p {
+    display: none !important;
+  }
+
+  .login-wrapper .cuslogin-left {
+    padding: 4px 20px !important;
+  }
 }

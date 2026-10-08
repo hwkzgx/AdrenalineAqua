@@ -1,14 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./rider-deliverydetails.css";
 import { useParams, useNavigate } from "react-router-dom";
 import RiderLeafletMap from "./RiderLeafletMap";
 import { supabase } from "../../../supabase";
+import Chat from "../../../components/Chat";
 import {
   ArrowLeft,
   Calendar,
   MapPin,
   Send,
-  Briefcase
+  Briefcase,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 
 export default function RiderDeliveryDetails() {
@@ -16,7 +19,24 @@ export default function RiderDeliveryDetails() {
   const [delivery, setDelivery] = useState(null);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showChat, setShowChat] = useState(false);
   const navigate = useNavigate();
+
+  // TOAST
+  const [toast, setToast] = useState(null); // { message, type: "success" | "error" }
+  const toastTimer = useRef(null);
+
+  const showToast = (message, type = "success") => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast({ message, type });
+    toastTimer.current = setTimeout(() => setToast(null), 9000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+    };
+  }, []);
 
   // Estados para sa Modal at Map
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -29,7 +49,7 @@ export default function RiderDeliveryDetails() {
   const [destinationPosition, setDestinationPosition] = useState(null);
   const [mapCoordinates, setMapCoordinates] = useState([14.8311, 120.7358]);
 
-  // Estados para sa Container Tracking Modal (Idinagdag)
+  // Estados para sa Container Tracking Modal
   const [showContainerModal, setShowContainerModal] = useState(false);
   const [containersDelivered, setContainersDelivered] = useState(0);
   const [containersReturned, setContainersReturned] = useState(0);
@@ -155,9 +175,12 @@ export default function RiderDeliveryDetails() {
       .select(`
         order_id,
         order_code,
+        user_id,
         full_name,
         delivery_address,
         delivery_date,
+        destination_lat,
+        destination_lng,
         delivery_schedule (
           order_id,
           delivery_code,
@@ -188,26 +211,35 @@ export default function RiderDeliveryDetails() {
     const riderLng = data.delivery_schedule?.[0]?.rider_lng;
 
     if (riderLat && riderLng) {
-      setRiderPosition([
-        Number(riderLat),
-        Number(riderLng),
-      ]);
+      setRiderPosition([Number(riderLat), Number(riderLng)]);
     }
 
-    if (data.delivery_address) {
+    if (data.destination_lat && data.destination_lng) {
+      const destination = [
+        Number(data.destination_lat),
+        Number(data.destination_lng),
+      ];
+
+      setDestinationPosition(destination);
+      setMapCoordinates(destination);
+    } else if (data.delivery_address) {
       setMapQuery(data.delivery_address);
     }
 
     if (!scheduleId) {
+      // Gamitin ang nakalogin na rider (wala nang "Mark" na fallback)
+      const currentUser = JSON.parse(localStorage.getItem("user") || "null");
+
       const { data: newSched, error: insertError } = await supabase
         .from("delivery_schedule")
         .insert([
-          { 
-            order_id: data.order_id, 
+          {
+            order_id: data.order_id,
             delivery_status: "Pending",
-            assigned_rider: localStorage.getItem("userName") || "Mark",
-            delivery_code: `DEL-${data.order_id}`
-          }
+            assigned_rider: currentUser?.name || null,
+            assigned_rider_id: currentUser?.users_id ?? null,
+            delivery_code: `DEL-${data.order_id}`,
+          },
         ])
         .select()
         .single();
@@ -223,6 +255,7 @@ export default function RiderDeliveryDetails() {
       orderId: data.order_id,
       scheduleOrderId: scheduleId,
       deliveryId: deliveryCode || "N/A",
+      customerId: data.user_id,
       full_name: data.full_name,
       delivery_address: data.delivery_address,
       delivery_date: data.delivery_date,
@@ -235,7 +268,7 @@ export default function RiderDeliveryDetails() {
 
   const updateDeliveryStatus = async (newStatus) => {
     if (!delivery?.scheduleOrderId) {
-      alert("Hindi ma-update: Walang nakitang schedule reference sa database.");
+      showToast("Hindi ma-update: walang nakitang schedule sa database.", "error");
       return;
     }
 
@@ -246,14 +279,21 @@ export default function RiderDeliveryDetails() {
 
     if (error) {
       console.log("Error updating status:", error.message);
-      alert("Failed to update status.");
+      showToast("Failed to update status.", "error");
     } else {
       setDelivery((prev) => ({ ...prev, delivery_status: newStatus }));
-      alert(`Status updated to: ${newStatus}`);
+
+      if (newStatus === "Out for Delivery") {
+        showToast("Delivery accepted! You're now out for delivery.");
+      } else if (newStatus === "Delivered") {
+        showToast("Delivery marked as delivered!");
+      } else {
+        showToast(`Status updated to: ${newStatus}`);
+      }
     }
   };
 
-  // Function para i-save ang container transactions sa Supabase (Idinagdag)
+  // I-save ang container transactions sa Supabase, tapos i-mark as delivered
   const handleSaveContainerAndDelivery = async () => {
     const delivered = Number(containersDelivered);
     const returned = Number(containersReturned);
@@ -268,12 +308,12 @@ export default function RiderDeliveryDetails() {
           delivered_quantity: delivered,
           returned_quantity: returned,
           outstanding_quantity: outstanding,
-          container_status: status
-        }
+          container_status: status,
+        },
       ]);
 
     if (containerError) {
-      alert("Error sa pag-save ng container: " + containerError.message);
+      showToast("Error saving container: " + containerError.message, "error");
       return;
     }
 
@@ -302,9 +342,21 @@ export default function RiderDeliveryDetails() {
 
   return (
     <div className="details-container">
+      {/* TOAST */}
+      {toast && (
+        <div className={`toast toast-${toast.type}`} role="status">
+          {toast.type === "success" ? (
+            <CheckCircle2 size={20} />
+          ) : (
+            <XCircle size={20} />
+          )}
+          <span>{toast.message}</span>
+        </div>
+      )}
+
       <div className="header">
         <div className="header-left">
-          <button onClick={() => navigate(-1)} className="back-btn">
+          <button onClick={() => navigate(-1)} className="rddback-btn">
             <ArrowLeft size={20} />
           </button>
           <h2>Delivery Details</h2>
@@ -317,14 +369,20 @@ export default function RiderDeliveryDetails() {
             <p className="detailslabel">Delivery ID</p>
             <h1>{delivery.deliveryId}</h1>
           </div>
-          <span className={`deliverydetstatus ${currentStatus.toLowerCase().replace(/\s+/g, '-')}`}>
+          <span
+            className={`deliverydetstatus ${currentStatus
+              .toLowerCase()
+              .replace(/\s+/g, "-")}`}
+          >
             {currentStatus}
           </span>
         </div>
 
         <div className="customer-row">
           <h3 className="customer-name">{delivery.full_name}</h3>
-          <button className="message-btn">Message</button>
+          <button className="message-btn" onClick={() => setShowChat(true)}>
+            Message
+          </button>
         </div>
 
         <div className="schedule">
@@ -342,7 +400,7 @@ export default function RiderDeliveryDetails() {
           <h3>Delivery Address</h3>
         </div>
         <p className="address">{delivery.delivery_address}</p>
-        
+
         {/* VIEW MAP BUTTON */}
         <button className="open-map" onClick={handleOpenMapClick}>
           <Send size={18} /> View Map
@@ -366,88 +424,182 @@ export default function RiderDeliveryDetails() {
         )}
       </div>
 
-      <button 
-        className="accept-btn" 
+      <button
+        className="accept-btn"
         onClick={() => updateDeliveryStatus("Out for Delivery")}
         disabled={currentStatus !== "Pending"}
-        style={{ opacity: currentStatus !== "Pending" ? 0.5 : 1, cursor: currentStatus !== "Pending" ? "not-allowed" : "pointer" }}
+        style={{
+          opacity: currentStatus !== "Pending" ? 0.5 : 1,
+          cursor: currentStatus !== "Pending" ? "not-allowed" : "pointer",
+        }}
       >
         Accept Delivery
       </button>
 
-      {/* Binago ang onClick para magbukas muna ng container modal bago i-mark as delivered */}
-      <button 
-        className="delivered-btn" 
+      {/* Magbubukas muna ng container modal bago i-mark as delivered */}
+      <button
+        className="delivered-btn"
         onClick={() => setShowContainerModal(true)}
         disabled={currentStatus !== "Out for Delivery"}
-        style={{ opacity: currentStatus !== "Out for Delivery" ? 0.5 : 1, cursor: currentStatus !== "Out for Delivery" ? "not-allowed" : "pointer" }}
+        style={{
+          opacity: currentStatus !== "Out for Delivery" ? 0.5 : 1,
+          cursor:
+            currentStatus !== "Out for Delivery" ? "not-allowed" : "pointer",
+        }}
       >
         Mark as Delivered
       </button>
 
       {currentStatus === "Delivered" && (
-        <p style={{ textAlign: "center", fontWeight: "600", color: "#047857", marginTop: "15px" }}>
+        <p
+          style={{
+            textAlign: "center",
+            fontWeight: "600",
+            color: "#047857",
+            marginTop: "15px",
+          }}
+        >
           ✓ This delivery has been completed.
         </p>
       )}
 
-      {/* CONTAINER TRACKING MODAL (Idinagdag) */}
+      {/* CONTAINER TRACKING MODAL */}
       {showContainerModal && (
-        <div style={{
-          position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
-          backgroundColor: "rgba(0,0,0,0.6)", display: "flex", justifyContent: "center",
-          alignItems: "center", zIndex: 1200, padding: "20px"
-        }}>
-          <div style={{
-            background: "#fff", padding: "24px", borderRadius: "16px", width: "100%", maxWidth: "360px",
-            boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
-          }}>
-            <h3 style={{ marginBottom: "6px", fontSize: "18px", color: "#1e293b" }}>Container Summary</h3>
-            <p style={{ fontSize: "13px", color: "#64748b", marginBottom: "20px" }}>How many containers were dropped off and returned by the customer?</p>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.6)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1200,
+            padding: "20px",
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              padding: "24px",
+              borderRadius: "16px",
+              width: "100%",
+              maxWidth: "360px",
+              boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+            }}
+          >
+            <h3 style={{ marginBottom: "6px", fontSize: "18px", color: "#1e293b" }}>
+              Container Summary
+            </h3>
+            <p style={{ fontSize: "13px", color: "#64748b", marginBottom: "20px" }}>
+              How many containers were dropped off and returned by the customer?
+            </p>
 
             <div style={{ marginBottom: "15px" }}>
-              <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "5px", color: "#334155" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "13px",
+                  fontWeight: "600",
+                  marginBottom: "5px",
+                  color: "#334155",
+                }}
+              >
                 Containers Delivered:
               </label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 min="0"
                 value={containersDelivered}
-                onChange={(e) => setContainersDelivered(parseInt(e.target.value) || 0)}
-                style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "15px" }}
+                onChange={(e) =>
+                  setContainersDelivered(parseInt(e.target.value) || 0)
+                }
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  border: "1px solid #cbd5e1",
+                  fontSize: "15px",
+                }}
               />
             </div>
 
             <div style={{ marginBottom: "15px" }}>
-              <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "5px", color: "#334155" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "13px",
+                  fontWeight: "600",
+                  marginBottom: "5px",
+                  color: "#334155",
+                }}
+              >
                 Containers Returned:
               </label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 min="0"
                 value={containersReturned}
-                onChange={(e) => setContainersReturned(parseInt(e.target.value) || 0)}
-                style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "15px" }}
+                onChange={(e) =>
+                  setContainersReturned(parseInt(e.target.value) || 0)
+                }
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  border: "1px solid #cbd5e1",
+                  fontSize: "15px",
+                }}
               />
             </div>
 
-            <div style={{ backgroundColor: "#f8fafc", padding: "10px 14px", borderRadius: "8px", marginBottom: "20px", border: "1px solid #e2e8f0" }}>
-              <span style={{ fontSize: "13px", color: "#475569" }}>Outstanding Balance: </span>
+            <div
+              style={{
+                backgroundColor: "#f8fafc",
+                padding: "10px 14px",
+                borderRadius: "8px",
+                marginBottom: "20px",
+                border: "1px solid #e2e8f0",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#475569" }}>
+                Outstanding Balance:{" "}
+              </span>
               <strong style={{ fontSize: "14px", color: "#2563eb" }}>
                 {containersDelivered - containersReturned} container(s)
               </strong>
             </div>
 
             <div style={{ display: "flex", gap: "10px" }}>
-              <button 
+              <button
                 onClick={() => setShowContainerModal(false)}
-                style={{ flex: 1, padding: "10px", background: "#e2e8f0", border: "none", borderRadius: "8px", fontWeight: "600", cursor: "pointer", color: "#475569" }}
+                style={{
+                  flex: 1,
+                  padding: "10px",
+                  background: "#e2e8f0",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  color: "#475569",
+                }}
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={handleSaveContainerAndDelivery}
-                style={{ flex: 1, padding: "10px", background: "#2563eb", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "600", cursor: "pointer" }}
+                style={{
+                  flex: 1,
+                  padding: "10px",
+                  background: "#2563eb",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                }}
               >
                 Save & Complete
               </button>
@@ -458,32 +610,68 @@ export default function RiderDeliveryDetails() {
 
       {/* 1. QUESTION MODAL (Lalabas lang sa unang beses) */}
       {showConfirmModal && (
-        <div style={{
-          position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
-          backgroundColor: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center",
-          alignItems: "center", zIndex: 1000, padding: "20px"
-        }}>
-          <div style={{
-            background: "#fff", padding: "24px", borderRadius: "12px", width: "100%", maxWidth: "320px",
-            textAlign: "center", boxShadow: "0 4px 20px rgba(0,0,0,0.15)"
-          }}>
-            <h3 style={{ marginBottom: "10px", fontSize: "18px", color: "#1e293b" }}>Open Map?</h3>
-            <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px" }}>Do you want to open the live map for this delivery address?</p>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+            padding: "20px",
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              padding: "24px",
+              borderRadius: "12px",
+              width: "100%",
+              maxWidth: "320px",
+              textAlign: "center",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+            }}
+          >
+            <h3 style={{ marginBottom: "10px", fontSize: "18px", color: "#1e293b" }}>
+              Open Map?
+            </h3>
+            <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "20px" }}>
+              Do you want to open the live map for this delivery address?
+            </p>
             <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-              <button 
+              <button
                 onClick={() => setShowConfirmModal(false)}
-                style={{ padding: "8px 16px", background: "#e2e8f0", border: "none", borderRadius: "6px", fontWeight: "600", cursor: "pointer" }}
+                style={{
+                  padding: "8px 16px",
+                  background: "#e2e8f0",
+                  border: "none",
+                  borderRadius: "6px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                }}
               >
                 No
               </button>
-              <button 
+              <button
                 onClick={() => {
                   localStorage.setItem("riderMapConfirmed", "true");
                   setHasConfirmedMap(true);
                   setShowConfirmModal(false);
                   setShowMapModal(true);
                 }}
-                style={{ padding: "8px 16px", background: "#2563eb", color: "#fff", border: "none", borderRadius: "6px", fontWeight: "600", cursor: "pointer" }}
+                style={{
+                  padding: "8px 16px",
+                  background: "#2563eb",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "6px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                }}
               >
                 Yes
               </button>
@@ -492,64 +680,121 @@ export default function RiderDeliveryDetails() {
         </div>
       )}
 
-      {/* 2. MAP MODAL (Google Maps Embed na may Tricycle Indicator) */}
+      {/* 2. MAP MODAL (may Tricycle Indicator) */}
       {showMapModal && (
-        <div style={{
-          position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
-          backgroundColor: "rgba(0,0,0,0.6)", display: "flex", justifyContent: "center",
-          alignItems: "center", zIndex: 1100, padding: "20px"
-        }}>
-          <div style={{
-            background: "#fff", borderRadius: "16px", width: "100%", maxWidth: "500px",
-            overflow: "hidden", boxShadow: "0 10px 25px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column"
-          }}>
-            <div style={{ padding: "15px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #e2e8f0" }}>
-              <h3 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b" }}>Delivery Map Route</h3>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.6)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1100,
+            padding: "20px",
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: "16px",
+              width: "100%",
+              maxWidth: "500px",
+              overflow: "hidden",
+              boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <div
+              style={{
+                padding: "15px 20px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                borderBottom: "1px solid #e2e8f0",
+              }}
+            >
+              <h3 style={{ fontSize: "16px", fontWeight: "600", color: "#1e293b" }}>
+                Delivery Map Route
+              </h3>
             </div>
 
             <div style={{ padding: "15px", backgroundColor: "#f8fafc" }}>
               <p style={{ fontSize: "13px", color: "#475569", marginBottom: "10px" }}>
                 <strong>Destination:</strong> {delivery.delivery_address}
               </p>
-              
-              <div style={{ height: "350px", width: "100%", borderRadius: "10px", overflow: "hidden", position: "relative" }}>
+
+              <div
+                style={{
+                  height: "350px",
+                  width: "100%",
+                  borderRadius: "10px",
+                  overflow: "hidden",
+                  position: "relative",
+                }}
+              >
                 <RiderLeafletMap
                   center={mapCoordinates}
                   riderPosition={riderPosition}
                   destinationPosition={destinationPosition}
+                  isTracking={currentStatus === "Out for Delivery"}
                 />
 
                 {/* TRICYCLE INDICATOR BADGE */}
-                <div style={{
-                  position: "absolute",
-                  bottom: "15px",
-                  left: "15px",
-                  background: "white",
-                  padding: "8px 14px",
-                  borderRadius: "30px",
-                  boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  zIndex: 10,
-                  border: "1px solid #e2e8f0"
-                }}>
-                  <div style={{
-                    background: "#2563eb",
-                    color: "white",
-                    width: "34px",
-                    height: "34px",
-                    borderRadius: "50%",
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "15px",
+                    left: "15px",
+                    background: "white",
+                    padding: "8px 14px",
+                    borderRadius: "30px",
+                    boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "16px"
-                  }}>
+                    gap: "10px",
+                    zIndex: 10,
+                    border: "1px solid #e2e8f0",
+                  }}
+                >
+                  <div
+                    style={{
+                      background: "#2563eb",
+                      color: "white",
+                      width: "34px",
+                      height: "34px",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "16px",
+                    }}
+                  >
                     🛺
                   </div>
                   <div>
-                    <p style={{ fontSize: "10px", fontWeight: "700", color: "#2563eb", margin: 0 }}>ACTIVE ROUTE</p>
-                    <p style={{ fontSize: "11px", fontWeight: "600", color: "#1e293b", margin: 0 }}>
+                    <p
+                      style={{
+                        fontSize: "10px",
+                        fontWeight: "700",
+                        color: "#2563eb",
+                        margin: 0,
+                      }}
+                    >
+                      ACTIVE ROUTE
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "11px",
+                        fontWeight: "600",
+                        color: "#1e293b",
+                        margin: 0,
+                      }}
+                    >
                       {isRiderMoving ? "Tricycle is moving..." : "Heading to destination"}
                     </p>
                   </div>
@@ -557,14 +802,65 @@ export default function RiderDeliveryDetails() {
               </div>
             </div>
 
-            <div style={{ padding: "12px 20px", textAlign: "right", borderTop: "1px solid #e2e8f0" }}>
-              <button 
+            <div
+              style={{
+                padding: "12px 20px",
+                textAlign: "right",
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <button
                 onClick={() => setShowMapModal(false)}
-                style={{ padding: "8px 16px", background: "#64748b", color: "#fff", border: "none", borderRadius: "6px", fontWeight: "600", cursor: "pointer" }}
+                style={{
+                  padding: "8px 16px",
+                  background: "#64748b",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "6px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                }}
               >
                 Close Map
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* CUSTOMER-RIDER CHAT */}
+      {showChat && delivery?.customerId && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              padding: "20px",
+              borderRadius: "16px",
+              width: "500px",
+              maxWidth: "90%",
+            }}
+          >
+            <Chat
+              orderId={delivery.orderId}
+              currentUserId={
+                JSON.parse(localStorage.getItem("user"))?.users_id ||
+                JSON.parse(localStorage.getItem("user"))?.id
+              }
+              otherUserId={delivery.customerId}
+              otherUserName={delivery.full_name}
+              otherUserRole="Customer"
+              onClose={() => setShowChat(false)}
+            />
           </div>
         </div>
       )}

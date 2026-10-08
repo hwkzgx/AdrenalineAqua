@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 import "./customer-forgotpassword.css";
 
+
 export default function CustomerAccountCreated() {
   const navigate = useNavigate();
 

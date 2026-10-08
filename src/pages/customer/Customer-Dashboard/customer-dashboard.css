@@ -32,9 +32,10 @@ body {
 }
 
 .welcome-section h1 {
-  font-size: 30px;
+  font-size: 28px;
   color: #111827;
   font-weight: 700;
+  letter-spacing: -0.3px;
 }
 
 .welcome-section p {
@@ -53,8 +54,8 @@ body {
 }
 
 .month-btn {
-  border: 1px solid #004292;
-  box-shadow: 0 2px 10px rgba(123, 191, 255, 0.4);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   background: #fff;
   padding: 10px 16px;
   border-radius: 12px;
@@ -63,13 +64,14 @@ body {
   align-items: center;
   cursor: pointer;
   color: #2563eb;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 14px;
-  transition: 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .month-btn:hover {
-  background: #f8fbff;
+  border-color: #93c5fd;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.12);
 }
 
 /* GRAPH HEADER */
@@ -78,11 +80,13 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .graph-header h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 19px;
   color: #111827;
   font-weight: 700;
 }
@@ -106,8 +110,8 @@ body {
   width: 180px;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-  border: 1px solid #e2e8f0;
+  box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.18), 0 4px 10px rgba(15, 23, 42, 0.06);
+  border: 1px solid #eef2f7;
   overflow: hidden;
   z-index: 9999;
   animation: dropFade 0.15s ease;
@@ -121,6 +125,7 @@ body {
   border-bottom: 1px solid #eef2f7;
   font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .month-dropdown-menu div {
@@ -128,7 +133,7 @@ body {
   cursor: pointer;
   font-size: 13px;
   color: #1f2937;
-  transition: 0.2s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .month-dropdown-menu div:hover {
@@ -148,7 +153,7 @@ body {
 }
 
 /* =========================
-   TOP CARDS (PANTAY-PANTAY)
+   TOP CARDS
 ========================= */
 
 .top-cards {
@@ -160,20 +165,26 @@ body {
 
 .card {
   background: #fff;
-  border-radius: 20px;
-  padding: 24px;
-  border: 1px solid #004292;
-  box-shadow: 0 2px 10px rgba(123, 191, 255, 0.4);
+  border-radius: 18px;
+  padding: 22px;
+  border: 1px solid #eef2f7;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 8px 20px -8px rgba(15, 23, 42, 0.06);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 200px; /* Eksaktong nagpapantay sa height ng tatlong cards */
+  min-height: 190px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 14px 28px -10px rgba(15, 23, 42, 0.1);
 }
 
 .icon-box {
-  width: 50px;
-  height: 50px;
-  border-radius: 14px;
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
   background: #eff6ff;
   display: flex;
   align-items: center;
@@ -183,22 +194,23 @@ body {
 }
 
 .card h3 {
-  font-size: 15px;
+  font-size: 13.5px;
   margin-bottom: 6px;
-  color: #1f2937;
+  color: #64748b;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
-/* Ginawang pare-pareho ang sizing ng text sa loob para lapat at malinis */
 .card h2 {
-  font-size: 32px;
-  color: #2563eb;
+  font-size: 30px;
+  color: #111827;
   font-weight: 700;
   line-height: 1.2;
 }
 
 .card h2 span {
-  font-size: 15px;
+  font-size: 14px;
   color: #4b5563;
   font-weight: 500;
 }
@@ -208,41 +220,41 @@ body {
   padding-top: 14px;
   display: flex;
   justify-content: space-between;
-  color: #6b7280;
-  font-size: 13px;
-  border-top: 1px solid #f3f4f6;
+  color: #94a3b8;
+  font-size: 12.5px;
+  border-top: 1px solid #f1f5f9;
 }
 
 /* =========================
-   GRAPH SECTION (MODERN)
+   GRAPH SECTION
 ========================= */
 
 .graph-card {
   background: #fff;
-  border-radius: 22px;
+  border-radius: 20px;
   padding: 24px 28px;
-  border: 1px solid #004292;
-  box-shadow: 0 2px 10px rgba(123, 191, 255, 0.4);
+  border: 1px solid #eef2f7;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 8px 20px -8px rgba(15, 23, 42, 0.06);
   margin-bottom: 24px;
 }
 
 .graph {
   position: relative;
   height: 260px;
-  border-left: 1px solid #cbd5e1;
-  border-bottom: 1px solid #cbd5e1;
+  border-left: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
   margin: 15px 0 16px 0;
   background-image: linear-gradient(to right, rgba(241, 245, 249, 0.6) 1px, transparent 1px);
   background-size: 11.11% 100%;
+  border-radius: 4px;
 }
 
-/* MODERN LINE / AREA GRADIENT */
 .line {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(37, 99, 235, 0.2),
+    rgba(37, 99, 235, 0.18),
     rgba(37, 99, 235, 0.02)
   );
   clip-path: polygon(
@@ -260,15 +272,14 @@ body {
   );
 }
 
-/* POINTS */
 .point {
   position: absolute;
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
   background: #2563eb;
   border-radius: 50%;
   border: 2px solid #ffffff;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.22);
   transform: translate(-50%, 50%);
   cursor: pointer;
 }
@@ -283,17 +294,16 @@ body {
   background: #0f172a;
   color: #fff;
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: 5px;
   white-space: nowrap;
 }
 
-/* LABELS */
 .graph-labels {
   display: flex;
   justify-content: space-between;
   gap: 4px;
   font-size: 10px;
-  color: #64748b;
+  color: #94a3b8;
   font-weight: 500;
   text-align: center;
   padding-top: 8px;
@@ -318,10 +328,10 @@ body {
 .customer-delivery-card,
 .recent-card {
   background: white;
-  border-radius: 22px;
+  border-radius: 20px;
   padding: 24px;
-  border: 1px solid #004292;
-  box-shadow: 0 2px 10px rgba(123, 191, 255, 0.4);
+  border: 1px solid #eef2f7;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 8px 20px -8px rgba(15, 23, 42, 0.06);
 }
 
 .customer-section-header,
@@ -335,7 +345,7 @@ body {
 .customer-section-header h2,
 .section-header h2 {
   color: #111827;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
 }
 
@@ -346,13 +356,14 @@ body {
   background: #f8fafc;
   padding: 16px;
   border-radius: 14px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #eef2f7;
 }
 
 .customer-delivery-content img {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
+  flex-shrink: 0;
 }
 
 .customer-delivery-content h4 {
@@ -369,7 +380,7 @@ body {
 
 .customer-delivery-content button {
   margin-left: auto;
-  height: 36px;
+  height: 34px;
   border: none;
   background: #dbeafe;
   color: #2563eb;
@@ -378,6 +389,7 @@ body {
   font-weight: 600;
   font-size: 12px;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 /* TABLE STYLING */
@@ -389,6 +401,7 @@ body {
 
 .table-container table {
   width: 100%;
+  min-width: 420px;
   border-collapse: collapse;
   text-align: left;
 }
@@ -400,6 +413,7 @@ body {
   font-weight: 600;
   border-bottom: 1px solid #e2e8f0;
   background: #f8fafc;
+  white-space: nowrap;
 }
 
 .table-container tbody td {
@@ -407,6 +421,7 @@ body {
   border-top: 1px solid #f1f5f9;
   font-size: 13px;
   color: #1e293b;
+  white-space: nowrap;
 }
 
 .table-container tbody tr:hover {
@@ -417,99 +432,91 @@ body {
    RESPONSIVE DESIGN
 ========================= */
 
+/* TABLET (<=1200px): 3 cards still fit, tighten bottom grid */
 @media (max-width: 1200px) {
+  .customer-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* TABLET (<=1024px): cards go 2-column */
+@media (max-width: 1024px) {
   .top-cards {
     grid-template-columns: repeat(2, 1fr);
   }
-
-  .customer-bottom-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
+/* MOBILE (<=768px) */
 @media (max-width: 768px) {
-  .top-cards {
-    grid-template-columns: 1fr;
-  }
-
-  .welcome-section {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .graph-labels {
-    font-size: 9px;
-  }
-
   .cusdashboard-container {
     padding: 16px;
-  }
-
-  @media (max-width: 1024px) {
-  .customer-bottom-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .cusdashboard-container {
-    padding: 12px;
   }
 
   .welcome-section {
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
-    margin-bottom: 14px;
+    margin-bottom: 18px;
   }
 
   .welcome-section h1 {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   .welcome-section p {
-    font-size: 11px;
+    font-size: 12.5px;
   }
 
-  /* Nanatiling 3-columns sa taas kahit mobile para magkatabi sila pero mas maliit */
+  /* 1 card per row para mas madaling basahin sa maliit na screen */
   .top-cards {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-bottom: 16px;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
   }
 
   .card {
-    padding: 10px;
-    min-height: 95px;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    min-height: auto;
   }
 
-  .card h2 {
-    font-size: 14px;
-  }
-
-  .card h3 {
-    font-size: 9.5px;
-  }
-
-  .card-bottom {
-    font-size: 8.5px;
+  .card > div:not(.icon-box) {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: left;
   }
 
   .icon-box {
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
-    margin-bottom: 4px;
+    width: 42px;
+    height: 42px;
+    margin-bottom: 0;
+    flex-shrink: 0;
   }
 
-  .icon-box svg, 
-  .icon-box i {
+  .card h3 {
     font-size: 11px;
+    margin-bottom: 0;
+  }
+
+  .card h2 {
+    font-size: 19px;
+  }
+
+  .card-bottom {
+    display: none;
   }
 
   .graph-card {
-    padding: 12px;
-    margin-bottom: 16px;
+    padding: 16px;
+    margin-bottom: 18px;
+  }
+
+  .graph {
+    height: 200px;
   }
 
   .graph-header {
@@ -527,29 +534,376 @@ body {
     justify-content: space-between;
   }
 
+  .graph-labels {
+    font-size: 8.5px;
+  }
+
   .customer-bottom-grid {
     gap: 14px;
   }
 
   .customer-delivery-card,
   .recent-card {
-    padding: 12px;
+    padding: 16px;
   }
 
   .customer-delivery-content {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    flex-wrap: wrap;
   }
 
   .customer-delivery-content button {
     margin-left: 0;
     width: 100%;
+    height: 38px;
   }
 
-  .month-btn.small{
-    width: 150px;
-    margin-left: 270px;
+  .month-btn.small {
+    width: 100%;
+    margin-left: 0;
   }
 }
+
+/* SMALL PHONES */
+@media (max-width: 420px) {
+  .welcome-section h1 {
+    font-size: 18px;
+  }
+
+  .card h2 {
+    font-size: 18px;
+  }
+
+  .customer-section-header h2,
+  .section-header h2 {
+    font-size: 15px;
+  }
+}
+
+/* =====================================================
+   MOBILE REDESIGN (<= 768px)
+   Import AFTER customer-dashboard.css so it overrides
+   the old mobile block. Desktop is not affected.
+===================================================== */
+
+/* mobile-only elements: hidden by default (desktop) */
+.view-orders-btn,
+.range-seg,
+.graph-line,
+.lbl-short {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* ---------- BACKGROUND + PAGE ---------- */
+  .cusdashboard-container {
+    background-size: 100% auto;
+    background-position: top center;
+    background-repeat: no-repeat;
+    background-color: #e0effc;
+    padding: 12px 12px 24px;
+  }
+
+  .welcome-section {
+    padding: 18px 6px 4px;
+    margin-bottom: 10px;
+  }
+
+  .welcome-section h1 {
+    font-size: 22px;
+    color: #0e1f3f;
+  }
+
+  .welcome-section p {
+    font-size: 14px;
+    color: #6a7d9c;
+  }
+
+  /* ---------- TOP CARDS ---------- */
+  .top-cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .top-cards .card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 10px;
+    row-gap: 0;
+    align-items: center;
+    padding: 14px 12px;
+    min-height: 0;
+    border: none;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 8px 24px rgba(40, 100, 190, 0.12);
+    transform: none;
+  }
+
+  /* Pending deliveries = full-width card with button */
+  .top-cards .card:first-child {
+    grid-column: 1 / -1;
+    grid-template-columns: auto 1fr auto;
+    padding: 16px;
+  }
+
+  .top-cards .card .icon-box {
+    grid-row: 1 / span 2;
+    width: 46px;
+    height: 46px;
+    margin: 0;
+    border-radius: 15px;
+  }
+
+  .top-cards .card:nth-child(2) .icon-box {
+    background: #e8e9fb;
+    color: #4a55d1;
+  }
+
+  .top-cards .card:nth-child(3) .icon-box {
+    background: #d8f5f2;
+    color: #0e9c92;
+  }
+
+  .top-cards .card h3 {
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: #5b6f93;
+    margin-bottom: 0;
+  }
+
+  .top-cards .card h2 {
+    font-size: 21px;
+    color: #0e1f3f;
+  }
+
+  .top-cards .card:first-child h2 {
+    font-size: 28px;
+  }
+
+  .top-cards .card h2 span {
+    font-size: 14px;
+    margin-left: 2px;
+  }
+
+  .top-cards .card .card-bottom {
+    display: block;
+    grid-column: 2;
+    margin: 0;
+    padding: 0;
+    border-top: none;
+    font-size: 12.5px;
+    color: #6a7d9c;
+  }
+
+  .view-orders-btn {
+    display: block;
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    border: 0;
+    background: #e1edfd;
+    color: #1d6fe8;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 12px 16px;
+    min-height: 44px;
+    border-radius: 14px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  /* ---------- GRAPH ---------- */
+  .graph-card {
+    padding: 18px 16px 14px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 8px 24px rgba(40, 100, 190, 0.12);
+  }
+
+  .graph-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+
+  .graph-header h2 {
+    font-size: 20px;
+    color: #0e1f3f;
+  }
+
+  /* dropdown -> segmented control */
+  .graph-header .month-dropdown {
+    display: none;
+  }
+
+  .range-seg {
+    display: flex;
+    background: #e8f1fc;
+    border-radius: 15px;
+    padding: 4px;
+  }
+
+  .range-seg button {
+    flex: 1;
+    min-height: 44px;
+    border: 0;
+    background: none;
+    color: #6a7d9c;
+    font-size: 13.5px;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+
+  .range-seg button.active {
+    background: #cfe3fc;
+    color: #1d6fe8;
+    font-weight: 700;
+  }
+
+  .graph {
+    height: 210px;
+    margin: 36px 0 10px;
+    border-left: none;
+    border-bottom: 1px solid #d6e3f5;
+    background-image:
+      linear-gradient(to right, #e3ecf8 1px, transparent 1px),
+      linear-gradient(to top, #e3ecf8 1px, transparent 1px);
+    background-size: 11.11% 100%, 100% 25%;
+  }
+
+  .line {
+    background: linear-gradient(
+      to bottom,
+      rgba(74, 142, 240, 0.32),
+      rgba(74, 142, 240, 0.03)
+    );
+  }
+
+  .graph-line {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .graph-line polyline {
+    fill: none;
+    stroke: #4a8ef0;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .point {
+    width: 13px;
+    height: 13px;
+    background: #1d6fe8;
+    box-shadow: 0 0 0 4px rgba(29, 111, 232, 0.18);
+  }
+
+  .point span {
+    top: -32px;
+    padding: 3px 7px;
+    font-size: 11px;
+    border-radius: 7px;
+    background: #0e1f3f;
+  }
+
+  .point span::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -4px;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: #0e1f3f;
+    border-bottom: 0;
+  }
+
+  .graph-labels {
+    border-top: none;
+    padding-top: 2px;
+    font-size: 10.5px;
+    color: #6a7d9c;
+  }
+
+  .lbl-full {
+    display: none;
+  }
+
+  .lbl-short {
+    display: inline;
+  }
+
+  /* ---------- BOTTOM SECTION ---------- */
+  .customer-bottom-grid {
+    gap: 10px;
+  }
+
+  .customer-delivery-card,
+  .recent-card {
+    padding: 16px;
+    border: none;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 8px 24px rgba(40, 100, 190, 0.12);
+  }
+}
+
+/* PENDING DELIVERIES CARD: explicit placement */
+@media (max-width: 768px) {
+  .top-cards .card:first-child {
+    grid-column: 1 / -1;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+  }
+
+  .top-cards .card:first-child .icon-box {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  .top-cards .card:first-child > div:nth-child(2) {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+  }
+
+  .top-cards .card:first-child .card-bottom {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+  }
+
+  .top-cards .card:first-child .view-orders-btn {
+    display: block;
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    justify-self: end;
+    align-self: center;
+    margin: 0;
+  }
+}
+
+@media (max-width: 350px) {
+  .top-cards .card:first-child {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .top-cards .card:first-child .view-orders-btn {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    justify-self: stretch;
+    margin-top: 10px;
+  }
 }

@@ -3,101 +3,318 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
-/* HERO SECTION (BACKGROUND IMAGE) */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* =========================================
+   HERO SECTION (BACKGROUND IMAGE - enhanced)
+========================================= */
 .hero-section {
   display: flex;
   align-items: center;
   padding: 80px 10%;
   min-height: 85vh;
-
-  background: url("../../../assets/HeroImage.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
+  background-color: #eaf6ff; /* fallback habang naglo-load ang image */
   position: relative;
   overflow: hidden;
+  isolation: isolate;
+}
+
+/* Yung picture mismo: mas vivid at mas malinaw */
+.hero-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: url("../../../assets/HeroImage.png") center / cover no-repeat;
+  filter: saturate(1.18) contrast(1.06) brightness(1.04);
+}
+
+/* Overlay: malinaw ang text sa kaliwa, kita ang picture sa kanan,
+   at smooth ang lipat papunta sa next section */
+.hero-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, transparent 78%, #dbe8f4 100%),
+    linear-gradient(90deg,
+      rgba(238, 246, 252, 0.74) 0%,
+      rgba(238, 246, 252, 0.44) 38%,
+      rgba(255, 255, 255, 0) 72%),
+    radial-gradient(60% 70% at 82% 35%, rgba(255, 255, 255, 0.22), transparent 70%),
+    linear-gradient(0deg, rgba(0, 119, 182, 0.12), transparent 45%);
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hero-content {
   max-width: 55%;
+  animation: riseIn 0.8s ease both;
 }
 
 .hero-content h1 {
-  font-size: 3rem;
+  font-size: clamp(2rem, 4.6vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
   color: #0077b6;
   margin-bottom: 10px;
-  text-shadow: 0 2px 4px rgba(255,255,255,0.8);
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
 }
 
 .hero-content h2 {
-  font-size: 1.5rem;
+  font-size: clamp(1.05rem, 2vw, 1.5rem);
+  font-weight: 600;
   color: #023e8a;
   margin-bottom: 20px;
 }
 
 .hero-content p {
   font-size: 1rem;
-  color: #333;
+  color: #1e293b;
   margin-bottom: 30px;
-  line-height: 1.6;
-  background: rgba(255, 255, 255, 0.7);
-  padding: 10px;
-  border-radius: 8px;
+  line-height: 1.7;
+  background: rgba(232, 242, 250, 0.78);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  padding: 14px 16px;
+  border-radius: 12px;
 }
 
+/* ORDER NOW: floating + may pulse na ring at gumagalaw na arrow */
 .order-btn {
-  padding: 12px 30px;
-  background: #0077b6;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.3s;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   width: 150px;
+  min-width: 190px;
+  padding: 16px 36px;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: white;
+  background: linear-gradient(135deg, #0077b6, #00a8e8);
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(0, 119, 182, 0.38);
+  transition: transform 0.2s ease, box-shadow 0.25s ease, filter 0.25s ease;
+  animation: orderFloat 3s ease-in-out infinite;
+}
+
+/* pulse ring sa paligid ng button */
+.order-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: orderPulse 2.4s ease-out infinite;
+}
+
+/* arrow na dahan-dahang umuusog */
+.order-btn::after {
+  content: "\2192";
+  font-size: 1.2em;
+  line-height: 1;
+  animation: arrowNudge 1.5s ease-in-out infinite;
 }
 
 .order-btn:hover {
-  background: #023e8a;
+  transform: translateY(-3px);
+  filter: brightness(0.96);
+  box-shadow: 0 16px 34px rgba(2, 62, 138, 0.42);
+}
+
+.order-btn:hover::after {
+  animation-duration: 0.8s;
+}
+
+.order-btn:active {
+  transform: translateY(0);
+}
+
+.order-btn:focus-visible {
+  outline: 3px solid rgba(30, 144, 255, 0.45);
+  outline-offset: 4px;
+}
+
+/* gumamit ng "translate" para hindi mag-conflict sa hover transform */
+@keyframes orderFloat {
+  0%, 100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -9px;
+  }
+}
+
+@keyframes orderPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 168, 232, 0.5);
+  }
+  70%, 100% {
+    box-shadow: 0 0 0 18px rgba(0, 168, 232, 0);
+  }
+}
+
+@keyframes arrowNudge {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(6px);
+  }
+}
+
+/* ==========================================
+   SHARED: section heading na may accent line
+========================================== */
+.services-section h1,
+.about-text h1,
+.contact-section h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0077b6;
+}
+
+.services-section h1::after,
+.contact-section h1::after,
+.about-text h1::after {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 4px;
+  border-radius: 4px;
+  margin-top: 14px;
+  background: linear-gradient(90deg, #0077b6, #00b4d8);
+}
+
+.services-section h1::after,
+.contact-section h1::after {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* SERVICES */
 .services-section {
-  padding: 80px 10%;
-  background: #f8fbff;
+  padding: 90px 10%;
+  background:
+    radial-gradient(520px 320px at 100% 0%, rgba(0, 180, 216, 0.1), transparent 70%),
+    radial-gradient(520px 320px at 0% 100%, rgba(0, 119, 182, 0.08), transparent 70%),
+    #dbe8f4;
   text-align: center;
 }
 
 .services-section h1 {
-  font-size: 2.5rem;
-  color: #0077b6;
-  margin-bottom: 40px;
+  margin-bottom: 48px;
 }
 
 .services-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
+  gap: 22px;
+  counter-reset: svc;
 }
 
 .service-card {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  transition: 0.3s;
+  position: relative;
+  overflow: hidden;
+  background: #f3f8fc;
+  padding: 32px 24px 28px;
+  border-radius: 20px;
+  border: 1px solid #c9dcec;
+  box-shadow: 0 4px 14px rgba(2, 62, 138, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* numbered badge */
+.service-card::before {
+  counter-increment: svc;
+  content: counter(svc, decimal-leading-zero);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 18px;
+  border-radius: 16px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0077b6;
+  background: linear-gradient(135deg, #e6f6ff, #c4e8fa);
+  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+/* accent line sa taas na lumalabas sa hover */
+.service-card::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #0077b6, #00b4d8);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
 }
 
 .service-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
+  border-color: #b9ddf2;
+  box-shadow: 0 18px 36px rgba(2, 62, 138, 0.14);
+}
+
+.service-card:hover::before {
+  background: linear-gradient(135deg, #0077b6, #00a8e8);
+  color: #fff;
+  transform: scale(1.06);
+}
+
+.service-card:hover::after {
+  transform: scaleX(1);
 }
 
 .service-card h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
   color: #023e8a;
   margin-bottom: 10px;
+}
+
+.service-card p {
+  color: #475569;
+  line-height: 1.65;
+  font-size: 0.95rem;
 }
 
 /* ABOUT */
@@ -105,10 +322,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 80px 10%;
-  background: white;
+  padding: 90px 10%;
+  background: #eaf2f9;
   flex-wrap: wrap;
-  gap: 40px;
+  gap: 56px;
   overflow-x: hidden;
 }
 
@@ -118,123 +335,185 @@
 }
 
 .about-text h1 {
-  font-size: 2.5rem;
-  color: #0077b6;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .about-text p {
-  margin-bottom: 15px;
-  color: #444;
-  line-height: 1.6;
+  margin-bottom: 16px;
+  color: #475569;
+  font-size: 1.05rem;
+  line-height: 1.8;
 }
 
 .about-image {
+  position: relative;
   flex: 1;
   max-width: 420px;
 }
 
+/* offset na kulay sa likod ng picture */
+.about-image::before {
+  content: "";
+  position: absolute;
+  inset: 18px -18px -18px 18px;
+  border-radius: 26px;
+  background: linear-gradient(135deg, #bfe6fb, #e6f6ff);
+  z-index: 0;
+}
+
 .about-image img {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 15px;
+  border-radius: 24px;
   object-fit: cover;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 16px 36px rgba(2, 62, 138, 0.18);
 }
 
 /* CONTACT */
 .contact-section {
-  padding: 80px 10%;
-  background: #f8fbff;
+  padding: 90px 10%;
+  background:
+    radial-gradient(560px 360px at 0% 0%, rgba(0, 180, 216, 0.1), transparent 70%),
+    linear-gradient(180deg, #dbe8f4, #cfe0f0);
 }
 
 .contact-section h1 {
   text-align: center;
-  font-size: 2.5rem;
-  color: #0077b6;
-  margin-bottom: 40px;
+  margin-bottom: 48px;
 }
 
 .contact-container {
   display: flex;
-  gap: 40px;
+  gap: 32px;
   flex-wrap: wrap;
   align-items: stretch;
 }
 
+/* form na naka-card */
 .contact-form {
   flex: 1;
-  min-width: 300px;
+  min-width: min(300px, 100%);
   display: flex;
   flex-direction: column;
+  background: #f3f8fc;
+  padding: 28px;
+  border-radius: 20px;
+  border: 1px solid #c9dcec;
+  box-shadow: 0 8px 24px rgba(2, 62, 138, 0.09);
 }
 
 .contact-form input,
 .contact-form textarea {
-  margin-bottom: 15px;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  font-size: 0.95rem;
+  color: #0f172a;
+  background: #e6f0f8;
+  border: 1px solid #c3d6e7;
+  border-radius: 12px;
   width: 100%;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+  color: #94a3b8;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  background: #ffffff;
+  border-color: #0077b6;
+  box-shadow: 0 0 0 4px rgba(0, 119, 182, 0.14);
 }
 
 .contact-form textarea {
-  height: 120px;
+  flex: 1;
+  min-height: 120px;
   resize: none;
 }
 
 .contact-form button {
-  padding: 12px;
-  background: #0077b6;
+  padding: 14px;
   color: white;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: linear-gradient(135deg, #0077b6, #00a8e8);
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 119, 182, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.25s ease, filter 0.25s ease;
 }
 
 .contact-form button:hover {
-  background: #023e8a;
+  transform: translateY(-2px);
+  filter: brightness(0.95);
+  box-shadow: 0 12px 26px rgba(2, 62, 138, 0.34);
+}
+
+.contact-form button:active {
+  transform: translateY(0);
 }
 
 .contact-info {
-  flex: 1.5; 
-  min-width: 450px; 
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  flex: 1.5;
+  min-width: min(450px, 100%);
+  background: #f3f8fc;
+  padding: 28px;
+  border-radius: 20px;
+  border: 1px solid #c9dcec;
+  box-shadow: 0 8px 24px rgba(2, 62, 138, 0.09);
   display: flex;
-  align-items: center; 
+  align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 24px;
   box-sizing: border-box;
 }
 
 .contact-details {
-  flex: 1; 
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .contact-details p {
   display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-  color: #333;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  color: #334155;
   line-height: 1.5;
 }
 
+.contact-details p:last-child {
+  margin-bottom: 0;
+}
+
+/* icon na naka-badge */
 .contact-icon {
+  width: 38px;
+  height: 38px;
+  padding: 10px;
+  flex-shrink: 0;
   color: #0077b6;
-  margin-top: 3px;
+  background: #e6f4fc;
+  border-radius: 12px;
 }
 
 .map-box {
   width: 260px;
   height: 220px;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   flex-shrink: 0;
   background: #e9f4ff;
+  border: 1px solid #e3eef9;
+  box-shadow: 0 6px 18px rgba(2, 62, 138, 0.1);
 }
 
 /* FOOTER */
@@ -242,10 +521,10 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 50px 10%;
+  padding: 56px 10%;
   color: white;
   flex-wrap: wrap;
-  gap: 30px;
+  gap: 32px;
   background: url("../../../assets/FooterImage.png") no-repeat center center;
   background-size: cover;
   position: relative;
@@ -256,7 +535,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: linear-gradient(135deg, rgba(2, 30, 70, 0.88), rgba(0, 70, 120, 0.7));
 }
 
 .footer > * {
@@ -264,30 +543,67 @@
   z-index: 1;
 }
 
-.footer h2,
+.footer h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
 .footer h3 {
-  margin-bottom: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #90e0ef;
+  margin-bottom: 14px;
 }
 
 .footer p {
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.86);
+  margin-bottom: 4px;
 }
 
 .footer-logo img {
   width: 70px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+}
+
+.footer-logo p {
+  font-style: italic;
+}
+
+.footer-contact {
+  max-width: 320px;
+}
+
+.footer-socials p {
+  width: fit-content;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.footer-socials p:hover {
+  color: #90e0ef;
+  transform: translateX(4px);
 }
 
 /* ==========================================
    RESPONSIVE DESIGN (TABLETS & PHONES)
-   ========================================== */
+========================================== */
 
 @media (max-width: 1024px) {
   .hero-section {
-    padding: 70px 6% !important;
-    min-height: unset !important;
-    height: auto;
+    padding: 70px 6%;
+    min-height: unset;
+  }
+
+  /* mas pantay ang overlay para mabasa ang text kahit nasa gitna */
+  .hero-section::after {
+    background:
+      linear-gradient(180deg, transparent 80%, #dbe8f4 100%),
+      linear-gradient(180deg, rgba(238, 246, 252, 0.66), rgba(238, 246, 252, 0.44));
   }
 
   .hero-content {
@@ -296,34 +612,41 @@
   }
 
   .hero-content p {
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(232, 242, 250, 0.86);
   }
 
   .order-btn {
+    display: flex;
+    width: fit-content;
     margin: 0 auto;
-    display: block;
   }
 
   .about-section {
     flex-direction: column-reverse;
     text-align: center;
-    gap: 20px;
+    gap: 40px;
   }
 
   .about-text {
     max-width: 100%;
   }
 
+  .about-text h1::after {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .about-image {
     width: 100%;
-    max-width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
   }
 
   .contact-info {
     flex-direction: column;
     align-items: flex-start;
     min-width: 100%;
-    padding: 20px;
+    padding: 22px;
   }
 
   .map-box {
@@ -333,51 +656,66 @@
 }
 
 @media (max-width: 768px) {
-  /* Mas pinaikli ang vertical paddings para hindi sayang sa space */
   .hero-section {
-    padding: 30px 5%;
+    padding: 40px 5% 50px;
     min-height: 60vh;
+  }
+
+  .hero-section::before {
+    background-position: 70% center; /* ipakita ang main subject ng picture */
   }
 
   .services-section,
   .about-section,
   .contact-section {
-    padding: 35px 5%;
-  }
-
-  /* Mas pinamaliit na fonts at margins sa mobile */
-  .hero-content h1 {
-    font-size: 1.5rem;
-    margin-bottom: 6px;
+    padding: 48px 5%;
   }
 
   .hero-content h2 {
-    font-size: 0.95rem;
     margin-bottom: 12px;
   }
 
   .hero-content p {
-    font-size: 0.8rem;
-    margin-bottom: 15px;
-    padding: 8px;
-    line-height: 1.4;
+    font-size: 0.85rem;
+    margin-bottom: 18px;
+    padding: 10px 12px;
+    line-height: 1.55;
   }
 
   .order-btn {
-    padding: 8px 20px;
-    font-size: 0.85rem;
-    width: 120px;
+    min-width: 0;
+    padding: 12px 26px;
+    font-size: 0.9rem;
   }
 
   .services-section h1,
   .about-text h1,
   .contact-section h1 {
-    font-size: 1.4rem;
-    margin-bottom: 15px;
+    font-size: 1.6rem;
+  }
+
+  .services-section h1,
+  .contact-section h1 {
+    margin-bottom: 30px;
+  }
+
+  .services-section h1::after,
+  .contact-section h1::after,
+  .about-text h1::after {
+    width: 44px;
+    height: 3px;
+    margin-top: 10px;
   }
 
   .service-card {
-    padding: 15px;
+    padding: 22px 18px;
+  }
+
+  .service-card::before {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
   }
 
   .service-card h2 {
@@ -386,57 +724,145 @@
   }
 
   .service-card p {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
   }
 
   .about-text p {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     margin-bottom: 10px;
   }
 
+  .about-image::before {
+    inset: 12px -10px -12px 10px;
+  }
+
   .contact-container {
-    gap: 15px;
+    gap: 18px;
+  }
+
+  .contact-form {
+    padding: 18px;
   }
 
   .contact-form input,
   .contact-form textarea {
     margin-bottom: 10px;
-    padding: 9px;
-    font-size: 0.85rem;
+    padding: 11px 13px;
+    font-size: 0.88rem;
   }
 
   .contact-form textarea {
-    height: 90px;
+    min-height: 100px;
   }
 
   .contact-form button {
-    padding: 9px;
-    font-size: 0.85rem;
+    padding: 12px;
+    font-size: 0.88rem;
   }
 
   .contact-details p {
-    font-size: 0.85rem;
-    margin-bottom: 10px;
+    font-size: 0.88rem;
+    margin-bottom: 12px;
+    gap: 12px;
+  }
+
+  .contact-icon {
+    width: 34px;
+    height: 34px;
+    padding: 9px;
   }
 
   .footer {
-    flex-direction: column;
-    padding: 30px 5%;
-    gap: 20px;
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    column-gap: 20px;
+    row-gap: 16px;
+    padding: 24px 6%;
   }
 
-  .footer h2,
-  .footer h3 {
-    font-size: 1.1rem;
-    margin-bottom: 5px;
-  }
-
-  .footer p {
-    font-size: 0.8rem;
+  /* logo sa kaliwa, pangalan at tagline sa kanan nito */
+  .footer-logo {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 12px;
+    align-items: center;
   }
 
   .footer-logo img {
-    width: 50px;
-    margin-bottom: 5px;
+    grid-row: 1 / 3;
+    width: 38px;
+    margin-bottom: 0;
+  }
+
+  .footer-logo h2 {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+  }
+
+  .footer-logo p {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+  }
+
+  .footer h2 {
+    font-size: 1rem;
+    margin-bottom: 0;
+  }
+
+  .footer h3 {
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+
+  .footer p {
+    font-size: 0.74rem;
+    line-height: 1.5;
+    margin-bottom: 2px;
+  }
+
+  .footer-contact {
+    max-width: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .services-container {
+    grid-template-columns: 1fr;
+  }
+
+  .map-box {
+    height: 170px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .hero-content {
+    animation: none;
+  }
+
+  .order-btn,
+  .order-btn::after,
+  .service-card,
+  .service-card::before,
+  .service-card::after,
+  .contact-form button,
+  .footer-socials p {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .order-btn,
+  .order-btn::before,
+  .order-btn::after {
+    animation: none;
   }
 }

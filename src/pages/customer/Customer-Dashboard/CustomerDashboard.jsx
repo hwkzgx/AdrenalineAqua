@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import "./customer-dashboard.css";
+import "./customer-dashboard.css"; // NEW: mobile-only styles (must come after the main css)
 import CustomerTopbar from "../../../components/NavBar/CustomerTopbar";
 import { supabase } from "../../../supabase";
 
@@ -104,6 +104,21 @@ export default function CustomerDashboard() {
     "Full Month",
   ];
 
+  // NEW: mobile segmented control options
+  const mobileRanges = ["This Week", "This Month", "All Time"];
+
+  const graphLabels = [
+    "Apr 28 - May 4",
+    "May 5 - May 11",
+    "May 12 - May 18",
+    "May 19 - May 25",
+    "May 26 - Jun 1",
+    "Jun 2 - Jun 8",
+    "Jun 9 - Jun 15",
+    "Jun 16 - Jun 22",
+    "Jun 23 - Jun 29",
+  ];
+
   return (
     <>
       <CustomerTopbar />
@@ -131,6 +146,18 @@ export default function CustomerDashboard() {
             <div className="card-bottom">
               <p>Here's your pending orders</p>
             </div>
+            {/* NEW: mobile only (hidden on desktop via css) */}
+            <button
+              type="button"
+              className="view-orders-btn"
+              onClick={() =>
+                document
+                  .getElementById("recent-orders")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
+            >
+              View orders
+            </button>
           </div>
 
           <div className="card">
@@ -172,7 +199,22 @@ export default function CustomerDashboard() {
           <div className="graph-header">
             <h2>Order Frequency</h2>
 
-            {/* GRAPH DROPDOWN */}
+            {/* NEW: mobile only segmented control */}
+            <div className="range-seg" role="group" aria-label="Time range">
+              {mobileRanges.map((opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  className={month === opt ? "active" : ""}
+                  aria-pressed={month === opt}
+                  onClick={() => setMonth(opt)}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+
+            {/* GRAPH DROPDOWN (desktop) */}
             <div className="month-dropdown" ref={graphRef}>
               <button className="month-btn small" onClick={() => setOpenGraph(!openGraph)}>
                 <CalendarDays size={16} />
@@ -203,6 +245,11 @@ export default function CustomerDashboard() {
           <div className="graph">
             <div className="line"></div>
 
+            {/* NEW: mobile only line on top of the area */}
+            <svg className="graph-line" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              <polyline points="3,85 15,75 28,65 40,50 53,72 66,55 76,40 86,30 97,38" />
+            </svg>
+
             <div className="points">
               <div className="point" style={{ left: "3%", bottom: "15%" }}><span>2</span></div>
               <div className="point" style={{ left: "15%", bottom: "25%" }}><span>3</span></div>
@@ -217,21 +264,18 @@ export default function CustomerDashboard() {
           </div>
 
           <div className="graph-labels">
-            <span>Apr 28 - May 4</span>
-            <span>May 5 - May 11</span>
-            <span>May 12 - May 18</span>
-            <span>May 19 - May 25</span>
-            <span>May 26 - Jun 1</span>
-            <span>Jun 2 - Jun 8</span>
-            <span>Jun 9 - Jun 15</span>
-            <span>Jun 16 - Jun 22</span>
-            <span>Jun 23 - Jun 29</span>
+            {graphLabels.map((label, i) => (
+              <span key={label}>
+                <span className="lbl-full">{label}</span>
+                <span className="lbl-short">Wk {i + 1}</span>
+              </span>
+            ))}
           </div>
         </div>
 
         {/* BOTTOM SECTION */}
         <div className="customer-bottom-grid">
-          
+
           {/* UPCOMING DELIVERIES */}
           <div className="customer-delivery-card">
             <div className="customer-section-header">
@@ -283,7 +327,7 @@ export default function CustomerDashboard() {
           </div>
 
           {/* RECENT ORDERS */}
-          <div className="recent-card">
+          <div className="recent-card" id="recent-orders">
             <div className="section-header">
               <h2>Recent Orders</h2>
             </div>

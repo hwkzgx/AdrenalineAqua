@@ -69,13 +69,11 @@
 /* =========================
    TABLE CONTAINER
 ========================= */
-
 .staffdeliveryschedule-table-container {
   background: white;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-  overflow: hidden;
+  overflow-x: auto;
 }
 
 /* HEADER */
@@ -111,9 +109,10 @@
   font-size: 12px;
 }
 
-.staffdelivery-status.pending { background: #fff7ed; color: #c2410c; }
-.staffdelivery-status.out.for.delivery { background: #eff6ff; color: #1d4ed8; }
-.staffdelivery-status.delivered { background: #ecfdf5; color: #047857; }
+.staffdeliveryschedule-status.pending { background: #fff7ed; color: #c2410c; }
+.staffdeliveryschedule-status.out-for-delivery { background: #eff6ff; color: #1d4ed8; }
+.staffdeliveryschedule-status.processing { background: #fefce8; color: #ca8a04; }
+.staffdeliveryschedule-status.delivered { background: #ecfdf5; color: #047857; }
 
 /* =========================
    ACTIONS
@@ -131,14 +130,14 @@
 }
 
 .staffdeliveryschedule-actions .staffedit {
-  background: #facc15;
+  background: #f59e0b;
 }
 
 .staffdeliveryschedule-actions .staffdelete {
   background: #ef4444;
 }
 
-.staffdeliveryschedule-actions label{
+.staffdeliveryschedule-actions label {
   padding-left: 5px;
 }
 
@@ -157,7 +156,8 @@
 .staffdelivery-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.55);
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -226,7 +226,6 @@
 /* =========================
    MODAL ACTIONS
 ========================= */
-
 .staffdelivery-modal-actions {
   display: flex;
   justify-content: flex-end;
@@ -234,6 +233,7 @@
 
   margin-top: 25px;
 }
+
 .staffdelivery-edit-modal,
 .staffdelivery-delete-modal {
   position: relative;
@@ -257,136 +257,140 @@
 }
 
 /* =========================
-   DELETE MODAL
+   DELETE MODAL - MODERN STYLE
 ========================= */
-
 .staffdelivery-delete-modal {
-  width: 560px;
-  background: #f8f8f8;
-
-  border: 2px solid #0b74d1;
-  border-radius: 10px;
-
-  padding: 25px;
   position: relative;
+  width: 460px;
+  max-width: calc(100vw - 40px);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border: none;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.18);
 }
 
 .staffdelivery-delete-modal h2 {
   text-align: center;
-
-  font-size: 36px;
-  margin-bottom: 8px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px;
 }
 
 .staffdelivery-delete-modal h6 {
   text-align: center;
-
-  font-size: 12px;
-  font-weight: 200;
-
-  margin-bottom: 20px;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #64748b;
+  margin: 0 0 20px;
 }
 
 .staffdeliverydelete-close-btn {
   position: absolute;
-  top: 5px;
-  right: -220px;
-  font-size: 22px;
-  font-weight: bold;
+  top: 20px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  color: #003b73;
-  background: transparent;
+  color: #64748b;
+  background: #f1f5f9;
   border: none;
+  border-radius: 50%;
+  transition: background 0.2s, color 0.2s;
 }
 
-/* WARNING BOX */
-
-.staffdelivery-warning-box {
-  background: #f9e6db;
-
-  border-left: 6px solid #ff6b35;
-  border-radius: 6px;
-
-  padding: 18px;
+.staffdeliverydelete-close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
 }
 
-.staffdelivery-warning-box h3 {
-  color: #ff3b30;
-  font-size: 26px;
-  text-align: center;
-
-  margin-bottom: 10px;
-}
-
-.staffdelivery-warning-box p {
-  font-size: 13px;
-  line-height: 1.5;
-  text-align: center;
-}
-
-.staffdelivery-warning-box hr {
-  border: none;
-  border-top: 1px solid #e7cfc5;
-
-  margin: 18px 0;
-}
-
-/* DELETE INFO */
-
-.staffdelivery-delete-info {
+/* DELETE DETAILS */
+.staffdelivery-delete-details {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 14px;
+  padding: 16px 18px;
 }
 
-.staffdelivery-delete-info p {
-  text-align: start;
-  font-size: 13px;
-  color: #222;
-}
-
-/* DELETE ACTIONS */
-
-.staffdelivery-modal-actions {
+.staffdelivery-delete-details div {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #fde0e0;
+}
 
+.staffdelivery-delete-details div:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.staffdelivery-delete-details label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #b91c1c;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.staffdelivery-delete-details p {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #0f172a;
+  text-align: right;
+}
+
+.staffdelivery-delete-details .staffdeliveryschedule-status {
+  width: fit-content;
+}
+
+/* MODAL ACTIONS */
+.staffdelivery-delete-modal .staffdelivery-modal-actions {
+  justify-content: flex-end;
+  gap: 12px;
   margin-top: 20px;
 }
 
 .cancel {
-  background: #5d5d66;
-  color: white;
-
-  border: none;
-  border-radius: 6px;
-
-  padding: 10px 24px;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 600;
   cursor: pointer;
 }
 
+.cancel:hover {
+  background: #e2e8f0;
+}
+
+.staffdelivery-modal-actions .delete,
 .staffdelivery-confirm-delete {
-  background: #ff3b30;
+  background: #dc2626;
   color: white;
-
   border: none;
-  border-radius: 6px;
-
+  border-radius: 8px;
   padding: 10px 24px;
+  font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2);
 }
 
-.staffdeliverydelete-close-btn {
-  position: absolute;
-  top: 5px;
-  right: -230px;
-  font-size: 22px;
-  font-weight: bold;
-  cursor: pointer;
-  color: #003b73;
-  background: transparent;
-  border: none;
+.staffdelivery-modal-actions .delete:hover {
+  opacity: 0.9;
 }
 
 .staffdelivery-closeAction {
@@ -398,34 +402,38 @@
 .staffdelivery-confirm-delete {
   pointer-events: auto !important;
   position: relative;
-  z-index: 99999; 
+  z-index: 99999;
   cursor: pointer;
 }
 
+/* =========================
+   TOAST
+========================= */
 .toast {
   position: fixed;
   bottom: 20px;
   right: 20px;
-
+  min-width: 250px;
+  padding: 12px 16px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   gap: 10px;
-
-  padding: 12px 16px;
-
-  border-radius: 10px;
-
   color: #fff;
   font-size: 14px;
-  font-weight: 500;
-
   z-index: 9999;
+  opacity: 0;
+  transform: translateX(100px);
+  transition: all 0.3s ease;
+}
 
-  animation: slideIn 0.3s ease;
+.toast.show {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .toast.success {
-  background: #22c55e;
+  background: #22c55e; 
 }
 
 .toast.error {
@@ -435,21 +443,81 @@
 .toast-icon {
   display: flex;
   align-items: center;
-  justify-content: center;
 }
 
 .toast-text {
-  white-space: nowrap;
+  flex: 1;
 }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
+/* =========================================
+   MODERN COLORFUL TABLE RIDER DROPDOWN
+========================================= */
+.table-rider-dropdown {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  background-color: #f0f7ff;
+  border: 2px solid #93c5fd;
+  border-radius: 8px;
+  padding: 8px 36px 8px 14px;
+
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e40af;
+
+  cursor: pointer;
+  width: 100%;
+  min-width: 130px;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%231e40af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.08);
+}
+
+.table-rider-dropdown:hover {
+  background-color: #e0f2fe;
+  border-color: #3b82f6;
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.15);
+}
+
+.table-rider-dropdown:focus {
+  outline: none;
+  background-color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}
+
+.table-rider-dropdown option {
+  background-color: #ffffff;
+  color: #1e293b;
+  font-weight: 500;
+  padding: 10px;
+}
+
+/* Export PDF Button Styling */
+.export-pdf-btn {
+  margin-top: 0;
+  width: 130px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #02457A;
+  color: white;
+  border: none;
+  padding: 0 16px;
+  height: 48px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.export-pdf-btn:hover {
+  background-color: #013259;
 }

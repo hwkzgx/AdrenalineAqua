@@ -1,17 +1,17 @@
 /* MAIN CONTAINER */
 .dashboard-container {
-  padding: 10px; /* 🔥 binawasan */
+  padding: 10px;
   background: #f8fafc;
 
   flex: 1;
-  overflow: hidden; /* 🔥 no scroll */
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
 /* HEADER */
 .dashboard-header {
-  margin-bottom: 10px; /* from 15 → 10 */
+  margin-bottom: 10px;
 }
 
 .dashboard-header h1 {
@@ -29,8 +29,9 @@
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px; /* 🔥 from 12 → 8 */
+  gap: 8px;
 }
+
 /* CARD */
 .dashboard-card {
   background: white;
@@ -43,7 +44,7 @@
 
 .dashboard-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
 }
 
 .dashboard-card h3 {
@@ -58,31 +59,29 @@
   color: #0f172a;
 }
 
-/* CHARTS CONTAINER - Modern Grid */
+/* CHARTS CONTAINER */
 .graph-container {
   display: grid;
-  /* Responsiveness: Awtomatikong mag-a-adjust ang layout */
   grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
   gap: 24px;
   margin-top: 24px;
 }
 
-/* CHART CARD - Modern Look */
+/* CHART CARD */
 .chart-card {
   padding: 24px;
   border-radius: 16px;
   min-height: 350px;
-  /* Mas soft at professional na shadow */
   box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.08);
   border: 1px solid #d3d0d0;
-  
+
   display: flex;
   flex-direction: column;
   transition: transform 0.2s ease;
 }
 
 .chart-card:hover {
-  transform: translateY(-2px); /* Slight lift effect on hover */
+  transform: translateY(-2px);
 }
 
 .chart-card h3 {
@@ -93,7 +92,7 @@
   letter-spacing: -0.01em;
 }
 
-/* EMPTY STATE - Mas malinis na style */
+/* EMPTY STATE */
 .empty-state {
   flex: 1;
   display: flex;
@@ -106,16 +105,7 @@
   border-radius: 12px;
 }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr; /* mobile fallback */
-  }
-
-  .charts-container {
-    grid-template-columns: 1fr;
-  }
-}
+/* DASHBOARD CARD COLORS */
 .dashboard-card.blue {
   background: linear-gradient(135deg, #eff6ff, #dbeafe);
   border-left: 4px solid #3b82f6;
@@ -141,13 +131,14 @@
   border-left: 4px solid #8b5cf6;
 }
 
+/* SALES DROPDOWN */
 .small-sales-dropdown {
   width: 80px;
   height: 30px;
   color: black;
-  padding: 2px 5px;       /* Mas manipis na padding */
-  font-size: 12px;        /* Mas maliit na text */
-  border-radius: 4px;     /* Rounded corners */
+  padding: 2px 5px;
+  font-size: 12px;
+  border-radius: 4px;
   border: 1px solid #ddd;
   background-color: transparent;
   cursor: pointer;
@@ -156,4 +147,122 @@
 
 .small-sales-dropdown:hover {
   background-color: #eee;
+}
+
+/* FLOATING PREDICTION + RECOMMENDATION + SALES INSIGHT */
+.floating-insights {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 9999;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  width: 340px;
+  max-width: calc(100vw - 32px);
+
+  pointer-events: none;
+}
+
+.floating-toast {
+  position: relative;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 14px 38px 14px 14px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+  pointer-events: auto;
+  animation: floatingToastIn 0.25s ease;
+}
+
+.prediction-toast {
+  border-left: 4px solid #3b82f6;
+}
+
+.recommendation-toast {
+  border-left: 4px solid #f59e0b;
+}
+
+.sales-insight-toast {
+  border-left: 4px solid #8b5cf6;
+}
+
+.floating-toast h4 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.floating-toast p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #475569;
+}
+
+.floating-toast p strong {
+  color: #0f172a;
+}
+
+.sales-forecast-text {
+  margin-top: 7px !important;
+  padding-top: 7px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.floating-toast-close {
+  position: absolute;
+  top: 7px;
+  right: 9px;
+
+  width: 24px;
+  height: 24px;
+
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+
+  color: #64748b;
+  font-size: 18px;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.floating-toast-close:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+@keyframes floatingToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .graph-container {
+    grid-template-columns: 1fr;
+  }
+
+  .floating-insights {
+    right: 16px;
+    bottom: 16px;
+    width: calc(100vw - 32px);
+  }
+}
+.expense-insight-toast {
+  border-left: 4px solid #ef4444;
 }

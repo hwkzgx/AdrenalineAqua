@@ -146,6 +146,7 @@
   color: #02457A;
   cursor: pointer;
   outline: none;
+  margin-left: -550px;
 }
 
 /* ==========================================
@@ -179,4 +180,64 @@
   border: 1px dashed #cbd5e1;
   border-radius: 10px;
   color: #94a3b8;
+}
+
+/* ==========================================
+   TOAST NOTIFICATIONS
+   ========================================== */
+.sales-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100vw - 48px);
+  padding: 14px 20px;
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
+  animation: salesToastIn 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.sales-toast.success {
+  background-color: #16a34a;
+}
+
+.sales-toast.error {
+  background-color: #ef4444;
+}
+
+.sales-toast-icon {
+  display: flex;
+  align-items: center;
+}
+
+@keyframes salesToastIn {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Export PDF Button Styling */
+.export-pdf-btn {
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #02457A;
+  color: white;
+  border: none;
+  padding: 0 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.export-pdf-btn:hover {
+  background-color: #013259;
 }

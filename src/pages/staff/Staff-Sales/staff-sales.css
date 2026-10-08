@@ -61,13 +61,13 @@
 }
 
 /* Text layout area */
-.staffsales-card .card-info {
+.staffsales-card .staffcard-info {
   display: flex;
   flex-direction: column;
 }
 
 /* Card titles */
-.staffsales-card .card-label {
+.staffsales-card .staffcard-label {
   font-size: 0.875rem;
   color: #64748b;
   font-weight: 500;
@@ -75,7 +75,7 @@
 }
 
 /* Sales amount/values */
-.staffsales-card .card-value {
+.staffsales-card .staffcard-value {
   font-size: 1.5rem;
   font-weight: 700;
   color: #0f172a;
@@ -83,23 +83,23 @@
   letter-spacing: -0.02em;
 }
 
-/* 🎨 CARD COLOR THEMES (Mula sa Image Profile) */
-.staffcard-today .icon-wrapper {
+/* 🎨 CARD COLOR THEMES (naitama: tumutugma na ngayon sa class na ginagamit sa JSX) */
+.card-today .icon-wrapper {
   background-color: #eff6ff;
   color: #2563eb;
 }
 
-.staffcard-weekly .icon-wrapper {
+.card-weekly .icon-wrapper {
   background-color: #f0fdf4;
   color: #16a34a;
 }
 
-.staffcard-monthly .icon-wrapper {
+.card-monthly .icon-wrapper {
   background-color: #faf5ff;
   color: #9333ea;
 }
 
-.staffcard-overall .icon-wrapper {
+.card-overall .icon-wrapper {
   background-color: #fff7ed;
   color: #ea580c;
 }
@@ -109,12 +109,19 @@
    ========================================== */
 .staffcontrols-row {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
   gap: 16px;
   margin-bottom: 20px;
   padding-left: 0;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+}
+
+.staffcontrols-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .staffsearch-input {
@@ -179,4 +186,64 @@
   border: 1px dashed #cbd5e1;
   border-radius: 10px;
   color: #94a3b8;
+}
+
+/* ==========================================
+   TOAST NOTIFICATIONS
+   ========================================== */
+.staffsales-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100vw - 48px);
+  padding: 14px 20px;
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
+  animation: staffSalesToastIn 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.staffsales-toast.success {
+  background-color: #16a34a;
+}
+
+.staffsales-toast.error {
+  background-color: #ef4444;
+}
+
+.staffsales-toast-icon {
+  display: flex;
+  align-items: center;
+}
+
+@keyframes staffSalesToastIn {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Export PDF Button Styling */
+.export-pdf-btn {
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #02457A;
+  color: white;
+  border: none;
+  padding: 0 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.export-pdf-btn:hover {
+  background-color: #013259;
 }

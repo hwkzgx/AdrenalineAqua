@@ -78,58 +78,75 @@ export default function Register() {
   };
 
   // 🔥 REGISTER
-  const handleRegister = async () => {
-    if (
-      !name ||
-      !email ||
-      !address ||
-      !contactNumber ||
-      !password ||
-      !confirmPassword
-    ) {
-      alert("Please fill all fields");
-      return;
-    }
+ // 🔥 REGISTER
+const handleRegister = async () => {
+  if (
+    !name ||
+    !email ||
+    !address ||
+    !contactNumber ||
+    !password ||
+    !confirmPassword
+  ) {
+    alert("Please fill all fields");
+    return;
+  }
 
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
+  if (password !== confirmPassword) {
+    alert("Passwords do not match");
+    return;
+  }
 
-    const passError = validatePassword(password);
+  const passError = validatePassword(password);
 
-    if (passError) {
-      alert(passError);
-      return;
-    }
+  if (passError) {
+    alert(passError);
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    const customId = await generateUserId(role);
+  // Create account in Supabase Authentication
+  const { data, error: authError } = await supabase.auth.signUp({
+    email,
+    password,
+  });
+  
+  console.log("SIGNUP DATA:", data);
+console.log("SIGNUP ERROR:", authError);
 
-    const { error } = await supabase.from("users").insert([
-      {
-        user_id: customId,
-        name,
-        email,
-        address,
-        contact_number: contactNumber,
-        password,
-        role,
-      },
-    ]);
-
+  if (authError) {
     setLoading(false);
+    alert("Registration failed: " + authError.message);
+    return;
+  }
 
-    if (error) {
-      console.log(error.message);
-      alert("Registration failed: " + error.message);
-      return;
-    }
+  const customId = await generateUserId(role);
 
-    alert(`Account created: ${customId}`);
-    nav("/accountcreated");
-  };
+  // Save additional user information
+  const { error: userError } = await supabase.from("users").insert([
+    {
+      user_id: customId,
+      name,
+      email,
+      address,
+      contact_number: contactNumber,
+      password,
+      role,
+    },
+  ]);
+
+  setLoading(false);
+
+  if (userError) {
+    console.log(userError.message);
+    alert("Registration failed: " + userError.message);
+    return;
+  }
+
+  alert("Account created! Please check your email to verify your account.");
+  nav("/accountcreated");
+};
 
   return (
     <div className="login-wrapper">
@@ -199,6 +216,7 @@ export default function Register() {
           />
 
           <button
+            className="register-btn"
             onClick={handleRegister}
             disabled={loading}
           >

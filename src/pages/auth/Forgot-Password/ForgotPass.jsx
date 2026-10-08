@@ -1,8 +1,12 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "../../../supabase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelopeOpenText } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEnvelopeOpenText,
+  faCircleCheck,
+  faCircleXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import "./forgot-pass.css";
 
 export default function ForgotPass() {
@@ -10,42 +14,84 @@ export default function ForgotPass() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const userType = location.state?.userType;
+
+  // TOAST
+  const [toast, setToast] = useState(null);
+  const toastTimer = useRef(null);
+  const navTimer = useRef(null);
+
+  const showToast = (type, message) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+
+    setToast({ type, message });
+
+    toastTimer.current = setTimeout(() => {
+      setToast(null);
+    }, 3000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+      if (navTimer.current) clearTimeout(navTimer.current);
+    };
+  }, []);
 
   const sendOTP = async () => {
-    if (!email) {
-      alert("Please enter your email");
+    const cleanEmail = email.trim();
+
+    if (!cleanEmail) {
+      showToast("error", "Please enter your email.");
       return;
     }
 
     setLoading(true);
 
     const { error } = await supabase.auth.signInWithOtp({
-      email,
+      email: cleanEmail,
       options: {
         shouldCreateUser: false, // change to true if allow signup
       },
     });
 
-    setLoading(false);
-
     if (error) {
-      alert(error.message);
+      setLoading(false);
+      showToast("error", error.message);
       return;
     }
 
-    alert("6-digit code sent to your email!");
+    showToast("success", "6-digit code sent to your email!");
 
     // 🔥 IMPORTANT: pass email to verification page
-    navigate("/verification", { state: { email } });
+    // Maghintay muna sandali para makita ang toast bago lumipat ng page
+    navTimer.current = setTimeout(() => {
+      navigate("/verification", {
+        state: { email: cleanEmail, userType },
+      });
+    }, 1500);
   };
 
   return (
     <div className="login-wrapper">
 
+      {/* TOAST */}
+      {toast && (
+        <div className={`forgotpass-toast ${toast.type}`}>
+          <span className="forgotpass-toast-icon">
+            <FontAwesomeIcon
+              icon={toast.type === "success" ? faCircleCheck : faCircleXmark}
+            />
+          </span>
+          <span className="forgotpass-toast-text">{toast.message}</span>
+        </div>
+      )}
+
       <div className="login-left">
         <div className="overlay"></div>
         <div className="branding">
-          <h1>AQUA SYSTEM</h1>
+          <h1>ADRENALINE AQUA WATER</h1>
           <p>Secure & Smart Access</p>
         </div>
       </div>
@@ -85,7 +131,13 @@ export default function ForgotPass() {
 
             <button
               className="back-btn"
-              onClick={() => navigate("/login")}
+              onClick={() =>
+                navigate(
+                  userType === "rider"
+                    ? "/rider/riderlogin"
+                    : "/login"
+                )
+              }
             >
               ← Back to Login
             </button>

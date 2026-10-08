@@ -85,7 +85,7 @@
   color: #1e3a8a;
   margin: auto;
   position: relative;
-  text-align: left; 
+  text-align: left;
 }
 
 .login-card h2 {
@@ -152,74 +152,6 @@
   100% { transform: translateY(0); }
 }
 
-/* MOBILE */
-@media (max-width: 768px) {
-  .login-wrapper {
-    position: relative;
-    display: block;
-  }
-
-  .riderlogin-left {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    align-items: flex-start;
-    padding-top: 60px;
-  }
-
-  .brand-logo {
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 8px;
-    width: 80px;
-  }
-
-  .branding h1 {
-    font-size: 20px;
-  }
-
-  .branding p {
-    font-size: 12px;
-  }
-
-  .login-right {
-    position: relative;
-    z-index: 2;
-    background: transparent;
-    height: 100vh;
-    min-height: 100vh;
-  }
-
-  .login-right::before {
-    display: none;
-  }
-
-  .login-card {
-    width: 90%;
-    max-width: 350px;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(6px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-  }
-
-  .login-options {
-    flex-direction: column;
-    gap: 8px;
-    align-items: flex-start;
-  }
-}
-
-@media (max-width: 480px) {
-  .login-card {
-    padding: 20px;
-  }
-
-  .login-input {
-    font-size: 16px;
-  }
-}
-
 .remember {
   display: flex;
   align-items: center;
@@ -227,7 +159,7 @@
   cursor: pointer;
   color: #0ea5e9;
   font-size: 13px;
-  white-space: nowrap; 
+  white-space: nowrap;
 }
 
 .remember input {
@@ -236,8 +168,9 @@
 
 .forgot {
   cursor: pointer;
-  color: #60a5fa;
+  color: #0ea5e9;
   transition: 0.2s ease;
+  font-size: 13px;
 }
 
 .forgot:hover {
@@ -265,4 +198,253 @@
 
 .login-body {
   text-align: center;
+}
+
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 8px;
+}
+
+
+/* =====================================================
+   MOBILE ONLY - flat, clean, nasa gitna (desktop hindi nagalaw)
+   ===================================================== */
+@media (max-width: 768px) {
+  .login-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center !important;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 24px 0 !important;
+    background: #fbfaf9;
+  }
+
+  /* ----- Header: walang blue, logo at pangalan lang ----- */
+  .login-wrapper .riderlogin-left {
+    position: relative;
+    inset: auto;
+    flex: none !important;
+    z-index: 1;
+    align-items: center;
+    padding: 0 20px 12px !important;
+    background: none;
+    color: #0f172a;
+  }
+
+  .login-wrapper .riderlogin-left .overlay {
+    display: none;
+  }
+
+  .login-wrapper .brand-logo {
+    width: 130px !important;
+    margin: 0 auto 14px !important;
+    animation: none;
+  }
+
+  .login-wrapper .branding h1 {
+    font-size: 28px !important;
+    color: #1e3a8a;
+  }
+
+  .login-wrapper .branding p {
+    font-size: 15px !important;
+    margin: 6px 0 0;
+    color: #64748b;
+    opacity: 1;
+  }
+
+  /* ----- Form area: flat, walang card ----- */
+  .login-wrapper .login-right {
+    display: block !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    flex: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible;
+    z-index: auto;
+    background: #fbfaf9 !important;
+    padding: 10px 22px 0 !important;
+  }
+
+  .login-wrapper .login-right::before {
+    display: none;
+  }
+
+  .login-wrapper .login-card {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    text-align: left;
+  }
+
+  .login-wrapper .login-body {
+    text-align: left;
+  }
+
+  .login-wrapper .login-header {
+    margin-bottom: 18px;
+  }
+
+  .login-wrapper .login-header button,
+  .login-wrapper .login-header a {
+    color: #64748b;
+    font-size: 14px;
+  }
+
+  .login-wrapper .login-card h2 {
+    margin: 0 0 16px;
+    font-size: 16px !important;
+    font-weight: 800;
+    color: #1e3a8a !important;
+    text-align: center !important;
+  }
+
+  .login-wrapper .subtitle {
+    font-size: 14px;
+    color: #64748b;
+    opacity: 1;
+    text-align: left !important;
+  }
+
+  /* ----- Pill inputs ----- */
+  .login-wrapper .login-input {
+    height: 54px;
+    margin: 8px 0;
+    padding: 0 20px;
+    font-size: 16px; /* iwas auto-zoom sa iPhone */
+    border-radius: 999px;
+    border: 1px solid #e2e0dd;
+    background: #fff;
+  }
+
+  .login-wrapper .login-input:focus {
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
+  }
+
+  /* ----- Remember me (kaliwa) at Forgot password (kanan) ----- */
+  .login-wrapper .login-options {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin: 10px 0 0;
+  }
+
+  .login-wrapper .remember {
+    color: #475569;
+    font-size: 14px;
+  }
+
+  .login-wrapper .remember input {
+    accent-color: #1e3a8a;
+  }
+
+  .login-wrapper .forgot {
+    display: block;
+    text-align: right;
+    color: #1e3a8a;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  /* ----- Button: pill, full width ----- */
+  .login-wrapper .login-btn {
+    height: 54px;
+    padding: 0;
+    margin-top: 20px;
+    font-size: 16px;
+    border-radius: 999px;
+    box-shadow: 0 10px 22px -8px rgba(30, 58, 138, 0.55);
+  }
+
+  .login-wrapper .signup-text {
+    margin-top: 22px;
+    font-size: 14px;
+    color: #64748b;
+    text-align: center;
+  }
+
+  .login-wrapper .signup-text span {
+    color: #1e3a8a;
+    font-weight: 700;
+  }
+}
+
+/* Medyo ibaba ang gitna (hindi sa landscape) */
+@media (max-width: 768px) and (min-height: 501px) {
+  .login-wrapper {
+    padding: 36px 0 16px !important;
+  }
+}
+
+/* Maliliit na phone */
+@media (max-width: 480px) {
+  .login-wrapper .brand-logo {
+    width: 112px !important;
+  }
+
+  .login-wrapper .branding h1 {
+    font-size: 24px !important;
+  }
+
+  .login-wrapper .branding p {
+    font-size: 14px !important;
+  }
+
+  .login-wrapper .login-card h2 {
+    font-size: 15px !important;
+  }
+
+  .login-wrapper .login-right {
+    padding: 10px 18px 0 !important;
+  }
+}
+
+/* Landscape phones (maiksi ang taas) */
+@media (max-width: 768px) and (max-height: 500px) {
+  .login-wrapper {
+    padding: 12px 0 !important;
+  }
+
+  .login-wrapper .brand-logo,
+  .login-wrapper .branding p {
+    display: none !important;
+  }
+
+  .login-wrapper .branding h1 {
+    font-size: 18px !important;
+  }
+}
+
+.riderlogback-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: #1e3a8a;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.riderlogback-btn:hover {
+  color: #0ea5e9;
+  text-decoration: underline;
 }

@@ -12,7 +12,7 @@ export default function AccountCreated() {
       <div className="login-left">
         <div className="overlay"></div>
         <div className="branding">
-          <h1>AQUA SYSTEM</h1>
+          <h1>ADRENALINE AQUA SYSTEM</h1>
           <p>Secure & Smart Access</p>
         </div>
       </div>

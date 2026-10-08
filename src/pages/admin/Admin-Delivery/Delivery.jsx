@@ -1,18 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./delivery.css";
 import Table from "../../../components/Table";
 import { supabase } from "../../../supabase";
+import { exportToPDF } from "../../../pdfExporter";
 import {
   Trash2,
   X,
   CheckCircle, 
-  XCircle 
+  XCircle,
+  Download
 } from "lucide-react";
 
 function Delivery() {
+  const reportRef = useRef();
 
   const [deliveries, setDeliveries] = useState([]);
-  const [riders, setRiders] = useState([]); // State para sa mga listahan ng rider galing database
+  const [riders, setRiders] = useState([]); 
   const [loading, setLoading] = useState(true);
 
   const [search, setSearch] = useState("");
@@ -57,6 +60,11 @@ function Delivery() {
           delivery_code,
           delivery_status,
           assigned_rider
+        ),
+        order_items (
+          item_name,
+          quantity,
+          unit_price
         )
       `)
       .eq("order_type", "Delivery")
@@ -78,6 +86,7 @@ function Delivery() {
       date: item.delivery_date,
       status: !item.delivery_schedule?.[0]?.assigned_rider ? "—" : (item.delivery_schedule?.[0]?.delivery_status || "Pending"),
       rider: item.delivery_schedule?.[0]?.assigned_rider || "",
+      orderItems: item.order_items || [],
     }));
 
     setDeliveries(formatted);
@@ -98,16 +107,15 @@ function Delivery() {
     }, 2500);
   };
 
-  // DIRECT UPDATE NG RIDER (Mananatiling Pending ang status kahit may i-assign na rider)
+  // DIRECT UPDATE NG RIDER
   const handleAssignRider = async (row, newRider) => {
-    // Palaging "Pending" ang status kapag nag-aassign ng rider, o kaya ay i-retain kung ano man
     const newStatus = "Pending"; 
 
     const { error } = await supabase
       .from("delivery_schedule")
       .update({
         assigned_rider: newRider || null,
-        delivery_status: newStatus, // Naka-set na ngayon sa Pending
+        delivery_status: newStatus,
       })
       .eq("order_id", row.scheduleOrderId);
 
@@ -171,6 +179,23 @@ function Delivery() {
     {
       key: "date",
       label: "Delivery Date"
+    },
+    {
+      key: "orderItems",
+      label: "Order Items",
+      render: (row) => (
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          {row.orderItems && row.orderItems.length > 0 ? (
+            row.orderItems.map((prod, index) => (
+              <div key={index} style={{ fontSize: "13px" }}>
+                <b>{prod.item_name}</b> (Qty: {prod.quantity}) — ₱{prod.unit_price}
+              </div>
+            ))
+          ) : (
+            <span style={{ color: "#888" }}>No items</span>
+          )}
+        </div>
+      ),
     },
     {
       key: "delivery_status",
@@ -263,10 +288,27 @@ function Delivery() {
           <option value="Out for Delivery">Out for Delivery</option>
           <option value="Delivered">Delivered</option>
         </select>
+
+        <button 
+          onClick={() => {
+            // Kunin ang user data mula sa localStorage (palitan ang mga key kung iba ang ginamit niyo sa pag-login)
+            const savedUser = JSON.parse(localStorage.getItem("user")) || {};
+            
+            const userPosition = savedUser.position || savedUser.role || "Admin";
+            const userName = savedUser.name || savedUser.fullName || "System User";
+            
+            const generatedByFull = `${userPosition} - ${userName}`;
+
+            exportToPDF(filtered, "delivery-report.pdf", generatedByFull);
+          }}
+          className="export-pdf-btn"
+        >
+          <Download size={18} /> Export PDF
+        </button>
       </div>
 
       {/* TABLE */}
-      <div className="delivery-table-container">
+      <div ref={reportRef} className="delivery-table-container">
         <Table
           columns={columns}
           data={loading ? [] : filtered}

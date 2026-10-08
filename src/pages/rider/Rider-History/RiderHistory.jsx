@@ -7,7 +7,6 @@ import {
   Home,
   Truck,
   History,
-  Calendar,
   CheckCircle,
   MapPin,
   Clock,
@@ -17,7 +16,7 @@ import {
 
 export default function RiderHistory() {
   const [historyList, setHistoryList] = useState([]);
-  const [totalAssigned, setTotalAssigned] = useState(0); 
+  const [totalAssigned, setTotalAssigned] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,8 +24,19 @@ export default function RiderHistory() {
   }, []);
 
   const fetchHistory = async () => {
-    // 1. Kunin ang pangalan ng nakelogin na rider (pwedeng i-adjust ang key kung kinakailangan)
-    const loggedInRiderName = localStorage.getItem("userName") || "Mark";
+    // 1. Kunin ang nakalogin na rider (parehong "user" object gaya ng sa Home at Deliveries)
+    const currentUser = JSON.parse(localStorage.getItem("user") || "null");
+
+    // Walang nakalogin = walang ipapakita (wala nang "Mark" na fallback)
+    if (!currentUser) {
+      setHistoryList([]);
+      setTotalAssigned(0);
+      setLoading(false);
+      return;
+    }
+
+    const myName = (currentUser.name || "").trim().toLowerCase();
+    const myId = currentUser.users_id;
 
     const { data, error } = await supabase
       .from("orders")
@@ -40,7 +50,8 @@ export default function RiderHistory() {
           order_id,
           delivery_code,
           delivery_status,
-          assigned_rider
+          assigned_rider,
+          assigned_rider_id
         )
       `)
       .eq("order_type", "Delivery")
@@ -52,10 +63,19 @@ export default function RiderHistory() {
       return;
     }
 
-    // 2. Salain muna ang buong data para sa nakelogin na rider lang
-    const riderOrders = data.filter((item) => {
-      const assignedRider = item.delivery_schedule?.[0]?.assigned_rider;
-      return assignedRider && assignedRider.toLowerCase() === loggedInRiderName.toLowerCase();
+    // 2. Salain muna ang buong data para sa nakalogin na rider LANG
+    const riderOrders = (data || []).filter((item) => {
+      const d = item.delivery_schedule?.[0];
+      if (!d) return false;
+
+      // May assigned_rider_id? ID lang ang basehan
+      if (d.assigned_rider_id != null) {
+        return myId != null && String(d.assigned_rider_id) === String(myId);
+      }
+
+      // Walang ID (lumang records): exact na pangalan lang
+      const assigned = (d.assigned_rider || "").trim().toLowerCase();
+      return assigned !== "" && assigned === myName;
     });
 
     // 3. Ang total assigned ay ang kabuuang naging trabaho ng rider na ito
@@ -80,14 +100,15 @@ export default function RiderHistory() {
     setLoading(false);
   };
 
-  // 🔥 Computation ng Success Rate para sa rider na ito
-  const successRate = totalAssigned > 0 
-    ? Math.round((historyList.length / totalAssigned) * 100) 
-    : 0;
+  // Computation ng Success Rate para sa rider na ito
+  const successRate =
+    totalAssigned > 0
+      ? Math.round((historyList.length / totalAssigned) * 100)
+      : 0;
 
   return (
     <div className="history-container">
-      
+
       {/* Reusable Topbar */}
       <RiderTopbar title="Delivery History" />
 
@@ -120,9 +141,13 @@ export default function RiderHistory() {
       </div>
 
       {loading ? (
-        <p style={{ marginTop: "30px", textAlign: "center", color: "#64748b", fontWeight: "500" }}>Loading history...</p>
+        <p style={{ marginTop: "30px", textAlign: "center", color: "#64748b", fontWeight: "500" }}>
+          Loading history...
+        </p>
       ) : historyList.length === 0 ? (
-        <p style={{ marginTop: "30px", textAlign: "center", color: "#64748b", fontWeight: "500" }}>No completed deliveries yet.</p>
+        <p style={{ marginTop: "30px", textAlign: "center", color: "#64748b", fontWeight: "500" }}>
+          No completed deliveries yet.
+        </p>
       ) : (
         historyList.map((item, index) => (
           <div className="history-card" key={item.id || index}>
@@ -156,13 +181,13 @@ export default function RiderHistory() {
 
       {/* Bottom Navigation */}
       <nav className="bottom-nav">
-        <NavLink to="/rider/home" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+        <NavLink to="/rider/home" className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}>
           <Home size={22} /><span>Home</span>
         </NavLink>
-        <NavLink to="/rider/deliveries" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+        <NavLink to="/rider/deliveries" className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}>
           <Truck size={22} /><span>Deliveries</span>
         </NavLink>
-        <NavLink to="/rider/history" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+        <NavLink to="/rider/history" className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}>
           <History size={22} /><span>History</span>
         </NavLink>
       </nav>

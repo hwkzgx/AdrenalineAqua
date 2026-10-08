@@ -26,14 +26,15 @@ export default function RiderTopbar({ title, showBackBtn = false, onBack }) {
   const [notifications, setNotifications] = useState([]);
 
   // FETCH NOTIFICATIONS FROM SUPABASE
+  // notifications.user_id = users.users_id (bigint)
   const fetchNotifications = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) return;
+    if (!user || !user.users_id) return;
 
     const { data, error } = await supabase
       .from("notifications")
       .select("*")
-      .or(`user_id.eq.${user.user_id},target_role.eq.rider`)
+      .eq("user_id", user.users_id)
       .order("created_at", { ascending: false });
 
     if (!error && data) {
@@ -45,7 +46,7 @@ export default function RiderTopbar({ title, showBackBtn = false, onBack }) {
     fetchNotifications();
 
     const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) return;
+    if (!user || !user.users_id) return;
 
     const channel = supabase
       .channel("rider-notifications")
@@ -55,7 +56,7 @@ export default function RiderTopbar({ title, showBackBtn = false, onBack }) {
           event: "INSERT",
           schema: "public",
           table: "notifications",
-          filter: `user_id=eq.${user.user_id}`,
+          filter: `user_id=eq.${user.users_id}`,
         },
         (payload) => {
           setNotifications((prev) => [payload.new, ...prev]);
@@ -73,27 +74,25 @@ export default function RiderTopbar({ title, showBackBtn = false, onBack }) {
     await supabase
       .from("notifications")
       .update({ is_read: true })
-      .eq("notification_id", id);
+      .eq("id", id);
 
-    setNotifications(
-      notifications.map((n) =>
-        n.notification_id === id ? { ...n, is_read: true } : n
-      )
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
     );
   };
 
   // MARK ALL AS READ
   const markAllAsRead = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) return;
+    if (!user || !user.users_id) return;
 
     await supabase
       .from("notifications")
       .update({ is_read: true })
-      .or(`user_id.eq.${user.user_id},target_role.eq.rider`)
+      .eq("user_id", user.users_id)
       .eq("is_read", false);
 
-    setNotifications(notifications.map((n) => ({ ...n, is_read: true })));
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
   };
 
   // FILTERED NOTIFICATIONS
@@ -155,14 +154,16 @@ export default function RiderTopbar({ title, showBackBtn = false, onBack }) {
                   {filteredNotifs.length > 0 ? (
                     filteredNotifs.map((notif) => (
                       <div
-                        key={notif.notification_id}
+                        key={notif.id}
                         className={`notif-item ${!notif.is_read ? "unread" : ""}`}
-                        onClick={() => !notif.is_read && markAsRead(notif.notification_id)}
+                        onClick={() => !notif.is_read && markAsRead(notif.id)}
                       >
                         <div className="notif-item-content">
                           <FontAwesomeIcon icon={faShoppingCart} className="notif-icon-item" />
                           <div>
-                            <p>{notif.message}</p>
+                            <p>
+  {notif.message.replace(/\s*\[STATE:.*?\]\s*$/, "")}
+</p>
                             <span className="notif-time">
                               {new Date(notif.created_at).toLocaleString([], {
                                 month: "numeric",
@@ -218,16 +219,6 @@ export default function RiderTopbar({ title, showBackBtn = false, onBack }) {
                   }}
                 >
                   <FontAwesomeIcon icon={faUser} /> My Profile
-                </div>
-
-                <div
-                  className="dropdown-item"
-                  onClick={() => {
-                    setOpenProfile(false);
-                    navigate("/rider/reset-password");
-                  }}
-                >
-                  <FontAwesomeIcon icon={faKey} /> Change Password
                 </div>
 
                 <button

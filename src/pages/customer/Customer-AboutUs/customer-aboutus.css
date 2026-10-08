@@ -3,23 +3,72 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
-/* ABOUT HERO */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* =========================================
+   ABOUT HERO (BACKGROUND IMAGE - enhanced)
+========================================= */
 .about-hero {
-  padding: 80px 10%;
-  background: url("../../../assets/AboutHeroImg.png") no-repeat center;
-    display: flex;
+  display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 80px 10%;
   min-height: 90vh;
-    background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
+  background-color: #eaf6ff; /* fallback habang naglo-load ang image */
+  position: relative;
   overflow: hidden;
+  isolation: isolate;
+}
+
+/* Yung picture: mas vivid at mas malinaw (walang zoom) */
+.about-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: url("../../../assets/AboutHeroImg.png") center / cover no-repeat;
+  filter: saturate(1.18) contrast(1.06) brightness(1.04);
+}
+
+/* Overlay: malinaw ang text sa kaliwa, kita ang picture sa kanan,
+   at smooth ang lipat papunta sa next section */
+.about-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, transparent 80%, #ffffff 100%),
+    linear-gradient(90deg,
+      rgba(255, 255, 255, 0.88) 0%,
+      rgba(255, 255, 255, 0.6) 40%,
+      rgba(255, 255, 255, 0) 72%),
+    radial-gradient(60% 70% at 82% 35%, rgba(255, 255, 255, 0.2), transparent 70%),
+    linear-gradient(0deg, rgba(0, 119, 182, 0.1), transparent 45%);
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .about-content {
@@ -28,94 +77,166 @@
   align-items: center;
   gap: 40px;
   flex-wrap: wrap;
+  width: 100%;
+  animation: riseIn 0.8s ease both;
 }
 
 .about-text {
   flex: 1;
+  max-width: 560px;
 }
 
 .about-text h1 {
-  font-size: 2.8rem;
+  font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
   color: #0077b6;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
+}
+
+.about-text h1::after {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 4px;
+  border-radius: 4px;
+  margin-top: 14px;
+  background: linear-gradient(90deg, #0077b6, #00b4d8);
 }
 
 .about-text p {
-  color: #444;
-  line-height: 1.6;
-  margin-bottom: 15px;
-  font-size: 1rem;
+  color: #1e293b;
+  line-height: 1.75;
+  margin-bottom: 16px;
+  font-size: 1.05rem;
 }
 
-
-/* DIRECTORS */
+/* =========================================
+   DIRECTORS
+========================================= */
 .directors-section {
-  padding: 80px 10%;
+  padding: 90px 10%;
   text-align: center;
-  background: white;
+  background:
+    radial-gradient(520px 320px at 100% 0%, rgba(0, 180, 216, 0.1), transparent 70%),
+    radial-gradient(520px 320px at 0% 100%, rgba(0, 119, 182, 0.08), transparent 70%),
+    #f8fbff;
 }
 
 .directors-section h1 {
   font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   color: #0077b6;
-  margin-bottom: 40px;
+  margin-bottom: 48px;
+}
+
+.directors-section h1::after {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 4px;
+  border-radius: 4px;
+  margin: 14px auto 0;
+  background: linear-gradient(90deg, #0077b6, #00b4d8);
 }
 
 .directors-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 25px;
+  gap: 24px;
 }
 
 .director-card {
-  background: #f8fbff;
-  border-radius: 15px;
-  padding: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  transition: 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  background: white;
+  border-radius: 20px;
+  padding: 14px 14px 24px;
+  border: 1px solid #e3eef9;
+  box-shadow: 0 4px 14px rgba(2, 62, 138, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* accent line sa taas na lumalabas sa hover */
+.director-card::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #0077b6, #00b4d8);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
 }
 
 .director-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
+  border-color: #b9ddf2;
+  box-shadow: 0 18px 36px rgba(2, 62, 138, 0.14);
+}
+
+.director-card:hover::after {
+  transform: scaleX(1);
 }
 
 .director-card img {
+  display: block;
   width: 100%;
-  height: 220px;
+  height: auto;
+  aspect-ratio: 4 / 5;
   object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 15px;
+  object-position: center top;
+  border-radius: 14px;
+  margin-bottom: 18px;
+  background: #e6f4fc;
 }
 
 .director-card h2 {
   color: #023e8a;
-  font-size: 1.2rem;
-  margin-bottom: 5px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 8px;
 }
 
+/* role na naka-pill */
 .director-card p {
-  font-size: 0.9rem;
-  color: #555;
+  display: inline-block;
+  padding: 5px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #0077b6;
+  background: #e6f4fc;
+  border-radius: 999px;
 }
 
+/* =========================================
+   FOOTER
+========================================= */
 .footer {
   display: flex;
   justify-content: space-between;
-  padding: 50px 10%;
+  align-items: flex-start;
+  padding: 56px 10%;
   color: white;
   flex-wrap: wrap;
-  gap: 30px;
-
-  background: url("../../../assets/FooterImage.png") no-repeat center;
+  gap: 32px;
+  background: url("../../../assets/FooterImage.png") no-repeat center center;
   background-size: cover;
   position: relative;
+  overflow-x: hidden;
 }
 
 .footer::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: linear-gradient(135deg, rgba(2, 30, 70, 0.88), rgba(0, 70, 120, 0.7));
 }
 
 .footer > * {
@@ -123,21 +244,228 @@
   z-index: 1;
 }
 
-/* RESPONSIVE */
-@media (max-width: 900px) {
+.footer h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
 
-  .about-content,
-  .about-contact-info {
-    flex-direction: column;
+.footer h3 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #90e0ef;
+  margin-bottom: 14px;
+}
+
+.footer p {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.86);
+  margin-bottom: 4px;
+}
+
+.footer-logo img {
+  width: 70px;
+  margin-bottom: 12px;
+}
+
+.footer-logo p {
+  font-style: italic;
+}
+
+.footer-contact {
+  max-width: 320px;
+}
+
+.footer-socials p {
+  width: fit-content;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.footer-socials p:hover {
+  color: #90e0ef;
+  transform: translateX(4px);
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+@media (max-width: 1024px) {
+  .about-hero {
+    padding: 70px 6%;
+    min-height: unset;
   }
 
-  .about-map-box {
-    width: 100%;
-    height: 250px;
+  /* mas pantay ang overlay para mabasa ang text kahit nasa gitna */
+  .about-hero::after {
+    background:
+      linear-gradient(180deg, transparent 82%, #ffffff 100%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.58));
+  }
+
+  .about-content {
+    flex-direction: column;
+    justify-content: center;
+    gap: 24px;
   }
 
   .about-text {
+    max-width: 100%;
     text-align: center;
   }
 
+  .about-text h1::after {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-hero {
+    padding: 44px 5% 56px;
+    min-height: 55vh;
+  }
+
+  .about-hero::before {
+    background-position: 70% center; /* ipakita ang main subject ng picture */
+  }
+
+  .about-text h1 {
+    margin-bottom: 18px;
+  }
+
+  .about-text h1::after {
+    width: 44px;
+    height: 3px;
+    margin-top: 10px;
+  }
+
+  .about-text p {
+    font-size: 0.92rem;
+    line-height: 1.65;
+    margin-bottom: 12px;
+  }
+
+  .directors-section {
+    padding: 48px 5%;
+  }
+
+  .directors-section h1 {
+    font-size: 1.6rem;
+    margin-bottom: 30px;
+  }
+
+  .directors-section h1::after {
+    width: 44px;
+    height: 3px;
+    margin-top: 10px;
+  }
+
+  /* 2 columns sa phone */
+  .directors-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .director-card {
+    padding: 10px 10px 18px;
+    border-radius: 16px;
+  }
+
+  .director-card img {
+    border-radius: 11px;
+    margin-bottom: 12px;
+  }
+
+  .director-card h2 {
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+  }
+
+  .director-card p {
+    font-size: 0.72rem;
+    padding: 4px 10px;
+    border-radius: 12px;
+  }
+
+  .footer {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    column-gap: 20px;
+    row-gap: 16px;
+    padding: 24px 6%;
+  }
+
+  /* logo sa kaliwa, pangalan at tagline sa kanan nito */
+  .footer-logo {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 12px;
+    align-items: center;
+  }
+
+  .footer-logo img {
+    grid-row: 1 / 3;
+    width: 38px;
+    margin-bottom: 0;
+  }
+
+  .footer-logo h2 {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+  }
+
+  .footer-logo p {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+  }
+
+  .footer h2 {
+    font-size: 1rem;
+    margin-bottom: 0;
+  }
+
+  .footer h3 {
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+
+  .footer p {
+    font-size: 0.74rem;
+    line-height: 1.5;
+    margin-bottom: 2px;
+  }
+
+  .footer-contact {
+    max-width: none;
+  }
+}
+
+@media (max-width: 360px) {
+  .directors-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .about-content {
+    animation: none;
+  }
+
+  .director-card,
+  .director-card::after,
+  .footer-socials p {
+    transition: none;
+  }
 }

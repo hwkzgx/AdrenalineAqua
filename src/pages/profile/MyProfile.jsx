@@ -1,64 +1,114 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
-import { Pencil } from "lucide-react";
+import { Pencil, CheckCircle2, XCircle } from "lucide-react";
 import "../../styles/my-profile.css";
 import { supabase } from "../../supabase";
 
+// Hanapin ang user gamit ang users_id; kung wala, email; kung wala, user_id
+function applyUserFilter(query, user) {
+  if (!user) return null;
+  if (user.users_id) return query.eq("users_id", user.users_id);
+  if (user.email) return query.ilike("email", String(user.email).trim());
+  if (user.user_id) return query.eq("user_id", user.user_id);
+  return null;
+}
+
 function MyProfile() {
   const context = useOutletContext();
-  const role = context?.role || "admin";
+  const role = (context?.role || "admin").toLowerCase();
   const navigate = useNavigate();
+
+  // Title, label at dashboard path ayon sa role
+  const isCo = role === "co" || role === "co_associate";
+
+  const roleLabel = isCo
+    ? "Co-Associate"
+    : role === "staff"
+    ? "Staff"
+    : role === "admin"
+    ? "Admin"
+    : role;
+
+  const dashboardPath = isCo
+    ? "/co/dashboard"
+    : role === "staff"
+    ? "/staff/dashboard"
+    : "/admin/dashboard";
 
   const [isEditing, setIsEditing] = useState(false);
 
- const [profile, setProfile] = useState({
-  fullname: "",
-  email: "",
-  contact: "",
-  address: "",
-});
+  const [profile, setProfile] = useState({
+    fullname: "",
+    email: "",
+    contact: "",
+    address: "",
+  });
 
   const [tempProfile, setTempProfile] = useState(profile);
 
   const [profilePic, setProfilePic] = useState(null);
+
+  // TOAST
+  const [toast, setToast] = useState(null);
+  const toastTimer = useRef(null);
+
+  const showToast = (type, message) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+
+    setToast({ type, message });
+
+    toastTimer.current = setTimeout(() => {
+      setToast(null);
+    }, 3000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+    };
+  }, []);
 
   useEffect(() => {
     setTempProfile(profile);
   }, [profile]);
 
   useEffect(() => {
-  const fetchProfile = async () => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const fetchProfile = async () => {
+      const storedUser = JSON.parse(localStorage.getItem("user"));
 
-    console.log("STORED USER RAW:", storedUser);
-    console.log(
-      "STORED USER JSON:",
-      JSON.stringify(storedUser, null, 2)
-    );
+      console.log("STORED USER RAW:", storedUser);
+      console.log(
+        "STORED USER JSON:",
+        JSON.stringify(storedUser, null, 2)
+      );
 
-    if (!storedUser) return;
+      if (!storedUser) return;
 
-    const { data, error } = await supabase
-  .from("users")
-  .select("*")
-  .eq("email", storedUser.email)
-  .single();
+      const query = applyUserFilter(
+        supabase.from("users").select("*"),
+        storedUser
+      );
 
-    console.log("FETCHED DATA:", data);
-    console.log("FETCH ERROR:", error);
+      if (!query) return;
 
-    if (data) {
-      setProfile({
-        fullname: data.name || "",
-        email: data.email || "",
-        contact: data.contact_number || "",
-        address: data.address || "",
-      });
-    }
-  };
+      const { data, error } = await query.limit(1).maybeSingle();
 
-  fetchProfile();
-}, []);
+      console.log("FETCHED DATA:", data);
+      console.log("FETCH ERROR:", error);
+
+      if (data) {
+        setProfile({
+          fullname: storedUser.name || data.name || "",
+          email: storedUser.email || data.email || "",
+          contact: storedUser.contact_number || data.contact_number || "",
+          address: storedUser.address || data.address || "",
+        });
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
   const hasChanges =
     JSON.stringify(profile) !== JSON.stringify(tempProfile);
 
@@ -80,32 +130,49 @@ function MyProfile() {
     setIsEditing(false);
   };
 
- const handleSave = async () => {
-  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const handleSave = async () => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
 
-  const userId =
-    storedUser.users_id ||
-    storedUser.user_id ||
-    storedUser.admin_id ||
-    storedUser.id;
+    const query = applyUserFilter(
+      supabase.from("users").update({
+        name: tempProfile.fullname,
+        contact_number: tempProfile.contact,
+        address: tempProfile.address,
+      }),
+      storedUser
+    );
 
- const { error } = await supabase
-  .from("users")
-  .update({
-    name: tempProfile.fullname,
-    contact_number: tempProfile.contact,
-    address: tempProfile.address,
-  })
-  .eq("email", storedUser.email);
+    if (!query) {
+      showToast("error", "Unable to update profile. Please log in again.");
+      return;
+    }
 
-if (error) {
-  console.log(error);
-  return;
-}
+    const { error } = await query;
 
-  setProfile(tempProfile);
-  setIsEditing(false);
-};
+    if (error) {
+      console.log(error);
+      showToast("error", "Failed to update profile. Please try again.");
+      return;
+    }
+
+    // Update localStorage para pati sidebar updated
+    const updatedUser = {
+      ...storedUser,
+      name: tempProfile.fullname,
+      contact_number: tempProfile.contact,
+      address: tempProfile.address,
+    };
+
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+
+    setProfile(tempProfile);
+    setIsEditing(false);
+
+    // Sabihan ang sidebar na may updated user
+    window.dispatchEvent(new Event("userUpdated"));
+
+    showToast("success", "Profile updated successfully!");
+  };
 
   const handleProfilePicUpload = (e) => {
     const file = e.target.files[0];
@@ -117,6 +184,20 @@ if (error) {
 
   return (
     <div className="myprofile-page">
+
+      {/* TOAST */}
+      {toast && (
+        <div className={`myprof-toast ${toast.type}`}>
+          <span className="myprof-toast-icon">
+            {toast.type === "success" ? (
+              <CheckCircle2 size={20} />
+            ) : (
+              <XCircle size={20} />
+            )}
+          </span>
+          <span className="myprof-toast-text">{toast.message}</span>
+        </div>
+      )}
 
       {/* TOPBAR */}
       <div className="myprofile-topbar">
@@ -131,22 +212,12 @@ if (error) {
         {/* HEADER */}
         <div className="profile-header">
           <div>
-            <h2>
-              {role === "admin"
-                ? "Admin Profile"
-                : "Co-Associate Profile"}
-            </h2>
+            <h2>{roleLabel} Profile</h2>
 
             <p className="breadcrumb">
               <span
                 className="breadcrumb-link"
-                onClick={() =>
-                  navigate(
-                    role === "admin"
-                      ? "/admin/dashboard"
-                      : "/co/dashboard"
-                  )
-                }
+                onClick={() => navigate(dashboardPath)}
               >
                 Dashboard
               </span>
@@ -209,7 +280,7 @@ if (error) {
 
                 <label>
                   {field === "fullname"
-                    ? "Full Name"
+                    ? "Username"
                     : field === "contact"
                     ? "Contact No."
                     : field.charAt(0).toUpperCase() + field.slice(1)}
@@ -227,14 +298,14 @@ if (error) {
                 )}
 
               </div>
-              
+
             ))}
-            
-          {/* ROLE BADGE */}
-          <div className="profile-field">
-          <label>Role</label>
-          <p className="role-badge">{role}</p>
-          </div>
+
+            {/* ROLE BADGE */}
+            <div className="profile-field">
+              <label>Role</label>
+              <p className="role-badge">{roleLabel}</p>
+            </div>
 
           </div>
 

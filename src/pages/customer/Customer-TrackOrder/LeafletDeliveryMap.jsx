@@ -11,59 +11,50 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 // ===============================
-// CUSTOM RIDER ICON
+// CUSTOM RIDER ICON (TRICYCLE SVG - CSS BASED)
 // ===============================
 const riderIcon = L.divIcon({
   className: "custom-rider-marker",
   html: `
-    <div style="
-      width: 42px;
-      height: 42px;
-      background: #2563eb;
-      border: 3px solid white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-      font-size: 22px;
-    ">
-      🛺
+    <div class="custom-rider-container">
+      <div class="custom-rider-pulse"></div>
+      <div class="custom-rider-icon-box">
+        <!-- Kolong-Kolong / Tricycle SVG -->
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Wheels -->
+          <circle cx="5" cy="19" r="2"></circle>
+          <circle cx="16" cy="19" r="2"></circle>
+          <circle cx="19" cy="13" r="1.5"></circle>
+          <!-- Cabin / Roof Structure -->
+          <path d="M3 17V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v9"></path>
+          <path d="M15 9h3l2 4v4"></path>
+          <path d="M3 13h12"></path>
+          <path d="M5 6V4h6v2"></path>
+        </svg>
+      </div>
     </div>
   `,
-  iconSize: [42, 42],
-  iconAnchor: [21, 21],
+  iconSize: [52, 52],
+  iconAnchor: [26, 26],
 });
 
 // ===============================
-// CUSTOM DESTINATION ICON
+// CUSTOM DESTINATION ICON (CSS BASED)
 // ===============================
 const destinationIcon = L.divIcon({
   className: "custom-destination-marker",
   html: `
-    <div style="
-      width: 38px;
-      height: 38px;
-      background: #ef4444;
-      border: 3px solid white;
-      border-radius: 50% 50% 50% 0;
-      transform: rotate(-45deg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-    ">
-      <div style="
-        transform: rotate(45deg);
-        color: white;
-        font-size: 19px;
-      ">
-        📍
+    <div class="custom-dest-icon-box">
+      <div class="custom-dest-inner">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
       </div>
     </div>
   `,
-  iconSize: [38, 38],
-  iconAnchor: [19, 38],
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
 });
 
 // ===============================
@@ -125,9 +116,6 @@ export default function LeafletDeliveryMap({
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [routeLoading, setRouteLoading] = useState(false);
 
-  // ===============================
-  // GET ROUTE FROM OSRM
-  // ===============================
   useEffect(() => {
     if (!riderPosition || !destinationPosition) {
       setRouteCoordinates([]);
@@ -183,9 +171,6 @@ export default function LeafletDeliveryMap({
     getRoute();
   }, [riderPosition, destinationPosition]);
 
-  // ===============================
-  // DEFAULT CENTER
-  // ===============================
   const defaultCenter = center || [14.8311, 120.7358];
 
   return (
@@ -209,13 +194,11 @@ export default function LeafletDeliveryMap({
           minHeight: "420px",
         }}
       >
-        {/* OPENSTREETMAP */}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {/* UPDATE MAP VIEW */}
         <MapUpdater
           center={center}
           riderPosition={riderPosition}
@@ -231,7 +214,7 @@ export default function LeafletDeliveryMap({
             <Popup>
               <strong>🛺 Rider</strong>
               <br />
-              Your delivery rider is here.
+              Your delivery rider is on the way.
             </Popup>
           </Marker>
         )}
@@ -253,7 +236,6 @@ export default function LeafletDeliveryMap({
         {/* ROUTE */}
         {routeCoordinates.length > 0 && (
           <>
-            {/* Outer route */}
             <Polyline
               positions={routeCoordinates}
               pathOptions={{
@@ -262,8 +244,6 @@ export default function LeafletDeliveryMap({
                 opacity: 0.9,
               }}
             />
-
-            {/* Main route */}
             <Polyline
               positions={routeCoordinates}
               pathOptions={{

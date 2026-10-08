@@ -13,7 +13,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleLogin = async () => {
+const handleLogin = async () => {
   setErrorMessage("");
 
   if (!email || !password) {
@@ -21,8 +21,70 @@ export default function Login() {
     return;
   }
 
+  const selectedRole = localStorage.getItem("role");
+
+  if (!selectedRole) {
+    setErrorMessage("Please select a role first.");
+    return;
+  }
+
   setLoading(true);
 
+  // STAFF - SUPABASE AUTH
+if (
+  selectedRole === "staff" ||
+  selectedRole === "co" ||
+  selectedRole === "admin"
+) {
+    const { error: authError } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+    if (authError) {
+      setLoading(false);
+      setErrorMessage("Invalid email or password.");
+      return;
+    }
+
+    const { data: userData, error: userError } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .eq("role", selectedRole)
+      .single();
+
+    if (userError || !userData) {
+      await supabase.auth.signOut();
+      setLoading(false);
+      setErrorMessage("This account is not registered as staff.");
+      return;
+    }
+
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        name: userData.name,
+        role: userData.role,
+        email: userData.email,
+      })
+    );
+
+  setLoading(false);
+
+if (selectedRole === "staff") {
+  nav("/staff/dashboard");
+} else if (selectedRole === "co") {
+  nav("/co/dashboard");
+} else if (selectedRole === "admin") {
+  nav("/admin/dashboard");
+}
+
+return;
+  }
+
+  // ADMIN + CO - OLD LOGIN MUNA
   const { data, error } = await supabase
     .from("users")
     .select("*")
@@ -34,13 +96,6 @@ export default function Login() {
 
   if (error || !data) {
     setErrorMessage("Account not found or incorrect credentials.");
-    return;
-  }
-
-  const selectedRole = localStorage.getItem("role");
-
-  if (!selectedRole) {
-    setErrorMessage("Please select a role first.");
     return;
   }
 
@@ -62,8 +117,6 @@ export default function Login() {
 
   if (data.role === "admin") nav("/admin/dashboard");
   else if (data.role === "co") nav("/co/dashboard");
-  else if (data.role === "staff") nav("/staff/dashboard");
-  else nav("/customer/dashboard");
 };
 
   return (

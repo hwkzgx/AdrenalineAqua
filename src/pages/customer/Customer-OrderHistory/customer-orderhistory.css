@@ -109,13 +109,13 @@
 
 /* FILTER DROPDOWN */
 .OrHis-filter {
-  width: 150px;          
+  width: 150px;
   padding: 6px 10px;
   border-radius: 6px;
   border: 2px solid #1686ff;
   background: white;
   cursor: pointer;
-  flex-shrink: 0;      
+  flex-shrink: 0;
 }
 
 /* TABLE */
@@ -255,4 +255,477 @@ tbody td {
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+/* ===============================================================
+   ================  RESPONSIVE (MOBILE LANG)  ===================
+   Lahat ng nasa baba ay nasa loob ng media query, kaya HINDI
+   nito binabago ang desktop design mo.
+   =============================================================== */
+
+/* ---------- TABLET (<= 900px): isang column ---------- */
+@media (max-width: 900px) {
+  .order-history-page {
+    padding: 20px;
+  }
+
+  .order-history-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+
+  .order-history-left {
+    flex: none;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .order-history-right {
+    width: 100%;
+  }
+
+  .details-card {
+    min-height: 0;
+  }
+
+  /* kung hindi kasya ang table, mag-scroll pakaliwa/kanan */
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  tbody td {
+    padding: 16px;
+  }
+}
+
+/* ---------- MOBILE (<= 600px): MODERN STYLE ---------- */
+@media (max-width: 600px) {
+  .order-history-page,
+  .order-history-page *,
+  .order-history-page *::before,
+  .order-history-page *::after {
+    box-sizing: border-box;
+  }
+
+  /* Page background */
+  .order-history-page {
+    padding: 12px 12px 28px;
+    background-image: none;
+    background: linear-gradient(180deg, #e3f0ff 0%, #f3f7fc 45%);
+  }
+
+  .order-history-container {
+    gap: 14px;
+  }
+
+  /* Wala nang malaking puting panel; bawat bahagi ay sariling card */
+  .order-history-left {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 0;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  /* ----- Header = blue banner ----- */
+  .history-header {
+    gap: 12px;
+    padding: 20px 18px;
+    background: linear-gradient(135deg, #2aa0ff, #0050b8);
+    border-radius: 24px;
+    box-shadow: 0 14px 30px rgba(0, 80, 184, 0.3);
+  }
+
+  .history-icon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .history-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .history-header h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .history-header p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  /* ----- Search + Filter = isang card ----- */
+  .history-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin: 0;
+    padding: 16px;
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 4px 16px rgba(15, 31, 61, 0.06);
+  }
+
+  .search-box {
+    width: 100%;
+    height: 52px;
+    padding: 0 16px;
+    border: 1.5px solid #e3e9f3;
+    border-radius: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .search-box:focus-within {
+    border-color: #0d7df2;
+    box-shadow: 0 0 0 4px rgba(13, 125, 242, 0.14);
+  }
+
+  /* Isang kahon lang: ang input mismo ay walang border/glow/background */
+  .search-box input,
+  .search-box input:hover,
+  .search-box input:focus {
+    min-width: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 16px; /* para hindi mag-zoom ang iOS */
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  .OrHis-filter {
+    display: block;
+    width: 100% !important;
+    height: 52px !important;
+    margin: 0;
+    padding: 0 44px 0 16px !important;
+    font-size: 16px;
+    font-weight: 500;
+    color: #0b2f6d;
+    background-color: #fff;
+    border: 1.5px solid #e3e9f3;
+    border-radius: 14px;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%230d7df2' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px;
+  }
+
+  .OrHis-filter:focus {
+    border-color: #0d7df2;
+    box-shadow: 0 0 0 4px rgba(13, 125, 242, 0.14);
+  }
+
+  /* ----- TABLE -> listahan ng cards (pareho ang pagkakasunod-sunod) ----- */
+  .table-wrapper {
+    margin: 0;
+    overflow: visible;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .table-wrapper table,
+  .table-wrapper tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .table-wrapper thead {
+    display: none;
+  }
+
+  .table-wrapper tbody tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    gap: 14px 12px;
+    margin-bottom: 14px;
+    padding: 18px 16px;
+    background: #fff !important;
+    border: 1.5px solid transparent;
+    border-radius: 24px;
+    box-shadow: 0 6px 20px rgba(15, 31, 61, 0.07);
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  }
+
+  .table-wrapper tbody tr:active {
+    transform: scale(0.99);
+  }
+
+  /* napiling order (may inline background na #f3f3f3 sa JSX) */
+  .table-wrapper tbody tr[style*="243, 243, 243"] {
+    background: #eaf4ff !important;
+    border-color: #0d7df2;
+    box-shadow: 0 8px 22px rgba(13, 125, 242, 0.16);
+  }
+
+  .table-wrapper tbody td {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+    padding: 0;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+    color: #17315e;
+    overflow-wrap: anywhere;
+  }
+
+  /* label ng bawat value (CSS lang, walang babaguhin sa JSX) */
+  .table-wrapper tbody td::before {
+    margin-bottom: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #94a3b8;
+  }
+
+  .table-wrapper tbody td:nth-child(1)::before { content: "Order ID"; }
+  .table-wrapper tbody td:nth-child(2)::before { content: "Date"; }
+  .table-wrapper tbody td:nth-child(3)::before { content: "Product"; }
+  .table-wrapper tbody td:nth-child(4)::before { content: "Qty"; }
+  .table-wrapper tbody td:nth-child(5)::before { content: "Status"; }
+  .table-wrapper tbody td:nth-child(6)::before { content: "Total"; }
+
+  .table-wrapper tbody td:nth-child(1) {
+    font-size: 15px;
+    font-weight: 800;
+    color: #0b2f6d;
+  }
+
+  /* Row 1: Order ID (kaliwa) | Status pill (kanan) */
+  .table-wrapper tbody td:nth-child(1) {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .table-wrapper tbody td:nth-child(5) {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    justify-self: end;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #0062d6;
+    background: #eaf4ff;
+    border-radius: 999px;
+  }
+
+  .table-wrapper tbody td:nth-child(5)::before {
+    content: none;
+  }
+
+  /* Row 2: Date (kaliwa) | Total (kanan), may linya sa taas */
+  .table-wrapper tbody td:nth-child(2),
+  .table-wrapper tbody td:nth-child(6) {
+    grid-row: 2;
+    padding-top: 14px;
+    border-top: 1px dashed #e3e9f3;
+  }
+
+  .table-wrapper tbody td:nth-child(2) {
+    grid-column: 1;
+  }
+
+  .table-wrapper tbody td:nth-child(6) {
+    grid-column: 2;
+    align-items: flex-end;
+    text-align: right;
+    font-size: 18px;
+    font-weight: 800;
+    color: #0062d6;
+  }
+
+  /* Row 3: Product (kaliwa) | Qty (kanan) */
+  .table-wrapper tbody td:nth-child(3) {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .table-wrapper tbody td:nth-child(4) {
+    grid-column: 2;
+    grid-row: 3;
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  /* "No orders found." */
+  .table-wrapper tbody td.empty-table {
+    grid-column: 1 / -1;
+    align-items: center;
+    height: auto;
+    padding: 28px 0;
+    text-align: center;
+    font-weight: 500;
+    color: #73839c;
+  }
+
+  .table-wrapper tbody td.empty-table::before {
+    content: none !important;
+  }
+
+  /* ----- RIGHT SIDE (details, address, payment, button) ----- */
+  .order-history-right {
+    width: 100%;
+    gap: 14px;
+  }
+
+  .details-card,
+  .address-card,
+  .order-history-right .payment-card {
+    display: block;
+    min-height: 0;
+    margin: 0;
+    padding: 18px 16px;
+    background: #fff;
+    border: none;
+    border-radius: 22px;
+    box-shadow: 0 4px 16px rgba(15, 31, 61, 0.06);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    cursor: default;
+    transform: none;
+  }
+
+  /* payment-card ay may kaparehong class sa Make Order, tanggalin ang tagas */
+  .order-history-right .payment-card::before {
+    content: none;
+  }
+
+  .order-history-right .payment-card:hover {
+    transform: none;
+  }
+
+  .details-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 6px;
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .details-card h3::before {
+    content: "";
+    width: 5px;
+    height: 22px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #2aa0ff, #0062d6);
+  }
+
+  .detail-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 0;
+    padding: 12px 0;
+    font-size: 14px;
+    color: #17315e;
+    text-align: right;
+    border-bottom: 1px dashed #e3e9f3;
+    overflow-wrap: anywhere;
+  }
+
+  .detail-item:last-child {
+    padding-bottom: 0;
+    font-size: 17px;
+    font-weight: 800;
+    color: #0062d6;
+    border-bottom: none;
+  }
+
+  .detail-item strong {
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    text-align: left;
+    color: #5b6b88;
+  }
+
+  .address-header,
+  .payment-header {
+    gap: 10px;
+  }
+
+  .address-header svg,
+  .payment-header svg {
+    width: 40px;
+    height: 40px;
+    padding: 9px;
+    flex-shrink: 0;
+    color: #0062d6;
+    background: #eaf4ff;
+    border-radius: 12px;
+  }
+
+  .address-header h4,
+  .payment-header h4 {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .address-card p,
+  .order-history-right .payment-card p {
+    margin: 10px 0 0;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+  }
+
+  .reorder-btn {
+    height: 54px;
+    font-size: 16px;
+    background: linear-gradient(135deg, #2aa0ff, #0062d6);
+    border-radius: 16px;
+    box-shadow: 0 12px 26px rgba(0, 98, 214, 0.35);
+  }
+}
+
+/* ---------- MALIIT NA PHONE (<= 360px) ---------- */
+@media (max-width: 360px) {
+  .order-history-page {
+    padding: 10px 10px 24px;
+  }
+
+  .history-header h2 {
+    font-size: 20px;
+  }
+
+  .table-wrapper tbody tr {
+    padding: 14px;
+    gap: 12px 10px;
+  }
+
+  .details-card,
+  .address-card,
+  .order-history-right .payment-card {
+    padding: 16px 12px;
+  }
 }

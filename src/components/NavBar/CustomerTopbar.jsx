@@ -12,7 +12,9 @@ import {
   faRightFromBracket,
   faCheckDouble,
   faCircleUser,
-  faCheck
+  faCheck,
+  faBars,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function CustomerTopbar() {
@@ -22,20 +24,22 @@ export default function CustomerTopbar() {
   const [openNotif, setOpenNotif] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
   const [activeTab, setActiveTab] = useState("unread");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // NOTIFICATION STATES
   const [notifications, setNotifications] = useState([]);
   const role = "customer";
 
   // FETCH NOTIFICATIONS FROM SUPABASE
+  // notifications.user_id = users.users_id (bigint)
   const fetchNotifications = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) return;
+    if (!user || !user.users_id) return;
 
     const { data, error } = await supabase
       .from("notifications")
       .select("*")
-      .eq("user_id", user.user_id)
+      .eq("user_id", user.users_id)
       .order("created_at", { ascending: false });
 
     if (!error && data) {
@@ -48,7 +52,7 @@ export default function CustomerTopbar() {
 
     // Real-time listener para sa bagong notifications
     const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) return;
+    if (!user || !user.users_id) return;
 
     const channel = supabase
       .channel("customer-notifications")
@@ -58,7 +62,7 @@ export default function CustomerTopbar() {
           event: "INSERT",
           schema: "public",
           table: "notifications",
-          filter: `user_id=eq.${user.user_id}`,
+          filter: `user_id=eq.${user.users_id}`,
         },
         (payload) => {
           setNotifications((prev) => [payload.new, ...prev]);
@@ -76,27 +80,25 @@ export default function CustomerTopbar() {
     await supabase
       .from("notifications")
       .update({ is_read: true })
-      .eq("notification_id", id);
+      .eq("id", id);
 
-    setNotifications(
-      notifications.map((n) =>
-        n.notification_id === id ? { ...n, is_read: true } : n
-      )
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
     );
   };
 
   // MARK ALL AS READ
   const markAllAsRead = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) return;
+    if (!user || !user.users_id) return;
 
     await supabase
       .from("notifications")
       .update({ is_read: true })
-      .eq("user_id", user.user_id)
+      .eq("user_id", user.users_id)
       .eq("is_read", false);
 
-    setNotifications(notifications.map((n) => ({ ...n, is_read: true })));
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
   };
 
   // FILTERED NOTIFICATIONS
@@ -105,6 +107,15 @@ export default function CustomerTopbar() {
   );
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
+
+  const navItems = [
+    { to: "/customer/dashboard", label: "Dashboard" },
+    { to: "/customer/make-order", label: "Make Order" },
+    { to: "/customer/track-order", label: "Track Order" },
+    { to: "/customer/order-history", label: "Order History" },
+    { to: "/customer/about-us", label: "About Us" },
+    { to: "/customer/contact-us", label: "Contact Us" },
+  ];
 
   return (
     <>
@@ -115,26 +126,17 @@ export default function CustomerTopbar() {
           <img src={AquaLogo} alt="Aqua Logo" />
         </div>
 
-        {/* LINKS */}
+        {/* LINKS (desktop) */}
         <nav className="ctopbar-links">
-          <NavLink to="/customer/dashboard" className={({ isActive }) => (isActive ? "active" : "")}>
-            Dashboard
-          </NavLink>
-          <NavLink to="/customer/make-order" className={({ isActive }) => (isActive ? "active" : "")}>
-            Make Order
-          </NavLink>
-          <NavLink to="/customer/track-order" className={({ isActive }) => (isActive ? "active" : "")}>
-            Track Order
-          </NavLink>
-          <NavLink to="/customer/order-history" className={({ isActive }) => (isActive ? "active" : "")}>
-            Order History
-          </NavLink>
-          <NavLink to="/customer/about-us" className={({ isActive }) => (isActive ? "active" : "")}>
-            About Us
-          </NavLink>
-          <NavLink to="/customer/contact-us" className={({ isActive }) => (isActive ? "active" : "")}>
-            Contact Us
-          </NavLink>
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              {item.label}
+            </NavLink>
+          ))}
         </nav>
 
         {/* RIGHT ICONS */}
@@ -147,6 +149,7 @@ export default function CustomerTopbar() {
               onClick={() => {
                 setOpenNotif(!openNotif);
                 setOpenProfile(false);
+                setMobileMenuOpen(false);
               }}
             >
               <FontAwesomeIcon icon={faBell} />
@@ -174,9 +177,9 @@ export default function CustomerTopbar() {
                   {filteredNotifs.length > 0 ? (
                     filteredNotifs.map((notif) => (
                       <div
-                        key={notif.notification_id}
+                        key={notif.id}
                         className={`notif-item ${!notif.is_read ? "unread" : ""}`}
-                        onClick={() => !notif.is_read && markAsRead(notif.notification_id)}
+                        onClick={() => !notif.is_read && markAsRead(notif.id)}
                       >
                         <p>{notif.message}</p>
                         <span className="notif-time">
@@ -212,6 +215,7 @@ export default function CustomerTopbar() {
               onClick={() => {
                 setOpenProfile(!openProfile);
                 setOpenNotif(false);
+                setMobileMenuOpen(false);
               }}
             >
               <FontAwesomeIcon icon={faCircleUser} />
@@ -229,16 +233,6 @@ export default function CustomerTopbar() {
                   <FontAwesomeIcon icon={faUser} /> My Profile
                 </div>
 
-                <div
-                  className="dropdown-item"
-                  onClick={() => {
-                    setOpenProfile(false);
-                    navigate("/reset-password");
-                  }}
-                >
-                  <FontAwesomeIcon icon={faKey} /> Change Password
-                </div>
-
                 <button
                   className="cus-logout-btn"
                   onClick={() => {
@@ -252,9 +246,47 @@ export default function CustomerTopbar() {
             )}
           </div>
 
+          {/* HAMBURGER (mobile only) */}
+          <div
+            className="icon-btn hamburger-btn"
+            onClick={() => {
+              setMobileMenuOpen(!mobileMenuOpen);
+              setOpenNotif(false);
+              setOpenProfile(false);
+            }}
+          >
+            <FontAwesomeIcon icon={mobileMenuOpen ? faXmark : faBars} />
+          </div>
+
         </div>
 
       </header>
+
+      {/* MOBILE NAV DRAWER */}
+      <div className={`mobile-nav-panel ${mobileMenuOpen ? "open" : ""}`}>
+        <div className="mobile-nav-brand">
+          <img src={AquaLogo} alt="Aqua Logo" />
+          <span>Adrenaline Aqua</span>
+        </div>
+
+        {navItems.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            onClick={() => setMobileMenuOpen(false)}
+            className={({ isActive }) => (isActive ? "active" : "")}
+          >
+            {item.label}
+          </NavLink>
+        ))}
+      </div>
+
+      {mobileMenuOpen && (
+        <div
+          className="mobile-nav-backdrop"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
 
       {/* ================= LOGOUT MODAL ================= */}
       {showLogoutModal && (
