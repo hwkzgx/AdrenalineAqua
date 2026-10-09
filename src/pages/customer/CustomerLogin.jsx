@@ -93,7 +93,7 @@ export default function CustomerLogin() {
 
         <div className="branding">
           <img src={AquaLogo} className="brand-logo" />
-          <h1>Welcome to Adrenaline Aqua Water</h1>
+          <h1>Adrenaline Aqua Water</h1>
           <p>Your trusted partner for clean water solutions</p>
         </div>
       </div>

@@ -210,223 +210,231 @@
 
 
 /* =====================================================
-   MOBILE ONLY - flat, clean, nasa gitna (desktop hindi nagalaw)
+   MOBILE ONLY - Modern, Spacious & Elevated Card
    ===================================================== */
 @media (max-width: 768px) {
   .login-wrapper {
-    display: flex;
-    flex-direction: column;
+    display: flex !important;
+    flex-direction: column !important;
     justify-content: center !important;
-    height: auto;
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding: 24px 0 !important;
-    background: #fbfaf9;
+    align-items: center !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    padding: 24px 16px !important;
+    background-image: url("../../../assets/aqua-bg.png") !important;
+    background-size: cover !important;
+    background-position: center top !important;
+    background-repeat: no-repeat !important;
+    background-color: #e0effc !important;
+    box-sizing: border-box !important;
+    overflow-y: auto !important;
   }
 
-  /* ----- Header: walang blue, logo at pangalan lang ----- */
+  /* ----- Header: clean branding ----- */
   .login-wrapper .riderlogin-left {
-    position: relative;
-    inset: auto;
+    position: relative !important;
+    inset: auto !important;
     flex: none !important;
     z-index: 1;
-    align-items: center;
-    padding: 0 20px 12px !important;
-    background: none;
-    color: #0f172a;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 0 0 28px 0 !important;
+    margin-bottom: 8px !important;
+    background: none !important;
+    color: #0f172a !important;
+    width: 100% !important;
+    max-width: 390px !important;
   }
 
   .login-wrapper .riderlogin-left .overlay {
-    display: none;
+    display: none !important;
   }
 
   .login-wrapper .brand-logo {
-    width: 130px !important;
-    margin: 0 auto 14px !important;
-    animation: none;
+    width: 90px !important;
+    margin: 0 auto 10px auto !important;
+    animation: none !important;
+    filter: drop-shadow(0 4px 12px rgba(14, 165, 233, 0.2));
   }
 
   .login-wrapper .branding h1 {
-    font-size: 28px !important;
-    color: #1e3a8a;
+    font-size: 22px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    line-height: 1.25 !important;
+    margin: 0 0 4px 0 !important;
   }
 
   .login-wrapper .branding p {
-    font-size: 15px !important;
-    margin: 6px 0 0;
-    color: #64748b;
-    opacity: 1;
+    font-size: 13.5px !important;
+    margin: 0 !important;
+    color: #64748b !important;
+    opacity: 1 !important;
   }
 
-  /* ----- Form area: flat, walang card ----- */
+  /* ----- Form area: elevated card container ----- */
   .login-wrapper .login-right {
-    display: block !important;
-    align-items: flex-start !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
     justify-content: flex-start !important;
     flex: none !important;
     height: auto !important;
     min-height: 0 !important;
-    overflow: visible;
+    overflow: visible !important;
     z-index: auto;
-    background: #fbfaf9 !important;
-    padding: 10px 22px 0 !important;
+    background: transparent !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 400px !important;
   }
 
   .login-wrapper .login-right::before {
-    display: none;
-  }
-
-  .login-wrapper .login-card {
-    width: 100%;
-    max-width: 420px;
-    margin: 0 auto !important;
-    padding: 0 !important;
-    background: none !important;
-    border: none !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    text-align: left;
-  }
-
-  .login-wrapper .login-body {
-    text-align: left;
-  }
-
-  .login-wrapper .login-header {
-    margin-bottom: 18px;
-  }
-
-  .login-wrapper .login-header button,
-  .login-wrapper .login-header a {
-    color: #64748b;
-    font-size: 14px;
-  }
-
-  .login-wrapper .login-card h2 {
-    margin: 0 0 16px;
-    font-size: 16px !important;
-    font-weight: 800;
-    color: #1e3a8a !important;
-    text-align: center !important;
-  }
-
-  .login-wrapper .subtitle {
-    font-size: 14px;
-    color: #64748b;
-    opacity: 1;
-    text-align: left !important;
-  }
-
-  /* ----- Pill inputs ----- */
-  .login-wrapper .login-input {
-    height: 54px;
-    margin: 8px 0;
-    padding: 0 20px;
-    font-size: 16px; /* iwas auto-zoom sa iPhone */
-    border-radius: 999px;
-    border: 1px solid #e2e0dd;
-    background: #fff;
-  }
-
-  .login-wrapper .login-input:focus {
-    border-color: #0ea5e9;
-    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
-  }
-
-  /* ----- Remember me (kaliwa) at Forgot password (kanan) ----- */
-  .login-wrapper .login-options {
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    flex-wrap: wrap;
-    gap: 8px 12px;
-    margin: 10px 0 0;
-  }
-
-  .login-wrapper .remember {
-    color: #475569;
-    font-size: 14px;
-  }
-
-  .login-wrapper .remember input {
-    accent-color: #1e3a8a;
-  }
-
-  .login-wrapper .forgot {
-    display: block;
-    text-align: right;
-    color: #1e3a8a;
-    font-size: 14px;
-    font-weight: 700;
-  }
-
-  /* ----- Button: pill, full width ----- */
-  .login-wrapper .login-btn {
-    height: 54px;
-    padding: 0;
-    margin-top: 20px;
-    font-size: 16px;
-    border-radius: 999px;
-    box-shadow: 0 10px 22px -8px rgba(30, 58, 138, 0.55);
-  }
-
-  .login-wrapper .signup-text {
-    margin-top: 22px;
-    font-size: 14px;
-    color: #64748b;
-    text-align: center;
-  }
-
-  .login-wrapper .signup-text span {
-    color: #1e3a8a;
-    font-weight: 700;
-  }
-}
-
-/* Medyo ibaba ang gitna (hindi sa landscape) */
-@media (max-width: 768px) and (min-height: 501px) {
-  .login-wrapper {
-    padding: 36px 0 16px !important;
-  }
-}
-
-/* Maliliit na phone */
-@media (max-width: 480px) {
-  .login-wrapper .brand-logo {
-    width: 112px !important;
-  }
-
-  .login-wrapper .branding h1 {
-    font-size: 24px !important;
-  }
-
-  .login-wrapper .branding p {
-    font-size: 14px !important;
-  }
-
-  .login-wrapper .login-card h2 {
-    font-size: 15px !important;
-  }
-
-  .login-wrapper .login-right {
-    padding: 10px 18px 0 !important;
-  }
-}
-
-/* Landscape phones (maiksi ang taas) */
-@media (max-width: 768px) and (max-height: 500px) {
-  .login-wrapper {
-    padding: 12px 0 !important;
-  }
-
-  .login-wrapper .brand-logo,
-  .login-wrapper .branding p {
     display: none !important;
   }
 
-  .login-wrapper .branding h1 {
-    font-size: 18px !important;
+  .login-wrapper .login-card {
+    width: 100% !important;
+    max-width: 400px !important;
+    margin: 0 !important;
+    padding: 24px 20px !important;
+    background: #ffffff !important;
+    border-radius: 22px !important;
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    text-align: left !important;
+    box-sizing: border-box !important;
+  }
+
+  .login-wrapper .login-header {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    margin-bottom: 14px !important;
+  }
+
+  .login-wrapper .riderlogback-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 6px 12px !important;
+    background: #eff6ff !important;
+    border: 1px solid #dbeafe !important;
+    border-radius: 999px !important;
+    color: #2563eb !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+  }
+
+  .login-wrapper .login-card h2 {
+    margin: 0 0 18px 0 !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    text-align: left !important;
+  }
+
+  .login-wrapper .login-body {
+    text-align: left !important;
+    width: 100% !important;
+  }
+
+  /* ----- Form inputs ----- */
+  .login-wrapper .login-input {
+    height: 48px !important;
+    margin: 0 0 12px 0 !important;
+    padding: 0 16px !important;
+    font-size: 15px !important;
+    border-radius: 12px !important;
+    border: 1.5px solid #e2e8f0 !important;
+    background: #f8fafc !important;
+    color: #0f172a !important;
+    box-sizing: border-box !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease !important;
+  }
+
+  .login-wrapper .login-input:focus {
+    border-color: #2563eb !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12) !important;
+  }
+
+  /* ----- Options: Remember me & Forgot Password ----- */
+  .login-wrapper .login-options {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin: 4px 0 18px 0 !important;
+    width: 100% !important;
+  }
+
+  .login-wrapper .remember {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    color: #64748b !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+  }
+
+  .login-wrapper .remember input {
+    accent-color: #2563eb !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 !important;
+  }
+
+  .login-wrapper .forgot {
+    color: #2563eb !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+  }
+
+  .login-wrapper .forgot:hover {
+    text-decoration: underline !important;
+  }
+
+  /* ----- Submit Button ----- */
+  .login-wrapper .login-btn {
+    height: 48px !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin-top: 0 !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: transform 0.1s ease, box-shadow 0.15s ease !important;
+  }
+
+  .login-wrapper .login-btn:active {
+    transform: scale(0.98) !important;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25) !important;
+  }
+
+  .login-wrapper .signup-text {
+    margin-top: 18px !important;
+    font-size: 13.5px !important;
+    color: #64748b !important;
+    text-align: center !important;
+  }
+
+  .login-wrapper .signup-text span {
+    color: #2563eb !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
   }
 }
 
