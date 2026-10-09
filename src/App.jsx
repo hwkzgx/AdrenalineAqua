@@ -21,6 +21,7 @@ import Delivery from "./pages/admin/Admin-Delivery/Delivery";
 import Inventory from "./pages/admin/Admin-Inventory/Inventory";
 import Expenses from "./pages/admin/Admin-Expenses/Expenses";
 import Sales from "./pages/admin/Admin-Sales/Sales";
+import AdminInsights from "./pages/admin/Admin-Insights/AdminInsights";
 import CoAssociates from "./pages/admin/users/CoAssociates";
 import Customer from "./pages/admin/users/Customer";
 import Staff from "./pages/admin/users/Staff";
@@ -31,6 +32,7 @@ import CoDashboard from "./pages/co-assoc/Co-Dashboard/CoDashboard";
 import CoExpenses from "./pages/co-assoc/Co-Expenses/CoExpenses";
 import CoSales from "./pages/co-assoc/Co-Sales/CoSales";
 import CoInventory from "./pages/co-assoc/Co-Inventory/CoInventory";
+import CoInsights from "./pages/co-assoc/Co-Insights/CoInsights";
 
 // STAFF
 import StaffDashboard from "./pages/staff/Staff-Dashboard/StaffDashboard";
@@ -38,6 +40,7 @@ import StaffOrders from "./pages/staff/Staff-Orders/StaffOrders";
 import StaffDeliverySchedule from "./pages/staff/Staff-DeliverySchedule/StaffDeliverySchedule";
 import StaffInventory from "./pages/staff/Staff-Inventory/StaffInventory";
 import StaffSales from "./pages/staff/Staff-Sales/StaffSales";
+import StaffInsights from "./pages/staff/Staff-Insights/StaffInsights";
 import StaffCustomers from "./pages/staff/Staff-Customers/StaffCustomers";
 
 // CUSTOMER
@@ -50,6 +53,7 @@ import CustomerDashboard from "./pages/customer/Customer-Dashboard/CustomerDashb
 import CustomerMakeOrder from "./pages/customer/Customer-MakeOrder/CustomerMakeOrder";
 import CustomerTrackOrder from "./pages/customer/Customer-TrackOrder/CustomerTrackOrder";
 import CustomerOrderHistory from "./pages/customer/Customer-OrderHistory/CustomerOrderHistory";
+import CustomerInsights from "./pages/customer/Customer-Insights/CustomerInsights";
 import CustomerProfile from "./pages/customer/Customer-Profile/CustomerProfile";
 
 // CUSTOMER AUTH
@@ -65,6 +69,7 @@ import RiderHome from "./pages/rider/Rider-Home/RiderHome";
 import RiderDeliveries from "./pages/rider/Rider-Deliveries/RiderDeliveries";
 import RiderDeliveryDetails from "./pages/rider/Rider-DeliveryDetails/RiderDeliveryDetails";
 import RiderHistory from "./pages/rider/Rider-History/RiderHistory";
+import RiderInsights from "./pages/rider/Rider-Insights/RiderInsights";
 import RiderProfile from "./pages/rider/Rider-Profile/RiderProfile";
 import RiderTopbar from "./pages/rider/Rider-Topbar/RiderTopbar";
 
@@ -99,6 +104,7 @@ function App() {
           <Route path="/admin/inventory" element={<Inventory />} />
           <Route path="/admin/expenses" element={<Expenses />} />
           <Route path="/admin/sales" element={<Sales />} />
+          <Route path="/admin/insights" element={<AdminInsights />} />
           <Route path="/admin/users/co" element={<CoAssociates />} />
           <Route path="/admin/users/customer" element={<Customer />} />
           <Route path="/admin/users/staff" element={<Staff />} />
@@ -114,6 +120,7 @@ function App() {
           <Route path="/co/expenses" element={<CoExpenses />} />
           <Route path="/co/sales" element={<CoSales />} />
           <Route path="/co/inventory" element={<CoInventory />} />
+          <Route path="/co/insights" element={<CoInsights />} />
 
         {/* CO PROFILE */}
           <Route path="/co/profile" element={<MyProfile />} />
@@ -126,6 +133,7 @@ function App() {
        <Route path="/staff/delivery-schedule" element={<StaffDeliverySchedule />} />
        <Route path="/staff/inventory" element={<StaffInventory />} />
        <Route path="/staff/sales" element={<StaffSales />} />
+       <Route path="/staff/insights" element={<StaffInsights />} />
        <Route path="/staff/customers" element={<StaffCustomers />} />
 
         {/* STAFF PROFILE */}
@@ -142,6 +150,7 @@ function App() {
         <Route path="/customer/make-order" element={<CustomerMakeOrder />} />
         <Route path="/customer/track-order" element={<CustomerTrackOrder />} />
         <Route path="/customer/order-history" element={<CustomerOrderHistory />} />
+        <Route path="/customer/insights" element={<CustomerInsights />} />
 
         {/* CUSTOMER AUTH */}
         <Route path="/customer/forgot-password" element={<CustomerForgotPassword />} />
@@ -163,6 +172,7 @@ function App() {
           <Route path="/rider/deliveries" element={<RiderDeliveries />}/>
           <Route path="/rider/delivery-details/:id" element={<RiderDeliveryDetails />}/>
           <Route path="/rider/history"element={<RiderHistory />}/>
+          <Route path="/rider/insights" element={<RiderInsights />} />
 
           {/* RIDER PROFILE */}
           <Route path="/rider/profile" element={<RiderProfile />}/>

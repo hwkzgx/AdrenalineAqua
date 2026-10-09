@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./admin-sidebar.css";
 
 // Assets
@@ -21,18 +21,18 @@ import {
   faUserShield,
   faMotorcycle,
   faArrowRightFromBracket,
-  
+  faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function AdminSidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // 🔥 STATES (IMPORTANT FIX)
+  // STATES
   const [openUsers, setOpenUsers] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  // 🔥 TOGGLES (clean behavior)
   const toggleUsers = () => {
     setOpenUsers(!openUsers);
     setOpenProfile(false);
@@ -43,77 +43,117 @@ export default function AdminSidebar() {
     setOpenUsers(false);
   };
 
+  const isActive = (path) =>
+    location.pathname === path || location.pathname.startsWith(path + "/");
+
   return (
     <div className="sidebar">
-
       {/* LOGO */}
       <img src={AquaLogo} alt="Aqua Logo" className="logo" />
 
       {/* MAIN NAVIGATION */}
-      <button onClick={() => navigate("/admin/dashboard")}>
-        <FontAwesomeIcon icon={faChartLine} /> Dashboard
-      </button>
+      <div className="sidebar-nav">
+        <button
+          className={isActive("/admin/dashboard") ? "active" : ""}
+          onClick={() => navigate("/admin/dashboard")}
+        >
+          <FontAwesomeIcon icon={faChartLine} /> Dashboard
+        </button>
 
-      <button onClick={() => navigate("/admin/orders")}>
-        <FontAwesomeIcon icon={faShoppingCart} /> Orders
-      </button>
+        <button
+          className={isActive("/admin/orders") ? "active" : ""}
+          onClick={() => navigate("/admin/orders")}
+        >
+          <FontAwesomeIcon icon={faShoppingCart} /> Orders
+        </button>
 
-      <button onClick={() => navigate("/admin/delivery")}>
-        <FontAwesomeIcon icon={faTruck} /> Delivery
-      </button>
+        <button
+          className={isActive("/admin/delivery") ? "active" : ""}
+          onClick={() => navigate("/admin/delivery")}
+        >
+          <FontAwesomeIcon icon={faTruck} /> Delivery
+        </button>
 
-      <button onClick={() => navigate("/admin/inventory")}>
-        <FontAwesomeIcon icon={faBox} /> Inventory
-      </button>
+        <button
+          className={isActive("/admin/inventory") ? "active" : ""}
+          onClick={() => navigate("/admin/inventory")}
+        >
+          <FontAwesomeIcon icon={faBox} /> Inventory
+        </button>
 
-      <button onClick={() => navigate("/admin/expenses")}>
-        <FontAwesomeIcon icon={faMoneyBill} /> Expenses
-      </button>
+        <button
+          className={isActive("/admin/expenses") ? "active" : ""}
+          onClick={() => navigate("/admin/expenses")}
+        >
+          <FontAwesomeIcon icon={faMoneyBill} /> Expenses
+        </button>
 
-      <button onClick={() => navigate("/admin/sales")}>
-        <FontAwesomeIcon icon={faChartPie} /> Sales
-      </button>
+        <button
+          className={isActive("/admin/sales") ? "active" : ""}
+          onClick={() => navigate("/admin/sales")}
+        >
+          <FontAwesomeIcon icon={faChartPie} /> Sales
+        </button>
 
-      {/* USERS DROPDOWN */}
-      <button onClick={toggleUsers}>
-        <FontAwesomeIcon icon={faUsers} /> Users ▾
-      </button>
+        <button
+          className={isActive("/admin/insights") ? "active" : ""}
+          onClick={() => navigate("/admin/insights")}
+        >
+          <FontAwesomeIcon icon={faWandMagicSparkles} /> Insights
+        </button>
 
-      {openUsers && (
-        <div className="dropdown">
+        {/* USERS DROPDOWN */}
+        <button
+          className={isActive("/admin/users") ? "active" : ""}
+          onClick={toggleUsers}
+        >
+          <FontAwesomeIcon icon={faUsers} /> Users ▾
+        </button>
 
-          <button onClick={() => navigate("/admin/users/co")}>
-            <FontAwesomeIcon icon={faUserTie} /> Co-Associates
-          </button>
+        {openUsers && (
+          <div className="dropdown">
+            <button
+              className={isActive("/admin/users/co") ? "active" : ""}
+              onClick={() => navigate("/admin/users/co")}
+            >
+              <FontAwesomeIcon icon={faUserTie} /> Co-Associates
+            </button>
 
-          <button onClick={() => navigate("/admin/users/customer")}>
-            <FontAwesomeIcon icon={faUser} /> Customers
-          </button>
+            <button
+              className={isActive("/admin/users/customer") ? "active" : ""}
+              onClick={() => navigate("/admin/users/customer")}
+            >
+              <FontAwesomeIcon icon={faUser} /> Customers
+            </button>
 
-          <button onClick={() => navigate("/admin/users/staff")}>
-            <FontAwesomeIcon icon={faUserShield} /> Staff
-          </button>
+            <button
+              className={isActive("/admin/users/staff") ? "active" : ""}
+              onClick={() => navigate("/admin/users/staff")}
+            >
+              <FontAwesomeIcon icon={faUserShield} /> Staff
+            </button>
 
-          {/* 🔥 Idinagdag ang Rider dito */}
-          <button onClick={() => navigate("/admin/users/rider")}>
-            <FontAwesomeIcon icon={faMotorcycle} /> Riders
-          </button>
-
-        </div>
-      )}
+            <button
+              className={isActive("/admin/users/rider") ? "active" : ""}
+              onClick={() => navigate("/admin/users/rider")}
+            >
+              <FontAwesomeIcon icon={faMotorcycle} /> Riders
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* BOTTOM SECTION */}
       <div className="sidebar-bottom">
+        {/* ADMIN PROFILE */}
+        <div className="admin-profile" onClick={toggleProfile}>
+          <img src={Profile} alt="Admin Profile" />
 
-{/* ADMIN PROFILE */}
-<div className="admin-profile" onClick={toggleProfile}>
-  <img src={Profile} alt="Admin Profile" />
-
-  <div>
-    <p className="name"> {user?.name || "User"} </p>
-    <p className="role">Administrator</p>
-  </div>
-</div>
+          <div>
+            <p className="name">{user?.name || "Kenn"}</p>
+            <p className="role">Administrator</p>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import {
   Home,
   Truck,
   History,
+  Sparkles,
   Package,
   CheckCircle2,
   Wallet,
@@ -293,6 +294,11 @@ export default function RiderHome() {
         <Link to="/rider/history" className="nav-item">
           <History size={22} />
           <span>History</span>
+        </Link>
+
+        <Link to="/rider/insights" className="nav-item">
+          <Sparkles size={22} />
+          <span>Insights</span>
         </Link>
       </nav>
     </div>

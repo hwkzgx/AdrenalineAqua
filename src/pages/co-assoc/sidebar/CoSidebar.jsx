@@ -11,6 +11,7 @@ import {
   faMoneyBill,
   faChartPie,
   faBox,
+  faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function CoSidebar() {
@@ -57,6 +58,13 @@ export default function CoSidebar() {
         onClick={() => navigate("/co/inventory")}
       >
         <FontAwesomeIcon icon={faBox} /> Inventory
+      </button>
+
+      <button
+        className={isActive("/co/insights") ? "active" : ""}
+        onClick={() => navigate("/co/insights")}
+      >
+        <FontAwesomeIcon icon={faWandMagicSparkles} /> Insights
       </button>
 
       <div className="sidebar-bottom">
