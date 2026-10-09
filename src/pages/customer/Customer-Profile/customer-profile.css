@@ -8,7 +8,8 @@
   );
 
   padding: 20px 40px;
-  font-family: Arial, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  box-sizing: border-box;
 }
 
 /* TOPBAR */
@@ -455,7 +456,9 @@
    ===================================================== */
 @media (max-width: 768px) {
   .cusprofile-page {
-    padding: 14px 14px 28px;
+    padding: 16px 16px 32px 16px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   /* TOPBAR */
@@ -476,9 +479,10 @@
   /* CARD */
   .cusprofile-card {
     width: 100%;
-    margin: 14px auto 0;
-    padding: 22px 18px;
-    border-radius: 16px;
+    margin: 16px auto 0;
+    padding: 20px 16px;
+    border-radius: 18px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
   }
 
   /* HEADER */

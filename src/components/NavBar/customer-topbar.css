@@ -1,14 +1,6 @@
-/* GLOBAL RESET */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
-
 /* TOPBAR */
 .customer-topbar {
- display: flex;
+  display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 15px 50px;
@@ -16,6 +8,7 @@
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   position: relative;
   z-index: 500;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 .customer-topbar-logo img {
@@ -342,8 +335,8 @@
 
 @media (max-width: 900px) {
   .customer-topbar {
-    padding: 0 20px;
-    height: 64px;
+    padding: 0 16px;
+    height: 60px;
   }
 
   .customer-topbar .ctopbar-links {

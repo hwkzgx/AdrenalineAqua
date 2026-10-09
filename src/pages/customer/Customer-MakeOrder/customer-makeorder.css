@@ -3,7 +3,8 @@
   min-height: 100vh;
   padding: 30px;
   background: #f3f7fc;
-  font-family: Arial, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  box-sizing: border-box;
 
   background-image: url("../../../assets/aqua-bg.png");
   background-size: cover;
@@ -823,13 +824,15 @@ select option {
 
   /* Page background */
   .make-order-page {
-    padding: 12px 12px 28px;
+    padding: 16px 16px 32px 16px;
     background-image: none;
     background: linear-gradient(180deg, #e3f0ff 0%, #f3f7fc 45%);
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .make-order-container {
-    gap: 14px;
+    gap: 16px;
   }
 
   /* Wala nang malaking puting panel; bawat section ay sariling card */
@@ -841,16 +844,19 @@ select option {
     border-radius: 0;
     box-shadow: none;
     counter-reset: step;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
 
   /* ----- Header = blue banner ----- */
   .makeOrd-header {
     gap: 12px;
-    margin-bottom: 14px;
+    margin-bottom: 0;
     padding: 20px 18px;
     background: linear-gradient(135deg, #2aa0ff, #0050b8);
-    border-radius: 24px;
-    box-shadow: 0 14px 30px rgba(0, 80, 184, 0.3);
+    border-radius: 18px;
+    box-shadow: 0 10px 24px rgba(0, 80, 184, 0.25);
   }
 
   .makeOrd-header .icon {
@@ -860,7 +866,7 @@ select option {
     flex-shrink: 0;
     color: #fff;
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 14px;
+    border-radius: 12px;
   }
 
   .makeOrd-header h2 {
@@ -878,11 +884,12 @@ select option {
   /* ----- Cards ----- */
   .section,
   .make-order-left > .field {
-    margin-bottom: 14px;
+    margin-bottom: 0;
     padding: 18px 16px;
     background: #fff;
-    border-radius: 22px;
+    border-radius: 18px;
     box-shadow: 0 4px 16px rgba(15, 31, 61, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.6);
   }
 
   /* pantay na espasyo sa lahat ng fields; tanggal lang sa pinakadulo ng card */

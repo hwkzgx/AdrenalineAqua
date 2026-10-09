@@ -130,7 +130,8 @@
    🏠 HOME-CONTAINER (RIDER) INTEGRATION
    Matches Rider Home margins, paddings, and card aesthetics pixel-for-pixel
    ========================================== */
-.home-container .insights-page-wrapper {
+.home-container .insights-page-wrapper,
+.cusdashboard-container .insights-page-wrapper {
   padding: 0;
   margin: 0;
   width: 100%;
