@@ -1,53 +1,43 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-}
-
-body {
-  background: #f1f5f9;
-}
-
 .history-container {
   width: 100%;
-  max-width: 850px;
+  max-width: 1000px;
   min-height: 100vh;
-  margin: auto;
-  background: #f8fafc;
-  padding: 24px;
-  padding-bottom: 110px;
+  margin: 0 auto;
+  background: transparent;
+  padding: 20px 24px 100px 24px;
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 /* Modern Summary Stat Cards */
 .history-summary-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-  margin-top: 20px;
+  margin: 20px 0 24px 0;
 }
 
 .summary-card {
-  flex: 1;
   background: #ffffff;
-  border-radius: 18px;
+  border-radius: 16px;
   padding: 20px;
   display: flex;
   align-items: center;
   gap: 16px;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
   transition: all 0.2s ease;
 }
 
 .summary-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
 
 .summary-icon-box {
-  width: 50px;
-  height: 50px;
-  border-radius: 14px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,18 +55,19 @@ body {
 }
 
 .summary-label {
-  font-size: 12px;
+  font-size: 11px;
   color: #64748b;
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  margin: 0;
 }
 
 .summary-value {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: #0f172a;
-  margin-top: 2px;
+  margin: 2px 0 0 0;
 }
 
 /* Section Title */
@@ -84,55 +75,43 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 30px;
+  margin-top: 24px;
   margin-bottom: 16px;
-  padding: 0 4px;
 }
 
 .section-title h3 {
   font-size: 18px;
   font-weight: 700;
   color: #0f172a;
+  margin: 0;
 }
 
-.section-date-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: #ffffff;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
-}
-
-/* Pinalaki at Mas Modernong History Card */
+/* Modern History Card */
 .history-card {
   background: #ffffff;
-  border-radius: 20px;
-  padding: 24px;
-  margin-bottom: 18px;
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 16px;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
   transition: all 0.2s ease;
 }
 
 .history-card:hover {
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.07);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
 
-/* Makapal na green accent bar sa kaliwa */
 .history-card::before {
   content: "";
   position: absolute;
   left: 0;
   top: 0;
   bottom: 0;
-  width: 6px;
+  width: 5px;
   background-color: #22c55e;
 }
 
@@ -146,7 +125,7 @@ body {
 .history-id-group {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .success-icon {
@@ -154,37 +133,39 @@ body {
 }
 
 .label {
-  font-size: 12px;
+  font-size: 11px;
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-weight: 500;
+  font-weight: 600;
+  margin: 0;
 }
 
 .history-card h2 {
   font-size: 17px;
   color: #0f172a;
   font-weight: 700;
-  margin-top: 1px;
+  margin: 2px 0 0 0;
 }
 
 /* Status Badge */
 .historydelstatus {
-  background: #dcfce7;
-  color: #15803d;
-  padding: 7px 16px;
-  border-radius: 20px;
-  font-size: 13px;
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.3px;
   flex-shrink: 0;
 }
 
 .customer-name {
-  font-size: 17px;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 16px 0 12px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 14px 0 10px 0;
 }
 
 .history-details-box {
@@ -194,15 +175,15 @@ body {
   border: 1px solid #f1f5f9;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .historyinfo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   color: #475569;
-  font-size: 14px;
+  font-size: 13.5px;
 }
 
 .info-icon {
@@ -213,18 +194,20 @@ body {
 /* Bottom Navigation */
 .bottom-nav {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  background: white;
-  border-top: 1px solid #e2e8f0;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  max-width: 540px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   align-items: center;
-  padding: 6px 0;
+  padding: 8px 12px;
   z-index: 1000;
-  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
 }
 
 .nav-item {
@@ -232,30 +215,36 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
   text-decoration: none;
   color: #64748b;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   width: 100%;
-  min-width: 0;
-  padding: 4px 0;
+  padding: 6px 0;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+  background: #f8fafc;
+  color: #0284c7;
 }
 
 .nav-item.active {
   color: #0284c7;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* MOBILE RESPONSIVE */
 @media (max-width: 768px) {
   .history-container {
-    padding: 16px;
-    padding-bottom: 100px;
+    padding: 16px 16px 90px 16px;
   }
 
   .history-summary-row {
     gap: 12px;
+    margin: 16px 0 20px 0;
   }
 
   .summary-card {
@@ -268,17 +257,27 @@ body {
   }
 
   .history-card {
-    padding: 18px;
-    border-radius: 16px;
+    padding: 16px;
+    border-radius: 14px;
   }
 
-  .customer-name {
-    font-size: 18px !important;
-    margin-top: 8px !important;
-    margin-bottom: 8px !important;
+  .bottom-nav {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    transform: none;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding: 6px 0;
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.04);
   }
 
-  .historyinfo {
-    font-size: 13px;
+  .nav-item {
+    font-size: 11px;
+    padding: 4px 0;
   }
 }

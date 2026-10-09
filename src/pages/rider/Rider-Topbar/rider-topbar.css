@@ -1,30 +1,33 @@
 .ridertopbar {
-  height: 60px;
+  height: 48px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   width: 100%;
-  padding: 0 15px;
+  max-width: 1000px;
+  margin: 0 0 16px 0;
+  padding: 0;
   background: transparent;
   position: relative;
   z-index: 100;
+  box-sizing: border-box;
 }
 
 .ridertopbar-left {
-  flex: 1;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .topbar-title {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
   margin: 0;
   color: #0f172a;
+  letter-spacing: -0.01em;
 }
 
 .ridertopbar-right {
-  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -52,7 +55,7 @@
 }
 
 .icon-btn:hover { 
-  background: #f1f5f9; 
+  background: #e2e8f0; 
 }
 
 .notif-badge {
@@ -88,34 +91,38 @@
   flex-direction: column;
 }
 
+.notif-tabs {
+  display: flex;
+  border-bottom: 1px solid #f1f5f9;
+}
+
 .notif-tab {
   flex: 1;
   text-align: center;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: #64748b;
-  padding: 14px 0;
+  padding: 12px 0;
   cursor: pointer;
   position: relative;
   transition: color 0.2s ease;
   background: transparent;
   border: none;
-  border-bottom: 2px solid #f1f5f9; 
 }
 
 .notif-tab.active {
-  color: #0088cc;
+  color: #2563eb;
   font-weight: 700;
 }
 
 .notif-tab.active::after {
   content: '';
   position: absolute;
-  bottom: -2px;
+  bottom: 0;
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: #0088cc;
+  background-color: #2563eb;
   z-index: 2;
 }
 
@@ -138,32 +145,31 @@
 }
 
 .notif-item-content {
-  display: grid;
-  grid-template-columns: 24px 1fr auto;
-  gap: 12px;
+  display: flex;
   align-items: flex-start;
+  gap: 12px;
 }
 
 .notif-icon-item {
   color: #64748b;
   font-size: 14px;
-  margin-top: 2px;
+  margin-top: 3px;
+  flex-shrink: 0;
 }
 
 .notif-item p {
-  font-size: 14px;
+  font-size: 13.5px;
   color: #0f172a;
   font-weight: 600;
   margin: 0;
   line-height: 1.4;
 }
 
-.notif-date {
+.notif-time {
   font-size: 11px;
   color: #94a3b8;
-  white-space: pre-line;
-  text-align: right;
-  line-height: 1.3;
+  display: block;
+  margin-top: 4px;
 }
 
 .notif-placeholder {
@@ -174,16 +180,16 @@
 }
 
 .notif-footer-action {
-  padding: 15px 20px;
+  padding: 12px 16px;
   background: #ffffff;
   border-top: 1px solid #f1f5f9;
 }
 
 .mark-all-btn-footer {
-  background: #e0f2fe;
+  background: #eff6ff;
   border: none;
-  color: #0284c7;
-  font-size: 14px;
+  color: #2563eb;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   display: flex;
@@ -191,13 +197,13 @@
   justify-content: center;
   gap: 8px;
   width: 100%;
-  padding: 12px 0;
-  border-radius: 12px;
+  padding: 10px 0;
+  border-radius: 10px;
   transition: background 0.2s;
 }
 
 .mark-all-btn-footer:hover {
-  background: #bae6fd;
+  background: #dbeafe;
 }
 
 .dropdown-item {
@@ -208,6 +214,11 @@
   align-items: center;
   gap: 10px;
   color: #334155;
+  width: 100%;
+  background: transparent;
+  border: none;
+  text-align: left;
+  box-sizing: border-box;
 }
 
 .dropdown-item:hover { 
@@ -229,9 +240,9 @@
 
 .rider-modal-box {
   background: #ffffff;
-  padding: 35px 30px;
+  padding: 30px 24px;
   border-radius: 16px;
-  width: 400px;
+  width: 380px;
   max-width: 90%;
   text-align: center;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
@@ -239,16 +250,16 @@
 }
 
 .rider-modal-box h3 {
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 700;
   color: #0f172a;
-  margin-bottom: 8px;
+  margin: 0 0 8px 0;
 }
 
 .rider-modal-box p {
   font-size: 14px;
   color: #64748b;
-  margin-bottom: 25px;
+  margin: 0 0 20px 0;
 }
 
 .rider-modal-actions {
@@ -262,7 +273,7 @@
 .rider-modal-logout-btn {
   flex: 1;
   height: 42px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: none;
   font-weight: 600;
   font-size: 14px;
@@ -285,4 +296,14 @@
 @keyframes fadeDown {
   from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .topbar-title {
+    font-size: 20px;
+  }
+
+  .riderdropdown-panel {
+    width: 300px;
+  }
 }

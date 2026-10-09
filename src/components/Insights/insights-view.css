@@ -133,27 +133,34 @@
 .home-container .insights-page-wrapper {
   padding: 0;
   margin: 0;
+  width: 100%;
 }
 
 .home-container .sales-cards-container {
-  margin: 20px 20px 24px 20px;
+  margin: 0 0 20px 0;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-  width: auto;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  width: 100%;
 }
 
 .home-container .sales-card {
   background: #ffffff;
-  border-radius: 18px;
-  padding: 18px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  border: none;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 0;
   min-width: 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.home-container .sales-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
 
 .home-container .sales-card .icon-wrapper {
@@ -182,18 +189,18 @@
 .home-container .sales-card .card-label {
   margin: 0;
   color: #64748b;
-  font-size: 14px;
-  font-weight: 400;
+  font-size: 13px;
+  font-weight: 500;
   order: 2;
   line-height: 1.2;
 }
 
 .home-container .rider-insights-top-actions {
-  margin: 0 20px 14px 20px;
+  margin: 0 0 16px 0;
   display: flex;
   align-items: center;
   gap: 10px;
-  width: auto;
+  width: 100%;
 }
 
 .home-container .rider-insights-top-actions button {
@@ -202,25 +209,44 @@
 }
 
 .home-container .insights-controls-row {
-  margin: 8px 20px 18px 20px;
-  width: auto;
+  margin: 0 0 16px 0;
+  width: 100%;
 }
 
 .home-container .insights-main-container {
-  margin: 20px;
+  margin: 0;
   background: #ffffff;
-  border-radius: 20px;
-  padding: 22px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  border: none;
+  border-radius: 18px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.home-container .skeleton-empty-box {
-  padding: 20px 10px 10px;
-}
-
+.home-container .skeleton-empty-box,
 .home-container .insights-empty-box {
   padding: 20px 10px 10px;
+}
+
+@media (max-width: 768px) {
+  .home-container .sales-cards-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 0 0 16px 0;
+    width: 100%;
+  }
+
+  .home-container .sales-card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .home-container .insights-main-container {
+    padding: 20px;
+    border-radius: 14px;
+    margin: 0;
+  }
 }
 
 /* ==========================================

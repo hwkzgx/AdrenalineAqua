@@ -105,13 +105,14 @@ export default function RiderTopbar({ title, showBackBtn = false, onBack }) {
 
   return (
     <>
-      <header className="ridertopbar customer-topbar">
+      <header className="ridertopbar">
         {/* LEFT TITLE / BACK BUTTON */}
         <div className="ridertopbar-left">
           {showBackBtn && (
             <button
               onClick={onBack || (() => navigate(-1))}
               className="icon-btn"
+              type="button"
             >
               <FontAwesomeIcon icon={faArrowLeft} />
             </button>
@@ -120,35 +121,38 @@ export default function RiderTopbar({ title, showBackBtn = false, onBack }) {
         </div>
 
         {/* RIGHT ICONS */}
-        <div className="ctopbar-buttons">
+        <div className="ridertopbar-right">
           {/* NOTIFICATIONS */}
-          <div className="profile-wrapper">
-            <div
+          <div className="riderprofile-wrapper">
+            <button
               className="icon-btn"
               onClick={() => {
                 setOpenNotif(!openNotif);
                 setOpenProfile(false);
               }}
+              type="button"
             >
               <FontAwesomeIcon icon={faBell} />
               {unreadCount > 0 && <span className="notif-badge">{unreadCount}</span>}
-            </div>
+            </button>
 
             {openNotif && (
-              <div className="dropdown-panel notif-panel">
+              <div className="riderdropdown-panel notif-panel">
                 <div className="notif-tabs">
-                  <span
-                    className={activeTab === "unread" ? "active" : ""}
+                  <button
+                    className={`notif-tab ${activeTab === "unread" ? "active" : ""}`}
                     onClick={() => setActiveTab("unread")}
+                    type="button"
                   >
                     Unread
-                  </span>
-                  <span
-                    className={activeTab === "read" ? "active" : ""}
+                  </button>
+                  <button
+                    className={`notif-tab ${activeTab === "read" ? "active" : ""}`}
                     onClick={() => setActiveTab("read")}
+                    type="button"
                   >
                     Read
-                  </span>
+                  </button>
                 </div>
 
                 <div className="notif-list">
@@ -163,8 +167,8 @@ export default function RiderTopbar({ title, showBackBtn = false, onBack }) {
                           <FontAwesomeIcon icon={faShoppingCart} className="notif-icon-item" />
                           <div>
                             <p>
-  {notif.message.replace(/\s*\[STATE:.*?\]\s*$/, "")}
-</p>
+                              {notif.message.replace(/\s*\[STATE:.*?\]\s*$/, "")}
+                            </p>
                             <span className="notif-time">
                               {new Date(notif.created_at).toLocaleString([], {
                                 month: "numeric",
@@ -186,10 +190,10 @@ export default function RiderTopbar({ title, showBackBtn = false, onBack }) {
                   )}
                 </div>
 
-                {/* Mark all as read button: Lalabas basta't naka-UNREAD tab */}
+                {/* Mark all as read button */}
                 {activeTab === "unread" && (
                   <div className="notif-footer-action">
-                    <button className="mark-all-btn-footer" onClick={markAllAsRead}>
+                    <button className="mark-all-btn-footer" onClick={markAllAsRead} type="button">
                       <FontAwesomeIcon icon={faCheckDouble} /> Mark all as read
                     </button>
                   </div>
@@ -199,19 +203,20 @@ export default function RiderTopbar({ title, showBackBtn = false, onBack }) {
           </div>
 
           {/* PROFILE */}
-          <div className="profile-wrapper">
-            <div
+          <div className="riderprofile-wrapper">
+            <button
               className="icon-btn"
               onClick={() => {
                 setOpenProfile(!openProfile);
                 setOpenNotif(false);
               }}
+              type="button"
             >
               <FontAwesomeIcon icon={faCircleUser} />
-            </div>
+            </button>
 
             {openProfile && (
-              <div className="dropdown-panel">
+              <div className="riderdropdown-panel">
                 <div
                   className="dropdown-item"
                   onClick={() => {
@@ -223,11 +228,12 @@ export default function RiderTopbar({ title, showBackBtn = false, onBack }) {
                 </div>
 
                 <button
-                  className="cus-logout-btn"
+                  className="dropdown-item rider-logout"
                   onClick={() => {
                     setOpenProfile(false);
                     setShowLogoutModal(true);
                   }}
+                  type="button"
                 >
                   <FontAwesomeIcon icon={faRightFromBracket} /> Logout
                 </button>
@@ -239,21 +245,22 @@ export default function RiderTopbar({ title, showBackBtn = false, onBack }) {
 
       {/* ================= LOGOUT MODAL ================= */}
       {showLogoutModal && (
-        <div className="cus-modal-overlay">
-          <div className="cus-modal-box">
+        <div className="rider-modal-overlay">
+          <div className="rider-modal-box">
             <h3>Confirm Logout</h3>
             <p>Are you sure you want to logout?</p>
 
-            <div className="cus-modal-actions">
+            <div className="rider-modal-actions">
               <button
-                className="cus-modal-cancel-btn"
+                className="rider-modal-cancel-btn"
                 onClick={() => setShowLogoutModal(false)}
+                type="button"
               >
                 Cancel
               </button>
 
               <button
-                className="cus-modal-logout-btn"
+                className="rider-modal-logout-btn"
                 onClick={() => {
                   localStorage.removeItem("token");
                   localStorage.removeItem("user");
@@ -261,6 +268,7 @@ export default function RiderTopbar({ title, showBackBtn = false, onBack }) {
                   setShowLogoutModal(false);
                   navigate("/rider/riderlogin");
                 }}
+                type="button"
               >
                 Logout
               </button>

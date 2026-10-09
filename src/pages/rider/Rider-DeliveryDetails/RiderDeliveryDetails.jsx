@@ -363,105 +363,111 @@ export default function RiderDeliveryDetails() {
         </div>
       </div>
 
-      <div className="top-card">
-        <div className="detailstop-row">
-          <div>
-            <p className="detailslabel">Delivery ID</p>
-            <h1>{delivery.deliveryId}</h1>
-          </div>
-          <span
-            className={`deliverydetstatus ${currentStatus
-              .toLowerCase()
-              .replace(/\s+/g, "-")}`}
-          >
-            {currentStatus}
-          </span>
-        </div>
-
-        <div className="customer-row">
-          <h3 className="customer-name">{delivery.full_name}</h3>
-          <button className="message-btn" onClick={() => setShowChat(true)}>
-            Message
-          </button>
-        </div>
-
-        <div className="schedule">
-          <div>
-            <p className="label">Scheduled Time</p>
-            <h4>{delivery.delivery_date}</h4>
-          </div>
-          <Calendar size={20} />
-        </div>
-      </div>
-
-      <div className="section">
-        <div className="section-title">
-          <MapPin size={25} />
-          <h3>Delivery Address</h3>
-        </div>
-        <p className="address">{delivery.delivery_address}</p>
-
-        {/* VIEW MAP BUTTON */}
-        <button className="open-map" onClick={handleOpenMapClick}>
-          <Send size={18} /> View Map
-        </button>
-      </div>
-
-      <div className="section">
-        <div className="section-title">
-          <Briefcase size={25} />
-          <h3>Order Items</h3>
-        </div>
-        {items.length === 0 ? (
-          <p>No items found.</p>
-        ) : (
-          items.map((item, index) => (
-            <div className="item-row" key={index}>
-              <span>💧 {item.item_name}</span>
-              <span>{item.quantity ? `x${item.quantity}` : ""}</span>
+      <div className="details-grid">
+        <div className="details-col">
+          <div className="top-card">
+            <div className="detailstop-row">
+              <div>
+                <p className="detailslabel">Delivery ID</p>
+                <h1>{delivery.deliveryId}</h1>
+              </div>
+              <span
+                className={`deliverydetstatus ${currentStatus
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")}`}
+              >
+                {currentStatus}
+              </span>
             </div>
-          ))
-        )}
+
+            <div className="customer-row">
+              <h3 className="customer-name">{delivery.full_name}</h3>
+              <button className="message-btn" onClick={() => setShowChat(true)}>
+                Message
+              </button>
+            </div>
+
+            <div className="schedule">
+              <div>
+                <p className="label">Scheduled Time</p>
+                <h4>{delivery.delivery_date}</h4>
+              </div>
+              <Calendar size={20} />
+            </div>
+          </div>
+
+          <div className="section">
+            <div className="section-title">
+              <Briefcase size={22} />
+              <h3>Order Items</h3>
+            </div>
+            {items.length === 0 ? (
+              <p>No items found.</p>
+            ) : (
+              items.map((item, index) => (
+                <div className="item-row" key={index}>
+                  <span>💧 {item.item_name}</span>
+                  <span>{item.quantity ? `x${item.quantity}` : ""}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="details-col">
+          <div className="section">
+            <div className="section-title">
+              <MapPin size={22} />
+              <h3>Delivery Address</h3>
+            </div>
+            <p className="address">{delivery.delivery_address}</p>
+
+            {/* VIEW MAP BUTTON */}
+            <button className="open-map" onClick={handleOpenMapClick}>
+              <Send size={18} /> View Map
+            </button>
+          </div>
+
+          <button
+            className="accept-btn"
+            onClick={() => updateDeliveryStatus("Out for Delivery")}
+            disabled={currentStatus !== "Pending"}
+            style={{
+              opacity: currentStatus !== "Pending" ? 0.5 : 1,
+              cursor: currentStatus !== "Pending" ? "not-allowed" : "pointer",
+            }}
+          >
+            Accept Delivery
+          </button>
+
+          {/* Magbubukas muna ng container modal bago i-mark as delivered */}
+          <button
+            className="delivered-btn"
+            onClick={() => setShowContainerModal(true)}
+            disabled={currentStatus !== "Out for Delivery"}
+            style={{
+              opacity: currentStatus !== "Out for Delivery" ? 0.5 : 1,
+              cursor:
+                currentStatus !== "Out for Delivery" ? "not-allowed" : "pointer",
+            }}
+          >
+            Mark as Delivered
+          </button>
+
+          {currentStatus === "Delivered" && (
+            <p
+              style={{
+                textAlign: "center",
+                fontWeight: "600",
+                color: "#047857",
+                marginTop: "15px",
+              }}
+            >
+              ✓ This delivery has been completed.
+            </p>
+          )}
+        </div>
       </div>
-
-      <button
-        className="accept-btn"
-        onClick={() => updateDeliveryStatus("Out for Delivery")}
-        disabled={currentStatus !== "Pending"}
-        style={{
-          opacity: currentStatus !== "Pending" ? 0.5 : 1,
-          cursor: currentStatus !== "Pending" ? "not-allowed" : "pointer",
-        }}
-      >
-        Accept Delivery
-      </button>
-
-      {/* Magbubukas muna ng container modal bago i-mark as delivered */}
-      <button
-        className="delivered-btn"
-        onClick={() => setShowContainerModal(true)}
-        disabled={currentStatus !== "Out for Delivery"}
-        style={{
-          opacity: currentStatus !== "Out for Delivery" ? 0.5 : 1,
-          cursor:
-            currentStatus !== "Out for Delivery" ? "not-allowed" : "pointer",
-        }}
-      >
-        Mark as Delivered
-      </button>
-
-      {currentStatus === "Delivered" && (
-        <p
-          style={{
-            textAlign: "center",
-            fontWeight: "600",
-            color: "#047857",
-            marginTop: "15px",
-          }}
-        >
-          ✓ This delivery has been completed.
-        </p>
-      )}
 
       {/* CONTAINER TRACKING MODAL */}
       {showContainerModal && (

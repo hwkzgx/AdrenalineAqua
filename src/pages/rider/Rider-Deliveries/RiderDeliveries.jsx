@@ -138,44 +138,49 @@ export default function RiderDeliveries() {
         <p style={{ padding: "0 20px" }}>No assigned deliveries found.</p>
       ) : (
         filteredDeliveries.map((item, index) => (
-          <div className="delivery-card" key={item.id || index}>
-            <div className="top-row">
-              <div className="left-content">
-                <div className="order-number">{index + 1}</div>
-
-                <div>
-                  <p className="label">Order ID</p>
-                  <h2>{item.orderId}</h2>
-                </div>
+          <div className="rider-delivery-card" key={item.id || index}>
+            {/* Desktop Col 1 / Mobile Top Left */}
+            <div className="rider-card-header-col">
+              <div className="rider-card-num">{index + 1}</div>
+              <div className="rider-card-order-info">
+                <span className="rider-card-label">ORDER ID</span>
+                <span className="rider-card-code">{item.orderId}</span>
               </div>
+            </div>
 
-              <div className="right-content">
-                <span
-                  className={`delivery-status ${item.status
-                    ?.toLowerCase()
-                    .replace(/\s+/g, "-")}`}
-                >
-                  {item.status}
+            {/* Desktop Col 2 / Mobile Top Right */}
+            <div className="rider-card-status-col">
+              <span
+                className={`rider-status-tag ${item.status
+                  ?.toLowerCase()
+                  .replace(/\s+/g, "-")}`}
+              >
+                {item.status}
+              </span>
+            </div>
+
+            {/* Desktop Col 3 / Mobile Center */}
+            <div className="rider-card-customer-info">
+              <span className="rider-customer-title">{item.customer}</span>
+              <div className="rider-meta-row">
+                <span className="rider-meta-item">
+                  <MapPin size={14} />
+                  <span className="rider-meta-text">{item.address}</span>
+                </span>
+                <span className="rider-meta-item">
+                  <Clock size={14} />
+                  <span className="rider-meta-text">{item.date}</span>
                 </span>
               </div>
             </div>
 
-            <h4 className="customer-name">{item.customer}</h4>
-
-            <div className="info">
-              <MapPin size={16} /> {item.address}
-            </div>
-
-            <div className="info">
-              <Clock size={16} /> {item.date}
-            </div>
-
-            <div className="buttons">
+            {/* Desktop Col 4 / Mobile Bottom */}
+            <div className="rider-card-action">
               <Link
                 to={`/rider/delivery-details/${item.id}`}
-                className="details-link"
+                className="rider-details-btn"
               >
-                <button className="details-btn">View Details</button>
+                View Details
               </Link>
             </div>
           </div>

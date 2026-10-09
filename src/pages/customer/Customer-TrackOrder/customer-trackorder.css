@@ -232,7 +232,7 @@
 }
 
 /* ADDRESS */
-.delivery-card {
+.track-order-page .delivery-card {
   margin-top: 25px;
   display: flex;
   gap: 15px;
@@ -240,17 +240,17 @@
   padding: 10px;
 }
 
-.delivery-icon {
+.track-order-page .delivery-icon {
   color: #1686ff;
 }
 
-.delivery-card h3 {
+.track-order-page .delivery-card h3 {
   margin: 0;
   color: #1686ff;
   font-size: 28px;
 }
 
-.delivery-card p {
+.track-order-page .delivery-card p {
   margin-top: 10px;
   color: #4e6487;
   font-size: 22px;
@@ -681,11 +681,11 @@
     border-radius: 18px !important;
   }
 
-  .delivery-card h3 {
+  .track-order-page .delivery-card h3 {
     font-size: 20px;
   }
 
-  .delivery-card p {
+  .track-order-page .delivery-card p {
     font-size: 15px;
   }
 }

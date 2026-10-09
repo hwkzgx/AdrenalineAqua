@@ -1,243 +1,280 @@
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:"Poppins",sans-serif;
+.deliveries-container {
+  width: 100%;
+  max-width: 1000px;
+  min-height: 100vh;
+  margin: 0 auto;
+  background: transparent;
+  padding: 20px 24px 100px 24px;
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
-
-
-body{
-  background:#f5f7fb;
-  overflow-x:hidden;
-}
-
-
-.deliveries-container{
-  width:100%;
-  max-width:1200px;
-  min-height:100vh;
-  margin:auto;
-  background:white;
-  padding:25px;
-  padding-bottom:100px;
-}
-
-
-/* HEADER */
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:15px;
-  flex-wrap:wrap;
-}
-
-
-.header h2{
-  font-size:2rem;
-}
-
-
-.header-icons{
-  display:flex;
-  gap:15px;
-}
-
 
 /* TABS */
-.tabs{
-  display:flex;
-  gap:10px;
-  margin-top:25px;
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0 24px 0;
+  max-width: 460px;
 }
 
-
-.tabs button{
-  flex:1;
-  height:48px;
-  border:none;
-  border-radius:12px;
-  font-weight:600;
-  font-size:15px;
-  cursor:pointer;
+.tabs button {
+  flex: 1;
+  height: 44px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.all-tab{
-  background: #e2e8f0;
-  color: #334155;
+.all-tab {
+  background: #f1f5f9;
+  color: #475569;
 }
 
-
-.pending-tab{
-  background: #fef3c7;
-  color: #d97706;
+.pending-tab {
+  background: #fefce8;
+  color: #ca8a04;
+  border-color: #fef08a;
 }
 
-
-.out-tab{
- background: #dcfce7;
-  color: #15803d;
+.out-tab {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
 }
 
-/* DATE */
-.date-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-top:35px;
+.tabs button.active {
+  color: #ffffff;
+  border-color: transparent;
 }
 
-
-/* DELIVERY CARD */
-.delivery-card{
-  margin:25px auto 0;
-  background:white;
-  border-radius:20px;
-  padding:20px;
-  border:1px solid #ececec;
-  box-shadow:0 4px 15px rgba(0,0,0,.05);
-  width:100%;
+.all-tab.active {
+  background: #334155;
 }
 
-
-.top-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  width:100%;
+.pending-tab.active {
+  background: #d97706;
 }
 
-.left-content{
-  display:flex;
-  align-items:center;
-  gap:15px;
+.out-tab.active {
+  background: #16a34a;
 }
 
-.right-content{
-  display:flex;
-  align-items:flex-start;
+/* DATE ROW */
+.date-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0 16px 0;
 }
 
-.order-number{
-  width:40px;
-  height:40px;
-  background:#0d6efd;
-  color:white;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  border-radius:10px;
-  font-weight:600;
+.date-row h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
 }
 
-
-.label{
-  font-size:13px;
-  color:#888;
+.date-row svg {
+  color: #64748b;
 }
 
-.assigned{
-  background:#e0f2fe;
-  color:#0369a1;
-  padding:6px 14px;
-  border-radius:20px;
-  font-size:13px;
-  white-space:nowrap;
-  margin-top: -14%;
+/* RIDER DELIVERY CARD - DESKTOP STANDARD GRID */
+.rider-delivery-card {
+  display: grid;
+  grid-template-columns: 210px 140px 1fr auto;
+  align-items: center;
+  gap: 20px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 18px 24px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  margin-bottom: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-
-.customer-name{
-  margin-top:20px;
-  margin-bottom:15px;
-  font-size:20px;
+.rider-delivery-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
 
-
-.info{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  color:#666;
-  margin-bottom:10px;
+/* Column 1: Number + Order ID */
+.rider-card-header-col {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
-
-/* BUTTONS */
-.buttons{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:15px;
-  margin-top:25px;
+.rider-card-num {
+  width: 42px;
+  height: 42px;
+  background: #2563eb;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 15px;
+  flex-shrink: 0;
 }
 
-.buttons button{
-  flex:1;
-  height:55px;
-  padding:0;
-  margin:0;
-  border-radius:12px;
-  font-size:15px;
-  font-weight:600;
-  cursor:pointer;
-
-  display:flex;
-  justify-content:center;
-  align-items:center;
-
-  appearance:none;
-  -webkit-appearance:none;
+.rider-card-order-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.details-link{
-  width:100%;
-  display:block;
+.rider-card-label {
+  font-size: 11px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.rider-card-code {
+  font-size: 15.5px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+/* Column 2: Status Pill */
+.rider-card-status-col {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.rider-status-tag {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.rider-status-tag.pending {
+  background: #fefce8;
+  color: #ca8a04;
+  border: 1px solid #fef08a;
+}
+
+.rider-status-tag.out-for-delivery {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.rider-status-tag.delivered,
+.rider-status-tag.completed {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+/* Column 3: Customer Info & Meta */
+.rider-card-customer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.rider-customer-title {
+  font-size: 15.5px;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rider-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.rider-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #475569;
+  font-size: 13px;
+  min-width: 0;
+}
+
+.rider-meta-item svg {
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+.rider-meta-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Column 4: Details Action */
+.rider-card-action {
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.rider-details-btn {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid #2563eb;
+  background: #eff6ff;
+  color: #2563eb;
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-
-.details-btn {
-  width:100%;
-  height:52px;
-
-
-  border-radius:12px;
-
-
-  font-size:15px;
-  font-weight:600;
-
-
-  cursor:pointer;
-  transition:.3s;
+.rider-details-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+  transform: translateY(-1px);
 }
 
-.details-btn{
-  border:2px solid #0d6efd;
-  background:white;
-  color:#0d6efd;
-}
-
-.details-btn:hover{
-  transform:translateY(-2px);
-}
-
-
-/* BOTTOM NAV */
+/* FLOATING DOCK BOTTOM NAV */
 .bottom-nav {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  background: white;
-  border-top: 1px solid #e2e8f0;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  max-width: 540px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   align-items: center;
-  padding: 6px 0;
+  padding: 8px 12px;
   z-index: 1000;
-  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
 }
 
 .nav-item {
@@ -245,112 +282,136 @@ body{
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
   color: #64748b;
   text-decoration: none;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   width: 100%;
-  min-width: 0;
-  padding: 4px 0;
+  padding: 6px 0;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+  background: #f8fafc;
+  color: #0284c7;
 }
 
 .nav-item.active {
   color: #0284c7;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-
-/* TABLET */
-@media (max-width:992px){
-  .delivery-card{
-    max-width:100%;
-  }
-}
-
-
-/* MOBILE */
-@media (max-width:768px){
+/* MOBILE RESPONSIVENESS */
+@media (max-width: 768px) {
   .deliveries-container {
-    padding: 16px 12px;
-    padding-bottom: 110px;
-  }
-
-  .delivery-card{
-    display:flex;
-    flex-direction:column;
-  }
-  
-  .header h2{
-    font-size:22px;
-  }
-
-  .section-title h3{
-    font-size:18px;
-  }
-
-  .profile-pic{
-    width:45px;
-    height:45px;
-  }
-
-  .top-row{
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: nowrap;
-    width: 100%;
-  }
-
-  .assigned{
-    flex-shrink:0;
-    white-space: nowrap;
-    margin-top: 15px;
-    margin-bottom: 10px;
-  }
-
-  .info{
-    font-size: 12px;
-    align-items: flex-start;
-    gap:3px;
-  }
-
-  .buttons{
-    flex-direction:column;
-  }
-
-  .buttons button{
-    width:110px;
-    height:44px;
+    padding: 16px 16px 90px 16px;
   }
 
   .tabs {
-  display: flex !important;
-  flex-direction: row !important; 
-  flex-wrap: nowrap !important;   
-  align-items: center;
-  gap: 8px !important;
-  width: 100% !important;
-}
+    max-width: 100%;
+    margin: 16px 0 20px 0;
+  }
 
-.tabs button {
-  flex: 1 !important;           
-  min-width: 0 !important;     
-  border: none;
-  border-radius: 14px;
-  font-weight: 600;
-  font-size: 13px;
-  padding: 0 4px;
-  cursor: pointer;
-  white-space: nowrap;         
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+  .tabs button {
+    height: 40px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
 
-/* Kulay kapag ang button ay may kasamang .active class */
-.tabs button.active {
-  color: #0f172a;                      
-  border-bottom: 4px solid #334155;    
-  font-weight: 600;
-}
+  /* Robust 2-column mobile card grid */
+  .rider-delivery-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: 14px;
+  }
+
+  .rider-card-header-col {
+    grid-column: 1 / 2;
+    gap: 10px;
+  }
+
+  .rider-card-num {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+
+  .rider-card-code {
+    font-size: 14.5px;
+  }
+
+  .rider-card-status-col {
+    grid-column: 2 / 3;
+    justify-content: flex-end;
+  }
+
+  .rider-status-tag {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+
+  .rider-card-customer-info {
+    grid-column: 1 / -1;
+    gap: 6px;
+  }
+
+  .rider-customer-title {
+    font-size: 15px;
+    white-space: normal;
+  }
+
+  .rider-meta-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .rider-meta-item {
+    font-size: 13px;
+    width: 100%;
+  }
+
+  .rider-meta-text {
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .rider-card-action {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .rider-details-btn {
+    width: 100%;
+    height: 44px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+
+  .bottom-nav {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    transform: none;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding: 6px 0;
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.04);
+  }
+
+  .nav-item {
+    font-size: 11px;
+    padding: 4px 0;
+  }
 }
