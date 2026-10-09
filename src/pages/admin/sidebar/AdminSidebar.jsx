@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./admin-sidebar.css";
 
@@ -31,7 +31,25 @@ export default function AdminSidebar() {
   // STATES
   const [openUsers, setOpenUsers] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const [user, setUser] = useState(() =>
+    JSON.parse(localStorage.getItem("user") || "{}")
+  );
+
+  useEffect(() => {
+    const handleUserUpdated = () => {
+      const updatedUser = JSON.parse(
+        localStorage.getItem("user") || "{}"
+      );
+      setUser(updatedUser);
+    };
+
+    window.addEventListener("userUpdated", handleUserUpdated);
+
+    return () => {
+      window.removeEventListener("userUpdated", handleUserUpdated);
+    };
+  }, []);
+
 
   const toggleUsers = () => {
     setOpenUsers(!openUsers);

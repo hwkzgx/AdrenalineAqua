@@ -53,7 +53,7 @@ export default function StaffSidebar() {
     <div className="sidebar">
       <img src={AquaLogo} alt="Aqua Logo" className="logo" />
 
-      <div className="sidebar-top">
+      <div className="sidebar-nav">
         <button
           className={isActive("/staff/dashboard") ? "active" : ""}
           onClick={() => navigate("/staff/dashboard")}

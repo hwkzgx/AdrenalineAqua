@@ -1,5 +1,3 @@
-
-
 /* ==========================================
    SIDEBAR CONTAINER
    ========================================== */
@@ -28,7 +26,8 @@
 }
 
 /* NAV WRAPPER */
-.sidebar-nav {
+.sidebar-nav,
+.sidebar-top {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -91,13 +90,14 @@
   font-size: 12px;
 }
 
-/* BOTTOM */
+/* BOTTOM SECTION */
 .sidebar-bottom {
-  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   padding-top: 10px;
+  margin-top: auto;
 }
 
-/* PROFILE */
+/* PROFILE BADGE */
 .admin-profile {
   display: flex;
   align-items: center;
@@ -125,7 +125,7 @@
 }
 
 .admin-profile .name {
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
   color: #ffffff;
   margin: 0;
@@ -133,61 +133,8 @@
 }
 
 .admin-profile .role {
-  font-size: 10.5px;
+  font-size: 11px;
   color: #e0e7ff;
   margin: 2px 0 0 0;
   line-height: 1.2;
-}
-
-/* PROFILE DROPDOWN (GOES UP) */
-.profile-dropdown {
-  position: absolute;
-  bottom: 60px;
-  left: 16px;
-  right: 16px;
-  display: flex;
-  flex-direction: column;
-  background: #1e3a8a;
-  border-radius: 10px;
-  padding: 6px;
-  gap: 6px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-  z-index: 10;
-  animation: slideUp 0.2s ease;
-}
-
-.profile-dropdown button {
-  background: transparent;
-  border: none;
-  color: #e5e7eb;
-  text-align: left;
-  padding: 8px 12px;
-  font-size: 12.5px;
-  cursor: pointer;
-  border-radius: 6px;
-}
-
-.profile-dropdown button:hover {
-  background: #4571af;
-}
-
-.profile-dropdown .logout {
-  background: #dc2626;
-  color: white;
-}
-
-.profile-dropdown .logout:hover {
-  background: #b81b1b;
-  transform: none;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }

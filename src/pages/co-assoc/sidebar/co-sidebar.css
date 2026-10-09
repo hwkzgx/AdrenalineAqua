@@ -1,37 +1,39 @@
+/* ==========================================
+   SIDEBAR CONTAINER
+   ========================================== */
 .sidebar {
   width: 220px;
   height: 100vh;
-  background: linear-gradient(
-    180deg,
-    #0d1e3a 0%,
-    #152c5b 60%,
-    #0d1e3a 100%
-  );
+  background: linear-gradient(180deg, #0d1e3a 0%, #152c5b 60%, #0d1e3a 100%);
   color: white;
   padding: 16px 14px 14px 14px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   flex-shrink: 0;
   box-sizing: border-box;
   overflow-y: auto;
   overflow-x: hidden;
+  position: relative;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
+/* LOGO */
+.logo {
+  width: 78px;
+  margin: 0 auto 12px auto;
+  display: block;
+}
+
+/* NAV WRAPPER */
+.sidebar-nav,
 .sidebar-top {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.logo {
-  width: 78px;
-  margin: 0 auto 12px;
-  display: block;
-}
-
+/* BUTTONS */
 .sidebar button {
   width: 100%;
   background: transparent;
@@ -46,6 +48,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  margin: 0;
   transition: all 0.2s ease;
   box-sizing: border-box;
 }
@@ -59,17 +62,18 @@
 
 .sidebar button:hover {
   background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
   transform: translateX(2px);
-  color: #fff;
 }
 
 .sidebar button.active {
   border: 1.5px solid rgba(255, 255, 255, 0.85);
   background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  color: #ffffff;
   font-weight: 600;
 }
 
+/* DROPDOWN */
 .dropdown {
   display: flex;
   flex-direction: column;
@@ -81,12 +85,19 @@
   gap: 3px;
 }
 
+.dropdown button {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+/* BOTTOM SECTION */
 .sidebar-bottom {
   border-top: 1px solid rgba(255, 255, 255, 0.15);
   padding-top: 10px;
   margin-top: auto;
 }
 
+/* PROFILE BADGE */
 .admin-profile {
   display: flex;
   align-items: center;
@@ -101,6 +112,7 @@
 
 .admin-profile:hover {
   background: #2563eb;
+  transform: translateY(-1px);
 }
 
 .admin-profile img {
@@ -117,23 +129,12 @@
   font-weight: 700;
   color: #ffffff;
   margin: 0;
+  line-height: 1.2;
 }
 
 .admin-profile .role {
   font-size: 11px;
   color: #e0e7ff;
   margin: 2px 0 0 0;
-}
-
-.sidebar button.cologout {
-  background: #dc2626;
-  color: white;
-  margin-top: 8px;
-  padding: 8px;
-  border-radius: 8px;
-}
-
-.sidebar button.cologout:hover {
-  background: #b81b1b;
-  transform: none;
+  line-height: 1.2;
 }
