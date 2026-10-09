@@ -2,22 +2,34 @@
    PAGE LAYOUT & HEADER
    ========================================== */
 .sales-page {
-  padding: 30px;
-  background: #f8fafc;
-  min-height: 100vh;
+  width: 100%;
+  background: transparent;
+  padding: 24px 30px 40px 30px;
+  box-sizing: border-box;
+}
+
+.sales-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
 }
 
 .sales-header h1 {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
-  color: #1e293b;
-  margin: 0;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.01em;
 }
 
 .sales-header p {
   font-size: 14px;
   color: #64748b;
-  margin: 4px 0 0 0;
+  margin: 0;
+  line-height: 1.5;
 }
 
 /* ==========================================
@@ -25,9 +37,9 @@
    ========================================== */
 .sales-cards-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
-  margin: 24px 0;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 20px 0 24px;
   width: 100%;
 }
 
@@ -36,12 +48,13 @@
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  padding: 20px;
+  padding: 18px 20px;
   display: flex;
   align-items: center;
   gap: 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 6px -1px rgba(0, 0, 0, 0.03);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
 }
 
 /* Hover effect */
@@ -111,19 +124,18 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   margin-bottom: 20px;
-  padding-left: 0;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
 }
 
 .search-input {
-  width: 350px;
-  height: 48px;
+  width: 300px;
+  height: 44px;
   padding: 0px 14px;
-  border: 3px solid #02457A;
-  border-radius: 12px;
-  font-size: 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 14px;
   outline: none;
   background: white;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -135,18 +147,17 @@
 }
 
 .filter-select {
-  width: 200px;
-  height: 48px;
+  width: 160px;
+  height: 44px;
   padding: 0 14px;
-  border: 3px solid #02457A;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 600;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
   background: white;
-  color: #02457A;
+  color: #334155;
   cursor: pointer;
   outline: none;
-  margin-left: -550px;
 }
 
 /* ==========================================
@@ -240,4 +251,67 @@
 
 .export-pdf-btn:hover {
   background-color: #013259;
+}
+
+/* ==========================================
+   RESPONSIVE (MOBILE)
+   ========================================== */
+@media (max-width: 768px) {
+  .sales-page {
+    padding: 16px 16px 32px 16px;
+  }
+
+  .sales-header {
+    margin-bottom: 18px;
+  }
+
+  .sales-cards-container {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 16px 0 20px;
+  }
+
+  .sales-card {
+    padding: 16px;
+    width: 100%;
+  }
+
+  .controls-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .search-input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .filter-select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .export-pdf-btn {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  .sales-graph-card {
+    padding: 16px 14px;
+    border-radius: 12px;
+  }
+
+  .sales-table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+  }
+
+  .sales-table {
+    min-width: 650px;
+  }
 }

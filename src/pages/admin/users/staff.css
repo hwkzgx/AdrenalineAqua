@@ -10,25 +10,35 @@
    PAGE HEADER
    ========================================== */
 .um-page {
-  background-color: #f8fafc;
+  width: 100%;
+  padding: 24px 30px 40px 30px;
+  background-color: transparent;
+  box-sizing: border-box;
   font-family: 'Inter', sans-serif;
 }
 
 .um-page-header {
-  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
 }
 
 .um-page-header h1 {
-  margin: 0 0 4px;
-  font-size: 26px;
+  margin: 0 0 4px 0;
+  font-size: 28px;
   font-weight: 700;
   color: #0f172a;
+  letter-spacing: -0.01em;
 }
 
 .um-page-header p {
   margin: 0;
   font-size: 14px;
   color: #64748b;
+  line-height: 1.5;
 }
 
 /* ==========================================
@@ -701,6 +711,57 @@
 .um-split-fields {
   flex: 1;
   min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .um-page {
+    padding: 16px 16px 32px 16px;
+  }
+
+  .um-page-header {
+    margin-bottom: 18px;
+  }
+
+  .um-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .um-search {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .um-toolbar-right {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .um-select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .um-add-btn {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  .um-table-card {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+  }
+
+  .um-table {
+    min-width: 700px;
+  }
 }
 
 @media (max-width: 760px) {

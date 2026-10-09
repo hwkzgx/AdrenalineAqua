@@ -3,8 +3,7 @@
    ========================================== */
 .insights-page-wrapper {
   width: 100%;
-  padding: 0;
-  padding-bottom: 40px;
+  padding: 24px 30px 40px 30px;
   background: transparent;
   position: relative;
   box-sizing: border-box;
@@ -46,21 +45,21 @@
   align-items: center;
   gap: 20px;
   flex-wrap: wrap;
-  margin-bottom: 4px;
+  margin-bottom: 24px;
 }
 
 .insights-header-text h1 {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
-  color: #1e293b;
-  margin: 0;
+  color: #0f172a;
+  margin: 0 0 4px 0;
   letter-spacing: -0.01em;
 }
 
 .insights-header-text p {
   font-size: 14px;
   color: #64748b;
-  margin: 4px 0 0 0;
+  margin: 0;
   line-height: 1.5;
 }
 
@@ -231,7 +230,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 15px;
-  margin: 16px 0 24px 0;
+  margin: 0 0 24px 0;
   width: 100%;
 }
 
@@ -1279,6 +1278,10 @@
 }
 
 @media (max-width: 768px) {
+  .insights-page-wrapper {
+    padding: 16px 16px 32px 16px;
+  }
+
   .rider-insights-wrapper {
     margin: 0;
   }

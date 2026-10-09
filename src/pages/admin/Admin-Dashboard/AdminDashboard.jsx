@@ -407,18 +407,14 @@ export default function AdminDashboard() {
         tension: 0,
         borderWidth: 3,
         pointStyle: "circle",
-        pointRadius: 8,
-        pointHoverRadius: 10,
-        pointBackgroundColor:
-          "#bfdbfe",
-        pointBorderColor:
-          "#2563eb",
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointBackgroundColor: "#bfdbfe",
+        pointBorderColor: "#2563eb",
         pointBorderWidth: 2,
-        pointHoverBackgroundColor:
-          "#ffffff",
-        pointHoverBorderColor:
-          "#2563eb",
-        pointHoverBorderWidth: 3,
+        pointHoverBackgroundColor: "#ffffff",
+        pointHoverBorderColor: "#2563eb",
+        pointHoverBorderWidth: 2,
       },
     ],
   };
@@ -441,6 +437,13 @@ export default function AdminDashboard() {
         grid: {
           color: "#e5e7eb",
         },
+        ticks: {
+          autoSkip: true,
+          maxTicksLimit: 6,
+          font: {
+            size: 11,
+          },
+        },
       },
       y: {
         beginAtZero: true,
@@ -450,6 +453,9 @@ export default function AdminDashboard() {
         ticks: {
           callback: (value) =>
             `₱${value}`,
+          font: {
+            size: 11,
+          },
         },
       },
     },
@@ -461,12 +467,10 @@ export default function AdminDashboard() {
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <h1>Admin Dashboard</h1>
-
-        <p>
-          Overview of your system
-          performance
-        </p>
+        <div>
+          <h1>Admin Dashboard</h1>
+          <p>Overview of your system performance</p>
+        </div>
       </div>
 
       <div className="dashboard-grid">

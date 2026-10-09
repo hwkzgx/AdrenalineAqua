@@ -387,8 +387,10 @@ function Sales() {
 
       {/* HEADER SECTION */}
       <div className="sales-header">
-        <h1>Sales</h1>
-        <p>Monitor daily and monthly sales performance</p>
+        <div>
+          <h1>Sales</h1>
+          <p>Monitor daily and monthly sales performance</p>
+        </div>
       </div>
 
       {/* 💳 OVERVIEW CARDS */}
