@@ -1,11 +1,13 @@
 /* =====================================================
-   CO INVENTORY - responsive
+   CO-ASSOCIATE INVENTORY - Unified & Responsive
    ===================================================== */
 
 .coinventory-page {
-  background-color: #f8fafc;
-  padding: 30px;
-  min-height: 100vh;
+  width: 100%;
+  padding: 24px 30px 40px 30px;
+  background-color: transparent;
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 .coinventory-page,
@@ -15,473 +17,212 @@
   box-sizing: border-box;
 }
 
-/* ----- HEADER ----- */
+/* HEADER */
+.coinventory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
 .coinventory-header h1 {
   font-size: 28px;
+  font-weight: 700;
   color: #0f172a;
   margin: 0 0 4px 0;
-  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .coinventory-header p {
   font-size: 14px;
   color: #64748b;
   margin: 0;
+  line-height: 1.5;
 }
 
-/* ----- PLACEHOLDER ----- */
-.coplaceholder-text {
-  color: #94a3b8;
-  font-size: 14px;
-  margin-top: 10px;
+/* SUMMARY CARDS */
+.coinventory-page .inventory-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
-.cograph-placeholder {
-  height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px dashed #cbd5e1;
-  border-radius: 10px;
-  color: #64748b;
-}
-
-/* ----- BOTTOM: REVENUE + GRAPH ----- */
-.coinventory-bottom {
-  display: flex;
-  align-items: stretch;      /* pantay ang taas ng 2 cards */
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.coinventory-revenue,
-.coinventory-graph {
-  flex: 1 1 0;
-  min-width: 0;
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
+.coinventory-page .summary-card {
+  background: #ffffff;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
-  overflow: hidden;          /* hindi lalabas ang laman sa rounded corners */
-  overflow-wrap: anywhere;   /* hindi mag-overflow ang mahabang text/numbers */
-}
-
-.corevenue-header {
+  border-radius: 12px;
+  padding: 18px 20px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.corefresh-btn {
-  padding: 6px 10px;
-  border: none;
-  background: #0ea5e9;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
+.coinventory-page .summary-card .card-icon {
+  width: 48px;
+  height: 48px;
+  padding: 10px;
+  border-radius: 10px;
+  flex-shrink: 0;
 }
 
-/* ----- CONTROLS ROW ----- */
+.coinventory-page .summary-card h3 {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.coinventory-page .summary-card h2 {
+  font-size: 24px;
+  color: #0f172a;
+  margin: 0;
+  font-weight: 700;
+}
+
+.coinventory-page .total-val .card-icon {
+  background-color: #f0fdf4;
+  color: #16a34a;
+}
+
+.coinventory-page .low-alert.active {
+  border-color: #fef08a;
+  background-color: #fffde7;
+}
+
+.coinventory-page .low-alert .card-icon {
+  background-color: #fef9c3;
+  color: #ca8a04;
+}
+
+.coinventory-page .out-alert.active {
+  border-color: #fecaca;
+  background-color: #fff5f5;
+}
+
+.coinventory-page .out-alert .card-icon {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* CONTROLS */
 .cocontrols-row {
   display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
+  justify-content: flex-start;
   align-items: center;
-  width: 100%;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 .cosearch-input {
-  width: 500px;
-  height: 48px;
-  padding: 0 16px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  width: 300px;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
   font-size: 14px;
   outline: none;
-  box-sizing: border-box;
-  transition: 0.3s;
+  background-color: #ffffff;
+  transition: border-color 0.2s;
 }
 
 .cosearch-input:focus {
   border-color: #0ea5e9;
-  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.1);
 }
 
 .cofilter-select {
-  width: 200px;
-  flex: 0 0 200px;
-  height: 48px;
-  padding: 0 16px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background-color: white;
+  width: 160px;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
   font-size: 14px;
+  font-weight: 500;
+  background-color: #ffffff;
+  color: #334155;
   cursor: pointer;
   outline: none;
-  box-sizing: border-box;
 }
 
-/* ----- EXPORT PDF BUTTON ----- */
-.export-pdf-btn {
-  margin-left: auto;
-  width: 200px;
-  flex: 0 0 200px;
-  justify-content: center;
-  display: flex;
+.coinventory-page .export-pdf-btn {
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  height: 44px;
+  padding: 0 18px;
   background-color: #02457A;
-  color: white;
+  color: #ffffff;
   border: none;
-  padding: 0 16px;
-  height: 48px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
+  border-radius: 10px;
   font-size: 14px;
-  transition: background-color 0.2s ease;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
-.export-pdf-btn:hover {
+.coinventory-page .export-pdf-btn:hover {
   background-color: #013259;
 }
 
+/* TABLE */
+.cotable-container {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cotable-container table {
+  min-width: 700px;
+}
 
 /* =====================================================
-   RESPONSIVE
-   (nasa loob ng media query, kaya hindi nagagalaw ang desktop)
+   RESPONSIVE (MOBILE)
    ===================================================== */
-
-/* ---------- LAPTOP (<= 1100px): pwedeng bumaba ang button ---------- */
-@media (max-width: 1100px) {
-  .cocontrols-row {
-    flex-wrap: wrap;
-  }
-
-  .cosearch-input {
-    flex: 1 1 240px;
-    width: auto;
-    min-width: 0;
-  }
-}
-
-/* ---------- TABLET (<= 900px) ---------- */
-@media (max-width: 900px) {
-  .coinventory-page {
-    padding: 20px;
-  }
-
-  .coinventory-bottom {
-    flex-direction: column;
-  }
-
-  .coinventory-revenue,
-  .coinventory-graph {
-    flex: none;              /* iwas collapse/kakaibang taas kapag naka-column */
-    width: 100%;
-  }
-}
-
-/* ---------- MOBILE LAYOUT (<= 768px) ----------
-   May sariling padding na ang .main (12-14px) sa mobile layout,
-   kaya tinatanggal dito ang padding ng page para hindi doble. */
 @media (max-width: 768px) {
   .coinventory-page {
-    padding: 4px 0 24px;
-    min-height: 0;
-    background: transparent;
-  }
-}
-
-/* ---------- MOBILE (<= 600px) ---------- */
-@media (max-width: 600px) {
-  .coinventory-page {
-    padding: 0 0 28px;
+    padding: 16px 16px 32px 16px;
   }
 
-  /* ----- Header = banner ----- */
   .coinventory-header {
-    margin-bottom: 14px;
-    padding: 22px 18px;
-    background: linear-gradient(135deg, #2aa0ff, #0050b8);
-    border-radius: 24px;
-    box-shadow: 0 14px 30px rgba(0, 80, 184, 0.3);
+    margin-bottom: 18px;
   }
 
-  .coinventory-header h1 {
-    font-size: 24px;
-    font-weight: 800;
-    color: #fff;
-  }
-
-  .coinventory-header p {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.85);
-  }
-
-  /* ----- Search + filter + export = isang card ----- */
-  .cocontrols-row {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; /* select + export = pantay */
-    align-items: stretch;
+  .coinventory-page .inventory-summary-cards {
+    grid-template-columns: 1fr;
     gap: 12px;
-    margin-bottom: 14px;
-    padding: 16px;
-    background: #fff;
-    border-radius: 22px;
-    box-shadow: 0 4px 16px rgba(15, 31, 61, 0.06);
+  }
+
+  .cocontrols-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
   }
 
   .cosearch-input {
-    grid-column: 1 / -1 !important;   /* search = buong lapad */
-  }
-
-  .cosearch-input,
-  .cofilter-select {
-    display: block;
-    flex: none;
-    width: 100% !important;
-    min-width: 0;
-    height: 52px;
-    margin: 0;
-    padding: 0 16px;
-    font-size: 16px; /* para hindi mag-zoom ang iOS */
-    border: 1.5px solid #e3e9f3;
-    border-radius: 14px;
-  }
-
-  .cofilter-select {
-    padding-right: 44px;
-    font-weight: 500;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%230d7df2' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    background-size: 16px;
-  }
-
-  .cosearch-input:focus,
-  .cofilter-select:focus {
-    border-color: #0d7df2;
-    box-shadow: 0 0 0 4px rgba(13, 125, 242, 0.14);
-  }
-
-  .cocontrols-row .export-pdf-btn,
-  button.export-pdf-btn {
-    grid-column: auto !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    align-self: stretch !important;
-    flex: none !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    height: 52px !important;
-    margin: 0 !important;
-    padding: 0 12px !important;
-    gap: 8px;
-    font-size: 15px;
-    font-weight: 700;
-    text-align: center;
-    background: linear-gradient(135deg, #2aa0ff, #0062d6) !important;
-    border-radius: 14px !important;
-    box-shadow: 0 12px 26px rgba(0, 98, 214, 0.35);
-  }
-
-  /* ----- Revenue + Graph ----- */
-  .coinventory-bottom {
-    gap: 14px;
-    margin-top: 14px;
-  }
-
-  .coinventory-revenue,
-  .coinventory-graph {
-    padding: 18px 16px 22px;
-    border: none;
-    border-radius: 22px;
-    box-shadow: 0 4px 16px rgba(15, 31, 61, 0.06);
-  }
-
-  .corevenue-header {
-    flex-wrap: wrap;
-  }
-
-  .corefresh-btn {
-    padding: 8px 14px;
-    border-radius: 10px;
-  }
-
-  .cograph-placeholder {
-    height: 160px;
-  }
-}
-
-/* ---------- MALIIT NA PHONE (<= 360px) ---------- */
-@media (max-width: 360px) {
-  .coinventory-header h1 {
-    font-size: 21px;
-  }
-
-  .cofilter-select {
-    font-size: 14px;
-    padding: 0 30px 0 12px;
-    background-position: right 10px center;
-  }
-
-  .export-pdf-btn {
-    font-size: 14px;
-    gap: 6px;
-  }
-
-  .cocontrols-row {
-    padding: 14px 12px;
-  }
-
-  .coinventory-revenue,
-  .coinventory-graph {
-    padding: 16px 14px 20px;
-  }
-}
-
-
-/* =====================================================
-   SUMMARY CARDS (Total Value / Low Stock / Out of Stock)
-   Layout at sukat lang ang inaayos dito. Walang binago sa
-   colors, background, o border ng cards (same look pa rin).
-   ===================================================== */
-
-.coinventory-page .inventory-summary-cards {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr)); /* pantay ang lapad */
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.coinventory-page .summary-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-width: 0;
-  width: auto;
-  flex: none;
-}
-
-.coinventory-page .summary-card > div {
-  min-width: 0;
-}
-
-.coinventory-page .summary-card .card-icon {
-  flex-shrink: 0;            /* hindi lumiliit ang icon box */
-}
-
-.coinventory-page .summary-card h3,
-.coinventory-page .summary-card h2 {
-  white-space: nowrap;       /* walang wrap */
-}
-
-.coinventory-page .summary-card h3 {
-  margin: 0 0 4px;
-  line-height: 1.2;
-}
-
-.coinventory-page .summary-card h2 {
-  margin: 0;
-  line-height: 1.1;
-}
-
-/* ---------- TABLET (<= 900px) ---------- */
-@media (max-width: 900px) {
-  .coinventory-page .inventory-summary-cards {
-    gap: 12px;
-  }
-
-  .coinventory-page .summary-card {
-    gap: 12px;
-  }
-
-  .coinventory-page .summary-card h3 {
-    font-size: 12px;
-  }
-
-  .coinventory-page .summary-card h2 {
-    font-size: 22px;
-  }
-}
-
-/* ---------- MOBILE (<= 600px) ----------
-   Total Value = buong lapad sa taas
-   Low Stock + Out of Stock = magkatabi sa baba */
-@media (max-width: 600px) {
-  .coinventory-page .inventory-summary-cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    margin-bottom: 14px;
-  }
-
-  .coinventory-page .summary-card.total-val {
-    grid-column: 1 / -1;
-    padding: 16px;
-  }
-
-  .coinventory-page .summary-card.total-val h3 {
-    font-size: 12px;
-  }
-
-  .coinventory-page .summary-card.total-val h2 {
-    font-size: 28px;
-  }
-
-  /* 2 cards sa baba: mas maliit para kasya */
-  .coinventory-page .summary-card.low-alert,
-  .coinventory-page .summary-card.out-alert {
-    padding: 12px;
-    gap: 10px;
-  }
-
-  .coinventory-page .summary-card.low-alert .card-icon,
-  .coinventory-page .summary-card.out-alert .card-icon {
+    width: 100%;
     box-sizing: border-box;
-    width: 40px;
-    height: 40px;
-    padding: 9px;
   }
 
-  .coinventory-page .summary-card.low-alert h3,
-  .coinventory-page .summary-card.out-alert h3 {
-    font-size: 11px;
-    letter-spacing: 0.02em;
+  .cofilter-select {
+    width: 100%;
+    box-sizing: border-box;
   }
 
-  .coinventory-page .summary-card.low-alert h2,
-  .coinventory-page .summary-card.out-alert h2 {
-    font-size: 22px;
-  }
-}
-
-/* ---------- MALIIT NA PHONE (<= 360px) ---------- */
-@media (max-width: 360px) {
-  .coinventory-page .summary-card.low-alert,
-  .coinventory-page .summary-card.out-alert {
-    padding: 10px;
-    gap: 8px;
-  }
-
-  .coinventory-page .summary-card.low-alert .card-icon,
-  .coinventory-page .summary-card.out-alert .card-icon {
-    width: 34px;
-    height: 34px;
-    padding: 7px;
-  }
-
-  .coinventory-page .summary-card.low-alert h3,
-  .coinventory-page .summary-card.out-alert h3 {
-    font-size: 10px;
-    letter-spacing: 0;
+  .coinventory-page .export-pdf-btn {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
   }
 }

@@ -46,33 +46,42 @@
 }
 
 .delivery-search {
-  width: 280px;
-  height: 48px;
+  width: 260px;
+  height: 44px;
   padding: 0 16px;
-  border: 3px solid #02457A;
-  border-radius: 12px;
-  font-size: 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 14px;
   outline: none;
   background: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
 }
 
 .delivery-search:focus {
-  border-color: #0ea5e9;
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+  border-color: #02457A;
+  box-shadow: 0 0 0 3px rgba(2, 69, 122, 0.15);
 }
 
 .delivery-filter {
   width: 150px;
-  height: 48px;
+  height: 44px;
   padding: 0 14px;
-  border: 3px solid #02457A;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 600;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
   background: white;
-  color: #02457A;
+  color: #334155;
   cursor: pointer;
   outline: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.delivery-filter:focus {
+  border-color: #02457A;
+  box-shadow: 0 0 0 3px rgba(2, 69, 122, 0.15);
 }
 
 /* =========================
@@ -521,12 +530,13 @@
   color: white;
   border: none;
   padding: 0 16px;
-  height: 48px;
-  border-radius: 12px;
+  height: 44px;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
-  transition: background-color 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .export-pdf-btn:hover {

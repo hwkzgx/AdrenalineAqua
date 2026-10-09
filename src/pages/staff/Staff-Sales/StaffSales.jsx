@@ -308,14 +308,14 @@ function StaffSales() {
         tension: 0.35,
         borderWidth: 3,
         pointStyle: "circle",
-        pointRadius: 7,
-        pointHoverRadius: 10,
+        pointRadius: 4,
+        pointHoverRadius: 6,
         pointBackgroundColor: "#93c5fd",
         pointBorderColor: "#2563eb",
         pointBorderWidth: 2,
         pointHoverBackgroundColor: "#ffffff",
         pointHoverBorderColor: "#2563eb",
-        pointHoverBorderWidth: 3,
+        pointHoverBorderWidth: 2,
       },
     ],
   };
@@ -348,7 +348,8 @@ function StaffSales() {
           display: false,
         },
         ticks: {
-          autoSkip: false,
+          autoSkip: true,
+          maxTicksLimit: 6,
           maxRotation: 0,
           minRotation: 0,
           font: {
@@ -383,8 +384,10 @@ function StaffSales() {
 
       {/* HEADER SECTION */}
       <div className="staffsales-header">
-        <h1>Sales</h1>
-        <p>Monitor daily and monthly sales performance</p>
+        <div>
+          <h1>Sales</h1>
+          <p>Monitor daily and monthly sales performance</p>
+        </div>
       </div>
 
       {/* 💳 OVERVIEW CARDS */}

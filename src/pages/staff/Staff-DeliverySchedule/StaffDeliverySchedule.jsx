@@ -264,8 +264,10 @@ function StaffDeliverySchedule() {
 
       {/* HEADER */}
       <div className="staffdeliveryschedule-header">
-        <h1>Delivery</h1>
-        <p>Manage delivery tracking and status</p>
+        <div>
+          <h1>Delivery</h1>
+          <p>Manage delivery tracking and status</p>
+        </div>
       </div>
 
       {/* CONTROLS */}

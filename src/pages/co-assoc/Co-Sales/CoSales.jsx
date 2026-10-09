@@ -315,36 +315,38 @@ const lineOptions = {
     },
   },
 
- scales: {
-  x: {
-    grid: {
-      display: false,
-    },
-
-    ticks: {
-      autoSkip: false,     // Ipakita lahat ng buwan
-      maxRotation: 0,      // Huwag i-rotate
-      minRotation: 0,
-      font: {
-        size: isMobile ? 9 : 11,
+    scales: {
+      x: {
+        grid: {
+          display: false,
+        },
+        ticks: {
+          autoSkip: true,
+          maxTicksLimit: 6,
+          font: {
+            size: 11,
+          },
+        },
+      },
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: (value) => `₱${value}`,
+          font: {
+            size: 11,
+          },
+        },
       },
     },
-  },
-
-  y: {
-    beginAtZero: true,
-    ticks: {
-      callback: (value) => `₱${value}`,
-    },
-  },
-},
-};
+  };
 
   return (
     <div className="cosales-page">
       <div className="cosales-header">
-        <h1>Co-Associate Sales</h1>
-        <p>View sales performance records</p>
+        <div>
+          <h1>Co-Associate Sales</h1>
+          <p>View sales performance records</p>
+        </div>
       </div>
 
       <div className="cosales-controls">

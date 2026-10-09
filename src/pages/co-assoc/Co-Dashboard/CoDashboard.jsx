@@ -283,130 +283,123 @@ export default function CoDashboard() {
       fill: true,
       tension: 0.35,
 
-      borderWidth: 3,
-
+      borderWidth: 2.5,
       pointStyle: "circle",
-
-      pointRadius: 7,
-      pointHoverRadius: 10,
-
-      pointBackgroundColor: "#93c5fd",
+      pointRadius: 4,
+      pointHoverRadius: 6,
+      pointBackgroundColor: "#bfdbfe",
       pointBorderColor: "#2563eb",
       pointBorderWidth: 2,
-
       pointHoverBackgroundColor: "#fff",
       pointHoverBorderColor: "#2563eb",
-      pointHoverBorderWidth: 3,
+      pointHoverBorderWidth: 2,
     },
   ],
 };
    
 const lineOptions = {
   responsive: true,
-
   maintainAspectRatio: false,
-
   interaction: {
     mode: "index",
     intersect: false,
   },
-
   plugins: {
     legend: {
       display: false,
     },
-
     tooltip: {
       backgroundColor: "#1e293b",
       titleColor: "#fff",
       bodyColor: "#fff",
       padding: 12,
       cornerRadius: 10,
-
       callbacks: {
         label: (context) =>
           `₱${Number(context.raw).toLocaleString()}`,
       },
     },
   },
-   
- scales: {
-  x: {
-    grid: {
-      display: false,
+  scales: {
+    x: {
+      grid: {
+        display: false,
+      },
+      ticks: {
+        autoSkip: true,
+        maxTicksLimit: 6,
+        font: {
+          size: 11,
+        },
+      },
     },
-
-    ticks: {
-      autoSkip: false,     // Ipakita lahat ng buwan
-      maxRotation: 0,      // Huwag i-rotate
-      minRotation: 0,
-      font: {
-        size: 11,
+    y: {
+      beginAtZero: true,
+      ticks: {
+        callback: (value) => `₱${value}`,
+        font: {
+          size: 11,
+        },
       },
     },
   },
-
-  y: {
-    beginAtZero: true,
-    ticks: {
-      callback: (value) => `₱${value}`,
-    },
-  },
-},
 };
 
   return (
-   <div className="co-dashboard-header">
-      <h1>Co-Associate Dashboard</h1>
+    <div className="codashboard-container">
+      <div className="codashboard-header">
+        <div>
+          <h1>Co-Associate Dashboard</h1>
+          <p>Real-time overview of inventory, sales, and expenses</p>
+        </div>
+      </div>
 
       {/* CARDS */}
-        <div className="codashboard-grid">
-          <div className="codashboard-card green">
-            <h3>Total Inventory</h3>
-            <p>{stats.totalInventory}</p>
-          </div>
-
-          <div className="codashboard-card purple">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3>Total Sales</h3>
-                    <select 
-                      value={salesRange} 
-                      onChange={(e) => setSalesRange(e.target.value)}
-                      className="small-sales-dropdown"
-                    >
-                      <option value="daily">Today</option>
-                      <option value="weekly">Weekly</option>
-                      <option value="monthly">Monthly</option>
-                    </select>
-                  </div>
-              <p>₱{salesValue.toLocaleString()}</p>
-                </div>
-
-          <div className="codashboard-card red">
-            <h3>Expenses</h3>
-            <p>₱{stats.expenses}</p>
-          </div>
-
-          <div className="codashboard-card blue">
-            <h3>Stocks</h3>
-            <p>{stats.stock}</p>
-          </div>
+      <div className="codashboard-grid">
+        <div className="codashboard-card green">
+          <h3>Total Inventory</h3>
+          <p>{stats.totalInventory}</p>
         </div>
 
-       {/* CHARTS */}
-      <div className="cograph-container">
-      
-       <div className="cochart-card">
-        <h3>Monthly Sales</h3>
-      
-        {salesData.length === 0 ? (
-          <div className="coempty-state">No sales data yet</div>
-        ) : (
-          <div style={{ width: "100%", height: "320px" }}>
-            <Line data={lineData} options={lineOptions} />
+        <div className="codashboard-card purple">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3>Total Sales</h3>
+            <select 
+              value={salesRange} 
+              onChange={(e) => setSalesRange(e.target.value)}
+              className="small-sales-dropdown"
+            >
+              <option value="daily">Today</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
           </div>
-        )}
+          <p>₱{salesValue.toLocaleString()}</p>
+        </div>
+
+        <div className="codashboard-card red">
+          <h3>Expenses</h3>
+          <p>₱{stats.expenses}</p>
+        </div>
+
+        <div className="codashboard-card blue">
+          <h3>Stocks</h3>
+          <p>{stats.stock}</p>
+        </div>
       </div>
+
+      {/* CHARTS */}
+      <div className="cograph-container">
+        <div className="cochart-card">
+          <h3>Monthly Sales</h3>
+          {salesData.length === 0 ? (
+            <div className="coempty-state">No sales data yet</div>
+          ) : (
+            <div style={{ width: "100%", height: "300px" }}>
+              <Line data={lineData} options={lineOptions} />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

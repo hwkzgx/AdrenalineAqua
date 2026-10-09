@@ -1,61 +1,71 @@
 /* =====================================================
-   CO DASHBOARD - responsive + modern
+   CO-ASSOCIATE DASHBOARD - Unified & Responsive
    ===================================================== */
 
 /* MAIN CONTAINER */
 .codashboard-container {
-  padding: 10px;
-  background: #f8fafc;
-
-  flex: 1;
-  overflow: hidden;
+  width: 100%;
+  padding: 24px 30px 40px 30px;
+  background: transparent;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
 }
 
 /* HEADER */
 .codashboard-header {
-  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
 }
 
-.co-dashboard-header h1 {
-  font-size: 22px;
+.codashboard-header h1 {
+  font-size: 28px;
   font-weight: 700;
-  letter-spacing: -0.02em;
   color: #0f172a;
-  margin: 0 0 10px;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.01em;
 }
 
-/* CARDS GRID: 2 per row, pantay ang lapad at taas */
+.codashboard-header p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* CARDS GRID */
 .codashboard-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: stretch;
-  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  width: 100%;
 }
 
 /* CARD */
 .codashboard-card {
   background: white;
-  border-radius: 14px;
-  padding: 14px 18px;
-  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.06);
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  min-width: 0;
+  transition: 0.2s ease;
+  box-sizing: border-box;
 }
 
 .codashboard-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
 }
 
 .codashboard-card h3 {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.02em;
   color: #64748b;
-  margin: 0 0 6px;
+  margin: 0 0 6px 0;
 }
 
 .codashboard-card p {
@@ -63,7 +73,6 @@
   font-weight: 700;
   color: #0f172a;
   margin: 0;
-  word-break: break-word;
 }
 
 /* CARD COLORS */
@@ -94,52 +103,45 @@
 
 /* SALES DROPDOWN */
 .small-sales-dropdown {
-  width: 84px;
-  max-width: 100%;
+  width: 80px;
   height: 30px;
-  color: #0f172a;
-  padding: 2px 8px;
+  color: black;
+  padding: 2px 5px;
   font-size: 12px;
-  font-weight: 600;
-  border-radius: 8px;
-  border: 1px solid rgba(100, 116, 139, 0.25);
-  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background-color: transparent;
   cursor: pointer;
   outline: none;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .small-sales-dropdown:hover {
-  background-color: #fff;
-}
-
-.small-sales-dropdown:focus {
-  border-color: #8b5cf6;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+  background-color: #eee;
 }
 
 /* CHARTS CONTAINER */
 .cograph-container {
   display: grid;
-  /* min(450px, 100%) para hindi lumampas sa maliliit na screen */
-  grid-template-columns: repeat(auto-fit, minmax(min(450px, 100%), 1fr));
-  gap: 24px;
+  grid-template-columns: 1fr;
+  gap: 20px;
   margin-top: 24px;
+  min-width: 0;
+  width: 100%;
 }
 
 /* CHART CARD */
 .cochart-card {
-  padding: 24px;
+  padding: 22px;
   border-radius: 16px;
-  min-height: 350px;
-  background: #fff;
-  box-shadow: 0 4px 20px -5px rgba(15, 23, 42, 0.08);
+  min-height: 340px;
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.08);
   border: 1px solid #e2e8f0;
-
+  background: #ffffff;
   display: flex;
   flex-direction: column;
-  min-width: 0;
   transition: transform 0.2s ease;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .cochart-card:hover {
@@ -147,14 +149,13 @@
 }
 
 .cochart-card h3 {
-  margin: 0 0 20px;
+  margin: 0 0 16px 0;
   font-size: 16px;
   font-weight: 600;
   color: #1e293b;
   letter-spacing: -0.01em;
 }
 
-/* EMPTY STATE */
 .coempty-state {
   flex: 1;
   display: flex;
@@ -165,179 +166,45 @@
   background: #f8fafc;
   border: 2px dashed #e2e8f0;
   border-radius: 12px;
+  min-height: 200px;
 }
 
-
 /* =====================================================
-   TABLET (hanggang 1024px)
+   RESPONSIVE (TABLET & MOBILE)
    ===================================================== */
 @media (max-width: 1024px) {
   .codashboard-grid {
-    gap: 10px;
-  }
-
-  .cochart-card {
-    padding: 20px;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-
-/* =====================================================
-   MOBILE (hanggang 768px)
-   ===================================================== */
 @media (max-width: 768px) {
-  /* hindi na putol: pwedeng mag-scroll pababa sa mobile
-     (ang overflow: hidden ay para lang sa desktop na walang scroll) */
   .codashboard-container {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 4px 0 24px;
-    background: transparent;
+    padding: 16px 16px 32px 16px;
   }
 
-  /* HEADER = blue banner (parang sa Expenses)
-     Ang h1 mismo ang banner, hindi ang buong wrapper, kaya
-     hindi kasama sa blue ang cards at chart. */
-  .co-dashboard-header h1,
-  .codashboard-header h1 {
-    margin: 0 0 14px;
-    padding: 22px 18px;
-    font-size: 24px;
-    font-weight: 800;
-    line-height: 1.2;
-    color: #fff;
-    background: linear-gradient(135deg, #2aa0ff, #0050b8);
-    border-radius: 24px;
-    box-shadow: 0 14px 30px rgba(0, 80, 184, 0.3);
+  .codashboard-header {
+    margin-bottom: 18px;
   }
 
-  /* subtitle sa loob ng banner (burahin ang block na ito kung ayaw) */
-  .co-dashboard-header h1::after,
-  .codashboard-header h1::after {
-    content: "Real-time overview of inventory, sales, and expenses";
-    display: block;
-    margin-top: 4px;
-    font-size: 13px;
-    font-weight: 400;
-    line-height: 1.4;
-    color: rgba(255, 255, 255, 0.85);
-  }
-
-  /* 2 per row, pantay lahat ng cards (walang buong-lapad na card) */
   .codashboard-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .codashboard-card {
-    padding: 14px 16px;
-    border-radius: 22px;
-    box-shadow: 0 4px 16px rgba(15, 31, 61, 0.06);
+    padding: 16px 18px;
   }
 
-  /* tanggal ang makapal na kulay sa kaliwa (mas malinis, parang Expenses) */
-  .codashboard-grid .codashboard-card.blue,
-  .codashboard-grid .codashboard-card.green,
-  .codashboard-grid .codashboard-card.orange,
-  .codashboard-grid .codashboard-card.red,
-  .codashboard-grid .codashboard-card.purple {
-    border-left: none;
-  }
-
-  .codashboard-card h3 {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
-
-  .codashboard-card p {
-    font-size: 19px;
-  }
-
-  .small-sales-dropdown {
-    height: 32px;
-    font-size: 13px;
-  }
-
-  /* Chart */
   .cograph-container {
     grid-template-columns: 1fr;
-    gap: 14px;
-    margin-top: 14px;
+    gap: 16px;
+    margin-top: 16px;
   }
 
   .cochart-card {
-    padding: 18px 16px 16px;
-    min-height: 0;
-    border: none;
-    border-radius: 22px;
-    box-shadow: 0 4px 16px rgba(15, 31, 61, 0.06);
-  }
-
-  .cochart-card h3 {
-    font-size: 15px;
-    margin-bottom: 12px;
-  }
-
-  /* mas mababa ang chart sa phone (override sa inline height na 320px) */
-  .cochart-card > div[style*="height"] {
-    height: 250px !important;
-  }
-
-  .coempty-state {
-    min-height: 160px;
-    font-size: 13px;
-  }
-}
-
-
-/* =====================================================
-   MALILIIT NA PHONE (hanggang 480px)
-   ===================================================== */
-@media (max-width: 480px) {
-  .co-dashboard-header h1,
-  .codashboard-header h1 {
-    font-size: 21px;
-  }
-
-  .codashboard-grid {
-    gap: 8px;
-  }
-
-  .codashboard-card {
-    padding: 10px 12px;
-  }
-
-  .codashboard-card h3 {
-    font-size: 11px;
-  }
-
-  .codashboard-card p {
-    font-size: 17px;
-  }
-
-  .small-sales-dropdown {
-    width: 76px;
-    height: 30px;
-    font-size: 12px;
-  }
-
-  .cochart-card > div[style*="height"] {
-    height: 220px !important;
-  }
-}
-
-
-/* walang "lift" na hover sa touch screen */
-@media (hover: none) {
-  .codashboard-card:hover,
-  .cochart-card:hover {
-    transform: none;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.06);
+    padding: 16px 14px;
+    min-height: 280px;
+    border-radius: 12px;
   }
 }
