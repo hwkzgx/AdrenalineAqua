@@ -52,6 +52,7 @@ export default function InsightsView({ role = "customer", customTitle }) {
   const [contextData, setContextData] = useState(() => {
     try {
       const user = JSON.parse(localStorage.getItem("user") || "null");
+      if (!user) return null;
       const key = getStorageKey(role, user, "insights_ctx");
       const cached = localStorage.getItem(key);
       return cached ? JSON.parse(cached) : null;
@@ -70,6 +71,7 @@ export default function InsightsView({ role = "customer", customTitle }) {
   const [cooldown, setCooldown] = useState(() => {
     try {
       const user = JSON.parse(localStorage.getItem("user") || "null");
+      if (!user) return 0;
       const key = getStorageKey(role, user, "insights_cooldown");
       const lastGen = sessionStorage.getItem(key);
       if (lastGen) {
@@ -104,6 +106,7 @@ export default function InsightsView({ role = "customer", customTitle }) {
   const [insightsResult, setInsightsResult] = useState(() => {
     try {
       const user = JSON.parse(localStorage.getItem("user") || "null");
+      if (!user) return null;
       const key = getStorageKey(role, user, "insights_res");
       // Clean legacy localStorage keys so fresh logins always start empty
       localStorage.removeItem(key);
@@ -118,6 +121,13 @@ export default function InsightsView({ role = "customer", customTitle }) {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "null");
     setCurrentUser(user);
+
+    if (!user) {
+      setContextData(null);
+      setInsightsResult(null);
+      setLoadingContext(false);
+      return;
+    }
 
     let isMounted = true;
 

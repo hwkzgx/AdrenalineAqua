@@ -3,6 +3,8 @@ import "./rider-login.css";
 import AquaLogo from "../../../assets/AquaLogo.png";
 import { useState } from "react";
 import { supabase } from "../../../supabase";
+import { clearInsightsStorage } from "../../../services/aiInsightsService";
+
 
 export default function RiderLogin() {
   const nav = useNavigate();
@@ -71,6 +73,7 @@ export default function RiderLogin() {
     }
 
     // Save logged in rider
+    clearInsightsStorage();
     localStorage.setItem("user", JSON.stringify(riderData));
     localStorage.setItem("role", "rider");
 

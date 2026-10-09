@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import { supabase } from "../../../supabase";
+import { clearInsightsStorage } from "../../../services/aiInsightsService";
 import "./rider-topbar.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -256,6 +257,7 @@ export default function RiderTopbar({ title, showBackBtn = false, onBack }) {
                 onClick={() => {
                   localStorage.removeItem("token");
                   localStorage.removeItem("user");
+                  clearInsightsStorage();
                   setShowLogoutModal(false);
                   navigate("/rider/riderlogin");
                 }}

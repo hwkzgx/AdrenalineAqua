@@ -3,6 +3,8 @@ import { useState } from "react";
 import "./login.css";
 import AquaLogo from "../../../assets/AquaLogo.png";
 import { supabase } from "../../../supabase";
+import { clearInsightsStorage } from "../../../services/aiInsightsService";
+
 
 export default function Login() {
   const nav = useNavigate();
@@ -81,6 +83,7 @@ export default function Login() {
     }
 
     // Persist complete user record
+    clearInsightsStorage();
     localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("userRole", userData.role);
 

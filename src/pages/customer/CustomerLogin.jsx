@@ -3,6 +3,8 @@ import "./customer-login.css";
 import AquaLogo from "../../assets/AquaLogo.png";
 import { useState } from "react";
 import { supabase } from "../../supabase";
+import { clearInsightsStorage } from "../../services/aiInsightsService";
+
 
 export default function CustomerLogin() {
   const nav = useNavigate();
@@ -71,6 +73,7 @@ export default function CustomerLogin() {
     }
 
     // Save complete customer information
+    clearInsightsStorage();
     localStorage.setItem("user", JSON.stringify(customerData));
 
     if (remember) {
