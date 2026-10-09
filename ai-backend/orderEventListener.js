@@ -8,33 +8,8 @@ let processing = false;
 let rerunRequested = false;
 
 async function runForecastJob() {
-  if (processing) {
-    rerunRequested = true;
-    return;
-  }
-
-  processing = true;
-
-  try {
-    do {
-      rerunRequested = false;
-
-      const result =
-        await generateInventoryForecastNotifications();
-
-      console.log(
-        `Demand forecast processing complete. ` +
-        `${result.notificationsCreated} notification(s) created.`
-      );
-    } while (rerunRequested);
-  } catch (error) {
-    console.error(
-      "Demand forecast processing error:",
-      error
-    );
-  } finally {
-    processing = false;
-  }
+  // AI notification triggers have been removed in favor of the dedicated Insights page.
+  return;
 }
 
 function startOrderEventListener() {
