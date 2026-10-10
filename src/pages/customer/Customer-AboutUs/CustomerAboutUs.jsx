@@ -103,9 +103,9 @@ export default function CustomerAboutUs() {
 
           <h3>Follow us</h3>
 
-          <p>Facebook</p>
+          <p>Facebook: Adrenaline Aqua Water Refilling Station</p>
 
-          <p>Messenger</p>
+          <p>Messenger: Adrenaline Aqua Water Refilling Station</p>
 
         </div>
 

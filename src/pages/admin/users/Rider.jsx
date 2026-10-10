@@ -440,9 +440,6 @@ if (authError) {
                 <h2>Add Rider</h2>
                 <p>Create a new rider account.</p>
               </div>
-              <button className="um-modal-close" onClick={closeAdd}>
-                <X size={18} />
-              </button>
             </div>
 
             <div className="um-modal-body">

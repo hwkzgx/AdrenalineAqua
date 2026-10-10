@@ -27,7 +27,6 @@ function Customer() {
   const [showDelete, setShowDelete] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [showView, setShowView] = useState(false);
-  const [passwordError, setPasswordError] = useState("");
 
   // SELECTED
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -45,7 +44,6 @@ function Customer() {
   const emptyAddData = {
     name: "",
     email: "",
-    password: "",
     address: "",
     contact_number: "",
     status: "Pending",
@@ -78,20 +76,6 @@ function Customer() {
     fetchCustomers();
   }, []);
 
-  const validatePassword = (pass) => {
-    const minLength = pass.length >= 8;
-    const hasUpper = /[A-Z]/.test(pass);
-    const hasLower = /[a-z]/.test(pass);
-    const hasNumber = /[0-9]/.test(pass);
-
-    if (!minLength) return "Password must be at least 8 characters.";
-    if (!hasUpper) return "Must contain 1 uppercase letter.";
-    if (!hasLower) return "Must contain 1 lowercase letter.";
-    if (!hasNumber) return "Must contain 1 number.";
-
-    return "";
-  };
-
   const fetchCustomers = async () => {
     const { data, error } = await supabase
       .from("users")
@@ -116,10 +100,9 @@ function Customer() {
     return matchSearch && matchStatus;
   });
 
-  const closeAdd = () => {
-    setShowAdd(false);
-    setPasswordError("");
-  };
+const closeAdd = () => {
+  setShowAdd(false);
+};
 
   // UPDATE
   const handleSaveChanges = async () => {
@@ -165,61 +148,84 @@ function Customer() {
   };
 
   // ADD CUSTOMER
-  const handleAddCustomer = async () => {
-    if (!addData.name.trim() || !addData.email.trim()) {
-      showToast("Name and email are required.", "error");
-      return;
+  
+const handleAddCustomer = async () => {
+  const name = addData.name.trim();
+  const email = addData.email.trim().toLowerCase();
+  const address = addData.address.trim();
+  const contact_number = addData.contact_number.trim();
+
+  if (!name || !email || !address || !contact_number) {
+    showToast("Please complete all customer fields.", "error");
+    return;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast("Please enter a valid email address.", "error");
+    return;
+  }
+
+  const { data: lastCustomers, error: idError } = await supabase
+    .from("users")
+    .select("user_id")
+    .eq("role", "customer")
+    .order("users_id", { ascending: false })
+    .limit(1);
+
+  if (idError) {
+    showToast("Failed to generate customer ID: " + idError.message, "error");
+    return;
+  }
+
+  let nextNumber = 1;
+
+  if (lastCustomers?.length && lastCustomers[0]?.user_id) {
+    const numberPart = Number(lastCustomers[0].user_id.slice(-3));
+
+    if (Number.isInteger(numberPart)) {
+      nextNumber = numberPart + 1;
+    }
+  }
+
+  const generatedUserId = `CUS2026${String(nextNumber).padStart(3, "0")}`;
+
+  const { data, error } = await supabase.functions.invoke("create-customer", {
+    body: {
+      user_id: generatedUserId,
+      name,
+      email,
+      address,
+      contact_number,
+    },
+  });
+
+  if (error) {
+    let message = error.message || "Failed to send customer invitation.";
+
+    try {
+      if (error.context && typeof error.context.json === "function") {
+        const details = await error.context.json();
+        if (details?.error) message = details.error;
+      }
+    } catch {
+      // Keep the original error message.
     }
 
-    const passError = validatePassword(addData.password);
+    showToast(message, "error");
+    return;
+  }
 
-    if (passError) {
-      setPasswordError(passError);
-      showToast(passError, "error");
-      return;
-    }
+  if (!data?.success) {
+    showToast(data?.error || "Failed to create customer account.", "error");
+    return;
+  }
 
-    // GET LAST Customer ID
-    const { data: lastCustomer } = await supabase
-      .from("users")
-      .select("user_id")
-      .eq("role", "customer")
-      .order("users_id", { ascending: false })
-      .limit(1)
-      .single();
-
-    let nextNumber = 1;
-
-    if (lastCustomer?.user_id) {
-      const numberPart = lastCustomer.user_id.slice(-3);
-      nextNumber = parseInt(numberPart) + 1;
-    }
-
-    const generatedUserId = `CUS2026${String(nextNumber).padStart(3, "0")}`;
-
-    const { error } = await supabase.from("users").insert([
-      {
-        user_id: generatedUserId,
-        name: addData.name,
-        email: addData.email,
-        password: addData.password,
-        address: addData.address,
-        contact_number: addData.contact_number,
-        role: "customer",
-        status: "Pending",
-      },
-    ]);
-
-    if (error) {
-      showToast(error.message, "error");
-    } else {
-      showToast("Customer added successfully!", "success");
-      closeAdd();
-      setAddData(emptyAddData);
-      fetchCustomers();
-    }
-  };
-
+  showToast("Customer invitation sent successfully!", "success");
+  closeAdd();
+  setAddData(emptyAddData);
+  fetchCustomers();
+};
+   
   // VERIFY / REJECT
   const handleUpdateStatus = async (status) => {
     if (!selectedCustomer) return;
@@ -614,13 +620,10 @@ function Customer() {
               <div className="um-modal-icon primary">
                 <Plus size={22} />
               </div>
-              <div className="um-modal-titles">
+              <div className="um-1`````-titles">
                 <h2>Add Customer</h2>
                 <p>Create a new customer account.</p>
               </div>
-              <button className="um-modal-close" onClick={closeAdd}>
-                <X size={18} />
-              </button>
             </div>
 
             <div className="um-modal-body">
@@ -639,21 +642,6 @@ function Customer() {
                   value={addData.email}
                   onChange={(e) => setAddData({ ...addData, email: e.target.value })}
                 />
-              </div>
-
-              <div className="um-field">
-                <label>Password</label>
-                <input
-                  type="password"
-                  className={passwordError ? "invalid" : ""}
-                  value={addData.password}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setAddData({ ...addData, password: value });
-                    setPasswordError(validatePassword(value));
-                  }}
-                />
-                {passwordError && <span className="um-error">{passwordError}</span>}
               </div>
 
               <div className="um-field">
@@ -695,5 +683,6 @@ function Customer() {
     </div>
   );
 }
+
 
 export default Customer;

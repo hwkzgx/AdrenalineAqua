@@ -1,5 +1,22 @@
 /* =========================================
-   CONTACT HERO (BACKGROUND IMAGE - enhanced)
+   TOKENS
+========================================= */
+.contact-hero,
+.contact-page-section {
+  --c-primary: #0077b6;
+  --c-primary-light: #00b4d8;
+  --c-navy: #023e8a;
+  --c-text: #334155;
+  --c-bg: #f8fbff;
+  --c-border: #e3eef9;
+  --c-soft: #e6f4fc;
+  --shadow-card: 0 8px 24px rgba(2, 62, 138, 0.07);
+
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* =========================================
+   HERO
 ========================================= */
 .contact-hero {
   display: flex;
@@ -11,10 +28,8 @@
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
-/* Yung picture: mas vivid at mas malinaw (walang zoom) */
 .contact-hero::before {
   content: "";
   position: absolute;
@@ -24,15 +39,13 @@
   filter: saturate(1.18) contrast(1.06) brightness(1.04);
 }
 
-/* Overlay: malinaw ang text sa kaliwa, kita ang picture sa kanan,
-   at smooth ang lipat papunta sa form section */
 .contact-hero::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(180deg, transparent 80%, #f8fbff 100%),
+    linear-gradient(180deg, transparent 80%, var(--c-bg) 100%),
     linear-gradient(90deg,
       rgba(255, 255, 255, 0.88) 0%,
       rgba(255, 255, 255, 0.6) 40%,
@@ -63,24 +76,20 @@
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.1;
-  color: #0077b6;
-  margin-bottom: 14px;
+  color: var(--c-primary);
+  margin: 0 0 14px;
   text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
-}
-
-.contact-hero-text h2,
-.contact-hero-text h3 {
-  font-size: clamp(1.05rem, 2vw, 1.5rem);
-  font-weight: 600;
-  color: #023e8a;
-  margin-bottom: 20px;
 }
 
 .contact-hero-text p {
   font-size: 1.05rem;
-  color: #1e293b;
-  margin-bottom: 30px;
   line-height: 1.75;
+  color: #1e293b;
+  margin: 0 0 16px;
+}
+
+.contact-hero-text p:last-child {
+  margin-bottom: 0;
 }
 
 /* =========================================
@@ -88,11 +97,10 @@
 ========================================= */
 .contact-page-section {
   padding: 56px 8% 72px;
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   background:
     radial-gradient(520px 320px at 100% 0%, rgba(0, 180, 216, 0.1), transparent 70%),
     radial-gradient(520px 320px at 0% 100%, rgba(0, 119, 182, 0.08), transparent 70%),
-    #f8fbff;
+    var(--c-bg);
 }
 
 .contact-page-container {
@@ -102,177 +110,205 @@
   width: 100%;
 }
 
-/* FORM CARD */
-.contact-form-card {
+/* =========================================
+   CARDS (FAQ at INFO)
+========================================= */
+.contact-page-section .contact-form-card,
+.contact-page-section .contact-info-card {
   position: relative;
   overflow: hidden;
   width: 100%;
-  background: white;
+  min-width: 0;
   padding: 30px 32px;
+  background: #fff;
+  border: 1px solid var(--c-border);
   border-radius: 20px;
-  border: 1px solid #e3eef9;
-  box-shadow: 0 8px 24px rgba(2, 62, 138, 0.07);
+  box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
 }
 
 /* accent line sa taas ng card */
-.contact-form-card::before,
-.contact-info-card::before {
+.contact-page-section .contact-form-card::before,
+.contact-page-section .contact-info-card::before {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
+  inset: 0 0 auto 0;
   height: 4px;
-  background: linear-gradient(90deg, #0077b6, #00b4d8);
+  background: linear-gradient(90deg, var(--c-primary), var(--c-primary-light));
 }
 
-.contact-form-card h2 {
-  margin-bottom: 18px;
-  color: #023e8a;
-  font-size: 1.4rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
-
-.contact-form-card input,
-.contact-form-card textarea {
-  width: 100%;
-  margin-bottom: 14px;
-  padding: 14px 16px;
-  font-family: inherit;
-  font-size: 0.95rem;
-  color: #0f172a;
-  background: #f8fbff;
-  border: 1px solid #d9e6f2;
-  border-radius: 12px;
-  outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-}
-
-.contact-form-card input::placeholder,
-.contact-form-card textarea::placeholder {
-  color: #94a3b8;
-}
-
-.contact-form-card input:focus,
-.contact-form-card textarea:focus {
-  background: #ffffff;
-  border-color: #0077b6;
-  box-shadow: 0 0 0 4px rgba(0, 119, 182, 0.14);
-}
-
-.contact-form-card textarea {
-  height: 120px;
-  resize: none;
-}
-
-.contact-form-card button {
-  width: 100%;
-  padding: 14px;
-  font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: white;
-  background: linear-gradient(135deg, #0077b6, #00a8e8);
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 8px 20px rgba(0, 119, 182, 0.28);
-  transition: transform 0.2s ease, box-shadow 0.25s ease, filter 0.25s ease;
-}
-
-.contact-form-card button:hover {
-  transform: translateY(-2px);
-  filter: brightness(0.95);
-  box-shadow: 0 12px 26px rgba(2, 62, 138, 0.34);
-}
-
-.contact-form-card button:active {
-  transform: translateY(0);
-}
-
-/* INFO CARD (nagiging stacked ang map sa maliit na screen) */
-.contact-info-card {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  background: white;
-  padding: 30px 32px;
-  border-radius: 20px;
-  border: 1px solid #e3eef9;
-  box-shadow: 0 8px 24px rgba(2, 62, 138, 0.07);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 28px;
-  flex-wrap: wrap;
-}
-
-.contact-details-content {
-  flex: 1 1 280px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-width: 0;
-}
-
-.contact-details-content h2 {
-  margin-bottom: 4px;
-  color: #023e8a;
+.contact-page-section .contact-form-card h2,
+.contact-page-section .contact-details-content h2 {
+  margin: 0 0 18px;
+  color: var(--c-navy);
   font-size: 1.4rem;
   font-weight: 800;
   letter-spacing: -0.02em;
   text-align: left;
 }
 
+/* =========================================
+   FAQ
+========================================= */
+.faq-item {
+  border: 1px solid var(--c-border);
+  border-radius: 14px;
+  background: var(--c-bg);
+  margin-bottom: 12px;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.faq-item:last-child {
+  margin-bottom: 0;
+}
+
+.faq-item[open] {
+  background: #fff;
+  border-color: #b9dcf2;
+  box-shadow: 0 6px 16px rgba(2, 62, 138, 0.08);
+}
+
+.faq-item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--c-navy);
+  cursor: pointer;
+  list-style: none; /* tanggal default arrow (Firefox/Chrome) */
+  border-radius: 14px;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none; /* tanggal default arrow (Safari) */
+}
+
+/* custom chevron */
+.faq-item summary::after {
+  content: "";
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--c-primary);
+  border-bottom: 2px solid var(--c-primary);
+  transform: rotate(45deg);
+  transition: transform 0.25s ease;
+}
+
+.faq-item[open] summary::after {
+  transform: rotate(-135deg);
+}
+
+.faq-item summary:hover {
+  color: var(--c-primary);
+}
+
+.faq-item summary:focus-visible {
+  outline: 3px solid rgba(0, 119, 182, 0.35);
+  outline-offset: 2px;
+}
+
+.faq-item p {
+  margin: 0;
+  padding: 0 18px 18px;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--c-text);
+}
+
+/* =========================================
+   CONTACT INFO
+========================================= */
+.contact-details-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+}
+
+.contact-details-content h2 {
+  margin-bottom: 4px;
+}
+
 .info-item {
   display: flex;
   align-items: center;
   gap: 14px;
-  color: #334155;
+  color: var(--c-text);
   font-size: 0.95rem;
   line-height: 1.5;
-  word-break: break-word;
+}
+
+.info-item p {
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
 }
 
 /* icon na naka-badge */
 .info-item svg {
+  flex: 0 0 auto;
   width: 38px;
   height: 38px;
   padding: 10px;
-  flex-shrink: 0;
-  color: #0077b6;
-  background: #e6f4fc;
+  color: var(--c-primary);
+  background: var(--c-soft);
   border-radius: 12px;
 }
 
-/* MAP BOX */
+/* MAP */
 .contact-map-box {
-  flex: 1 1 280px;
   width: 100%;
-  height: 240px;
+  height: 220px;
+  margin-top: 18px;
   border-radius: 16px;
   overflow: hidden;
   background: #e9f4ff;
-  border: 1px solid #e3eef9;
+  border: 1px solid var(--c-border);
   box-shadow: 0 6px 18px rgba(2, 62, 138, 0.1);
 }
 
 .contact-map-box iframe {
+  display: block;
   width: 100%;
   height: 100%;
-  display: block;
   border: 0;
 }
 
-/* ==========================================
-   RESPONSIVE DESIGN (TABLETS & PHONES)
-========================================== */
+/* =========================================
+   DESKTOP (901px pataas): magkatabi at pantay ang taas
+========================================= */
+@media (min-width: 901px) {
+  .contact-page-container {
+    flex-direction: row;
+    align-items: stretch;
+  }
 
+  .contact-page-section .contact-form-card,
+  .contact-page-section .contact-info-card {
+    flex: 1 1 0;
+    width: auto;
+    padding: 28px 30px;
+  }
+
+  /* lalawak ang mapa para pantay ang dalawang card */
+  .contact-map-box {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 220px;
+  }
+}
+
+/* =========================================
+   TABLET (hanggang 1024px)
+========================================= */
 @media (max-width: 1024px) {
   .contact-hero {
     padding: 70px 6%;
@@ -280,10 +316,9 @@
     justify-content: center;
   }
 
-  /* mas pantay ang overlay para mabasa ang text kahit nasa gitna */
   .contact-hero::after {
     background:
-      linear-gradient(180deg, transparent 82%, #f8fbff 100%),
+      linear-gradient(180deg, transparent 82%, var(--c-bg) 100%),
       linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.58));
   }
 
@@ -293,6 +328,9 @@
   }
 }
 
+/* =========================================
+   PHONE (hanggang 768px)
+========================================= */
 @media (max-width: 768px) {
   .contact-hero {
     padding: 44px 5% 56px;
@@ -300,23 +338,17 @@
   }
 
   .contact-hero::before {
-    background-position: 70% center; /* ipakita ang main subject ng picture */
+    background-position: 70% center;
   }
 
   .contact-hero-text h1 {
     margin-bottom: 10px;
   }
 
-  .contact-hero-text h2,
-  .contact-hero-text h3 {
-    font-size: 0.98rem;
-    margin-bottom: 12px;
-  }
-
   .contact-hero-text p {
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     line-height: 1.65;
-    margin-bottom: 0;
+    margin-bottom: 10px;
   }
 
   .contact-page-section {
@@ -327,52 +359,35 @@
     gap: 16px;
   }
 
-  .contact-form-card,
-  .contact-info-card {
+  .contact-page-section .contact-form-card,
+  .contact-page-section .contact-info-card {
     padding: 22px 18px;
     border-radius: 16px;
   }
 
-  .contact-form-card h2,
-  .contact-details-content h2 {
+  .contact-page-section .contact-form-card h2,
+  .contact-page-section .contact-details-content h2 {
     font-size: 1.15rem;
     margin-bottom: 12px;
   }
 
-  .contact-form-card input,
-  .contact-form-card textarea {
-    margin-bottom: 10px;
-    padding: 11px 13px;
+  .faq-item summary {
+    padding: 14px 14px;
+    font-size: 0.92rem;
+  }
+
+  .faq-item p {
+    padding: 0 14px 14px;
     font-size: 0.88rem;
-  }
-
-  .contact-form-card textarea {
-    height: 90px;
-  }
-
-  .contact-form-card button {
-    padding: 12px;
-    font-size: 0.88rem;
-  }
-
-  .contact-info-card {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 18px;
   }
 
   .contact-details-content {
-    flex: none;
     gap: 12px;
-  }
-
-  .contact-details-content h2 {
-    margin-bottom: 0;
   }
 
   .info-item {
-    font-size: 0.88rem;
     gap: 12px;
+    font-size: 0.88rem;
   }
 
   .info-item svg {
@@ -382,189 +397,21 @@
   }
 
   .contact-map-box {
-    flex: none;
     height: 190px;
+    margin-top: 12px;
   }
 }
 
-/* ==========================================
-   FIX: Contact Information (naka-pababa ang text)
-   Tablet at phone: isang column, buong lapad ang text
-========================================== */
-@media (max-width: 900px) {
-  .contact-info-card {
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    gap: 18px;
-    padding: 22px 18px;
-    border-radius: 16px;
-  }
-
-  .contact-details-content {
-    flex: none;
-    width: 100%;
-    min-width: 0;
-    gap: 12px;
-  }
-
-  .contact-details-content h2 {
-    margin-bottom: 0;
-    white-space: normal;
-  }
-
-  .info-item {
-    width: 100%;
-    min-width: 0;
-    gap: 12px;
-    font-size: 0.9rem;
-    word-break: normal;
-    overflow-wrap: anywhere;
-  }
-
-  /* ang text sa tabi ng icon ay kukuha ng natitirang lapad */
-  .info-item > :not(svg) {
-    flex: 1 1 0;
-    min-width: 0;
-  }
-
-  .contact-map-box {
-    flex: none;
-    width: 100%;
-    height: 220px;
-  }
-}
-
-/* Mas malakas na bersyon: para hindi ma-override ng ibang CSS file
-   na posibleng may kaparehong class name (global ang CSS sa React) */
-@media (max-width: 900px) {
-  .contact-page-section .contact-info-card {
-    display: flex !important;
-    flex-direction: column !important;
-    flex-wrap: nowrap !important;
-    align-items: stretch !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 22px 18px !important;
-  }
-
-  .contact-page-section .contact-info-card > * {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-  }
-
-  .contact-page-section .contact-details-content {
-    display: flex !important;
-    flex-direction: column !important;
-    flex: none !important;
-  }
-
-  .contact-page-section .contact-details-content h2 {
-    width: 100% !important;
-    max-width: 100% !important;
-    white-space: normal !important;
-  }
-
-  .contact-page-section .info-item {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  .contact-page-section .info-item > *:not(svg) {
-    flex: 1 1 0 !important;
-    width: auto !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    white-space: normal !important;
-    word-break: normal !important;
-    overflow-wrap: anywhere !important;
-  }
-
-  .contact-page-section .info-item svg {
-    flex: 0 0 auto !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .contact-map-box {
-    height: 190px;
-  }
-}
-
-/* ==========================================
-   WEB VIEW (901px pataas):
-   magkatabi at magkapantay ang "Send a Message" at "Contact Information"
-========================================== */
-@media (min-width: 901px) {
-  .contact-page-container {
-    flex-direction: row;
-    align-items: stretch; /* pantay ang taas ng dalawang card */
-    gap: 24px;
-  }
-
-  .contact-form-card,
-  .contact-info-card {
-    flex: 1 1 0;
-    width: auto;
-    min-width: 0;
-    padding: 26px 28px;
-  }
-
-  /* mas compact ang form */
-  .contact-form-card h2 {
-    margin-bottom: 14px;
-  }
-
-  .contact-form-card input,
-  .contact-form-card textarea {
-    margin-bottom: 12px;
-    padding: 12px 14px;
-  }
-
-  /* kung mas matangkad ang info card, ang message box ang lalaki
-     para laging pantay ang dalawa */
-  .contact-form-card textarea {
-    flex: 1 1 auto;
-    height: auto;
-    min-height: 110px;
-  }
-
-  /* info card: detalye sa taas, mapa sa baba */
-  .contact-info-card {
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    justify-content: flex-start;
-    gap: 18px;
-  }
-
-  .contact-details-content {
-    flex: none;
-    width: 100%;
-  }
-
-  .contact-map-box {
-    flex: 1 1 auto;
-    width: 100%;
-    height: auto;
-    min-height: 200px;
-  }
-}
-
+/* =========================================
+   ACCESSIBILITY
+========================================= */
 @media (prefers-reduced-motion: reduce) {
   .contact-hero-text {
     animation: none;
   }
 
-  .contact-form-card button {
+  .faq-item,
+  .faq-item summary::after {
     transition: none;
   }
 }

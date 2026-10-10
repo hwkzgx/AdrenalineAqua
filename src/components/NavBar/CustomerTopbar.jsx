@@ -116,8 +116,6 @@ export default function CustomerTopbar() {
     { to: "/customer/track-order", label: "Track Order" },
     { to: "/customer/order-history", label: "Order History" },
     { to: "/customer/insights", label: "Insights" },
-    { to: "/customer/about-us", label: "About Us" },
-    { to: "/customer/contact-us", label: "Contact Us" },
   ];
 
   return (

@@ -6,13 +6,6 @@ import FooterImage from "../../../assets/FooterImage.png";
 import AquaLogo from "../../../assets/AquaLogo.png";
 import { useNavigate } from "react-router-dom";
 
-import {
-  FaPhoneAlt,
-  FaMapMarkerAlt,
-  FaEnvelope,
-  FaFacebookF,
-} from "react-icons/fa";
-
 export default function CustomerHome() {
 
   const navigate = useNavigate();
@@ -117,78 +110,6 @@ quickly and safely right to your doorstep.
 
       </section>
 
-      {/* CONTACT US */}
-      <section className="contact-section">
-
-        <h1>Contact Us</h1>
-
-        <div className="contact-container">
-
-          {/* CONTACT FORM */}
-          <div className="contact-form">
-
-            <input type="text" placeholder="Full Name" />
-
-            <input type="email" placeholder="Email Address" />
-
-            <input type="text" placeholder="Phone Number" />
-
-            <textarea placeholder="Your Message"></textarea>
-
-            <button>SEND MESSAGE</button>
-
-          </div>
-
-          {/* CONTACT INFO */}
-          <div className="contact-info">
-
-            <div className="contact-details">
-
-              <p>
-                <FaPhoneAlt className="contact-icon" />
-                09705095542 / 09294636127
-              </p>
-
-              <p>
-                <FaMapMarkerAlt className="contact-icon" />
-                Stall #4 MH Del Pilar St.
-                San Sebastian Hagonoy, Bulacan
-              </p>
-
-              <p>
-                <FaEnvelope className="contact-icon" />
-                adrenalineaqua@gmail.com
-              </p>
-
-              <p>
-                <FaFacebookF className="contact-icon" />
-                Adrenaline Aqua Water Refilling Station
-              </p>
-
-            </div>
- 
-            {/* GOOGLE MAP */}
-            <div className="map-box">
-
-              <iframe
-                src="https://www.google.com/maps?q=Stall%20%234%20MH%20Del%20Pilar%20St.%20San%20Sebastian%20Hagonoy%20Bulacan&output=embed"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen=""
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Google Map"
-              ></iframe>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
       {/* FOOTER */}
       <footer className="footer">
 
@@ -221,9 +142,9 @@ quickly and safely right to your doorstep.
 
           <h3>Follow us</h3>
 
-          <p>Facebook</p>
+          <p>Facebook: Adrenaline Aqua Water Refilling Station</p>
 
-          <p>Messenger</p>
+          <p>Messenger: Adrenaline Aqua Water Refilling Station</p>
 
         </div>
 

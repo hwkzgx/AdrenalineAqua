@@ -6,7 +6,6 @@ import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "../../supabase";
 import { clearInsightsStorage } from "../../services/aiInsightsService";
 
-
 export default function CustomerLogin() {
   const nav = useNavigate();
   const location = useLocation();
@@ -28,9 +27,6 @@ export default function CustomerLogin() {
 
     setLoading(true);
 
-    let customerData = null;
-
-    // 1. Try Supabase Auth first
     try {
       const { data: authData, error: authError } =
         await supabase.auth.signInWithPassword({
@@ -38,53 +34,50 @@ export default function CustomerLogin() {
           password: password.trim(),
         });
 
-      if (!authError && authData?.user) {
-        const { data: userData } = await supabase
-          .from("users")
-          .select("*")
-          .eq("email", email.trim())
-          .eq("role", "customer")
-          .maybeSingle();
-
-        customerData = userData;
+      if (authError || !authData?.user) {
+        setError(
+          authError?.message?.toLowerCase().includes("email not confirmed")
+            ? "Please verify your email before logging in."
+            : "Invalid email or password."
+        );
+        return;
       }
-    } catch (e) {
-      console.warn("Supabase auth check skipped:", e.message);
-    }
 
-    // 2. Fallback to direct database check from public.users table
-    if (!customerData) {
-      const { data: dbUser, error: dbError } = await supabase
+      if (!authData.user.email_confirmed_at) {
+        await supabase.auth.signOut();
+        setError("Please verify your email before logging in.");
+        return;
+      }
+
+      const { data: customerData, error: userError } = await supabase
         .from("users")
         .select("*")
-        .eq("email", email.trim())
-        .eq("password", password.trim())
+        .eq("email", authData.user.email)
         .eq("role", "customer")
         .maybeSingle();
 
-      if (dbUser) {
-        customerData = dbUser;
+      if (userError || !customerData) {
+        await supabase.auth.signOut();
+        setError("Customer account not found. Please contact the administrator.");
+        return;
       }
+
+      clearInsightsStorage();
+      localStorage.setItem("user", JSON.stringify(customerData));
+
+      if (remember) {
+        localStorage.setItem("rememberUser", "true");
+      } else {
+        localStorage.removeItem("rememberUser");
+      }
+
+      nav("/customer/dashboard");
+    } catch (e) {
+      console.error("Customer login error:", e);
+      setError("Unable to log in. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
-
-    if (!customerData) {
-      setError("Invalid email or password.");
-      return;
-    }
-
-    // Save complete customer information
-    clearInsightsStorage();
-    localStorage.setItem("user", JSON.stringify(customerData));
-
-    if (remember) {
-      localStorage.setItem("rememberUser", "true");
-    } else {
-      localStorage.removeItem("rememberUser");
-    }
-
-    nav("/customer/dashboard");
   };
 
   return (
@@ -104,11 +97,11 @@ export default function CustomerLogin() {
 
         <div className="login-card">
 
-        <div className="login-header">
-        <button className="cuslogback-btn" onClick={() => nav('/customer/home', { replace: true })}>
-          ← Back
-        </button>
-        </div>
+          <div className="login-header">
+            <button className="cuslogback-btn" onClick={() => nav('/customer/home', { replace: true })}>
+              ← Back
+            </button>
+          </div>
 
           <div className="login-body">
 
@@ -176,7 +169,7 @@ export default function CustomerLogin() {
 
             <div className="role-login-container">
               <div className="login-divider">or</div>
-              
+
               <button onClick={() => nav("/roles")} className="role-login-btn">
                 Sign in with your role
               </button>

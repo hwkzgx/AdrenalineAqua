@@ -33,18 +33,20 @@ function Delivery() {
     fetchRiders();
   }, []);
 
-  const fetchRiders = async () => {
-    const { data, error } = await supabase
-      .from("users")
-      .select("name")
-      .eq("role", "rider");
+  
+const fetchRiders = async () => {
+  const { data, error } = await supabase
+    .from("users")
+    .select("users_id, name")
+    .eq("role", "rider");
 
-    if (error) {
-      console.log("Error fetching riders:", error.message);
-    } else {
-      setRiders(data || []);
-    }
-  };
+  if (error) {
+    console.log("Error fetching riders:", error.message);
+  } else {
+    setRiders(data || []);
+  }
+};
+
 
   const fetchDeliveries = async () => {
     const { data, error } = await supabase
@@ -59,7 +61,8 @@ function Delivery() {
           order_id,
           delivery_code,
           delivery_status,
-          assigned_rider
+          assigned_rider,
+          assigned_rider_id
         ),
         order_items (
           item_name,
@@ -86,6 +89,7 @@ function Delivery() {
       date: item.delivery_date,
       status: !item.delivery_schedule?.[0]?.assigned_rider ? "—" : (item.delivery_schedule?.[0]?.delivery_status || "Pending"),
       rider: item.delivery_schedule?.[0]?.assigned_rider || "",
+      assignedRiderId: item.delivery_schedule?.[0]?.assigned_rider_id || "",
       orderItems: item.order_items || [],
     }));
 
@@ -108,25 +112,36 @@ function Delivery() {
   };
 
   // DIRECT UPDATE NG RIDER
-  const handleAssignRider = async (row, newRider) => {
-    const newStatus = "Pending"; 
+ 
+const handleAssignRider = async (row, newRiderId) => {
+  const selectedRider = riders.find(
+    (r) => String(r.users_id) === String(newRiderId)
+  );
 
-    const { error } = await supabase
-      .from("delivery_schedule")
-      .update({
-        assigned_rider: newRider || null,
-        delivery_status: newStatus,
-      })
-      .eq("order_id", row.scheduleOrderId);
+  const { error } = await supabase
+    .from("delivery_schedule")
+    .update({
+      assigned_rider: selectedRider?.name || null,
+      assigned_rider_id: selectedRider?.users_id || null,
+      delivery_status: selectedRider ? "Pending" : null,
+    })
+    .eq("order_id", row.scheduleOrderId);
 
-    if (error) {
-      console.log(error.message);
-      showToast("Failed to assign rider", "error");
-    } else {
-      showToast(`Rider assigned! Status is Pending`, "success");
-      fetchDeliveries();
-    }
-  };
+  if (error) {
+    console.error("Error assigning rider:", error.message);
+    showToast("Failed to assign rider", "error");
+  } else {
+    showToast(
+      selectedRider
+        ? `Rider ${selectedRider.name} assigned successfully!`
+        : "Rider unassigned successfully!",
+      "success"
+    );
+
+    await fetchDeliveries();
+  }
+};
+
 
   // DELETE
   const confirmDelete = async () => {
@@ -207,23 +222,29 @@ function Delivery() {
       ),
     },
     {
-      key: "rider",
-      label: "Assigned Rider",
-      render: (row) => (
-        <select
-          className="table-rider-dropdown"
-          value={row.rider}
-          onChange={(e) => handleAssignRider(row, e.target.value)}
-        >
-          <option value="">Not Assigned</option>
-          {riders.map((r, index) => (
-            <option key={index} value={r.name}>
-              {r.name}
-            </option>
-          ))}
-        </select>
-      )
-    },
+  key: "rider",
+  label: "Assigned Rider",
+  render: (row) => {
+    const assignedRiderId = row.assignedRiderId || "";
+
+    return (
+      <select
+        className="table-rider-dropdown"
+        value={assignedRiderId}
+        onChange={(e) => handleAssignRider(row, e.target.value)}
+      >
+        <option value="">Not Assigned</option>
+        {riders.map((r) => (
+          <option key={r.users_id} value={r.users_id}>
+            {r.name}
+          </option>
+        ))}
+      </select>
+    );
+  },
+},
+
+
     {
       key: "actions",
       label: "Actions",

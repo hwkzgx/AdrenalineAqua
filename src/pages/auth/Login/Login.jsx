@@ -6,7 +6,6 @@ import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "../../../supabase";
 import { clearInsightsStorage } from "../../../services/aiInsightsService";
 
-
 export default function Login() {
   const nav = useNavigate();
 
@@ -34,9 +33,6 @@ export default function Login() {
 
     setLoading(true);
 
-    let userData = null;
-
-    // 1. Try Supabase Auth first
     try {
       const { data: authData, error: authError } =
         await supabase.auth.signInWithPassword({
@@ -44,61 +40,69 @@ export default function Login() {
           password: password.trim(),
         });
 
-      if (!authError && authData?.user) {
-        const { data } = await supabase
-          .from("users")
-          .select("*")
-          .eq("email", email.trim())
-          .eq("role", selectedRole)
-          .maybeSingle();
-
-        userData = data;
+      if (authError || !authData?.user) {
+        setErrorMessage(
+          authError?.message?.toLowerCase().includes("email not confirmed")
+            ? "Please verify your email before logging in."
+            : "Invalid email or password."
+        );
+        return;
       }
-    } catch (e) {
-      console.warn("Supabase auth check skipped:", e.message);
-    }
 
-    // 2. Fallback to direct database verification
-    if (!userData) {
-      const { data: dbUser, error: dbError } = await supabase
+      if (!authData.user.email_confirmed_at) {
+        await supabase.auth.signOut();
+        setErrorMessage("Please verify your email before logging in.");
+        return;
+      }
+
+      const { data: userData, error: userError } = await supabase
         .from("users")
         .select("*")
-        .eq("email", email.trim())
-        .eq("password", password.trim())
+        .eq("email", authData.user.email)
         .maybeSingle();
 
-      if (dbUser) {
-        if (dbUser.role?.toLowerCase() !== selectedRole) {
-          setLoading(false);
-          setErrorMessage(`This account is registered as ${dbUser.role}, not ${selectedRole}.`);
-          return;
-        }
-        userData = dbUser;
+      if (userError || !userData) {
+        await supabase.auth.signOut();
+        setErrorMessage("Account record not found. Please contact the administrator.");
+        return;
       }
-    }
 
-    setLoading(false);
+      const actualRole = userData.role?.toLowerCase();
 
-    if (!userData) {
-      setErrorMessage("Invalid email or password.");
-      return;
-    }
+      if (actualRole !== selectedRole) {
+        await supabase.auth.signOut();
+        setErrorMessage(
+          `This account is registered as ${userData.role}, not ${selectedRole}.`
+        );
+        return;
+      }
 
-    // Persist complete user record
-    clearInsightsStorage();
-    localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("userRole", userData.role);
+      clearInsightsStorage();
+      localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("userRole", userData.role);
 
-    if (userData.role === "staff") {
-      nav("/staff/dashboard");
-    } else if (userData.role === "co" || userData.role === "co_associate") {
-      nav("/co/dashboard");
-    } else if (userData.role === "admin") {
-      nav("/admin/dashboard");
-    } else if (userData.role === "rider") {
-      nav("/rider/home");
-    } else {
-      nav("/customer/dashboard");
+      if (remember) {
+        localStorage.setItem("rememberUser", "true");
+      } else {
+        localStorage.removeItem("rememberUser");
+      }
+
+      if (actualRole === "staff") {
+        nav("/staff/dashboard");
+      } else if (actualRole === "co" || actualRole === "co_associate") {
+        nav("/co/dashboard");
+      } else if (actualRole === "admin") {
+        nav("/admin/dashboard");
+      } else if (actualRole === "rider") {
+        nav("/rider/home");
+      } else {
+        nav("/customer/dashboard");
+      }
+    } catch (e) {
+      console.error("Login error:", e);
+      setErrorMessage("Unable to log in. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -160,11 +164,11 @@ export default function Login() {
             </div>
 
             {errorMessage && (
-  <div className="login-error">
-    <span className="error-icon">✕</span>
-    <span>{errorMessage}</span>
-  </div>
-)}
+              <div className="login-error">
+                <span className="error-icon">✕</span>
+                <span>{errorMessage}</span>
+              </div>
+            )}
 
             {/* OPTIONS */}
             <div className="login-options">
@@ -200,7 +204,6 @@ export default function Login() {
             </p>
 
           </div>
-
         </div>
       </div>
     </div>

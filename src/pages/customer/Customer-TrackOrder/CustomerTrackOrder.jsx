@@ -25,6 +25,21 @@ function calculateETA(lat1, lon1, lat2, lon2) {
   return Math.max(1, timeMinutes);
 }
 
+// ==========================================
+// STATUS NG delivery_schedule (galing sa Delivery page)
+//   walang rider      -> Order Received (25%)
+//   may naka-assign   -> Processing (50%)       status: "Pending"
+//   inaccept ni rider -> Out for Delivery (75%) status: "Out for Delivery"
+//   naihatid na       -> Delivered (100%)       status: "Delivered"
+// ==========================================
+const OUT_FOR_DELIVERY_STATUSES = [
+  "out for delivery",
+  "on delivery",
+  "on the way",
+  "in transit",
+  "delivering",
+];
+
 export default function CustomerTrackOrder() {
   const hagonoyDefaultCenter = "Hagonoy, Bulacan, Philippines";
 
@@ -32,6 +47,8 @@ export default function CustomerTrackOrder() {
   const [searchOrder, setSearchOrder] = useState("");
   const [riderName, setRiderName] = useState("No driver assigned yet");
   const [deliveryStatus, setDeliveryStatus] = useState("");
+  // status mula LANG sa delivery_schedule (hindi kasama ang status ng order mula admin/staff)
+  const [scheduleStatus, setScheduleStatus] = useState("");
   const [etaMinutes, setEtaMinutes] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [mapQuery, setMapQuery] = useState(hagonoyDefaultCenter);
@@ -59,6 +76,9 @@ export default function CustomerTrackOrder() {
       .eq("order_id", currentOrderId)
       .maybeSingle();
 
+      console.log("Delivery schedule data:", schedData);
+      console.log("Assigned rider ID:", schedData?.assigned_rider_id);
+
     if (error) {
       console.log("Error fetching delivery schedule:", error.message);
     }
@@ -71,6 +91,7 @@ export default function CustomerTrackOrder() {
     setRiderId(schedData?.assigned_rider_id || null);
 
     setDeliveryStatus(schedData?.delivery_status || orderData.status);
+    setScheduleStatus(schedData?.delivery_status || "");
     
     if (schedData?.rider_lat && schedData?.rider_lng) {
       setRiderPosition([
@@ -107,6 +128,7 @@ export default function CustomerTrackOrder() {
       setOrder(null);
       setRiderName("No driver assigned yet");
       setDeliveryStatus("");
+      setScheduleStatus("");
       setEtaMinutes(null);
       setMapQuery(hagonoyDefaultCenter);
       setIsRiderMoving(false);
@@ -210,13 +232,19 @@ export default function CustomerTrackOrder() {
 
           if (
             updatedSchedule.assigned_rider &&
-            updatedSchedule.assigned_rider !== "Not Assigned"
+            updatedSchedule.assigned_rider !== "Not Assigned" &&
+            updatedSchedule.assigned_rider.trim() !== ""
           ) {
             setRiderName(updatedSchedule.assigned_rider);
+          } else {
+            setRiderName("No driver assigned yet");
           }
+
+          setRiderId(updatedSchedule.assigned_rider_id || null);
 
           if (updatedSchedule.delivery_status) {
             setDeliveryStatus(updatedSchedule.delivery_status);
+            setScheduleStatus(updatedSchedule.delivery_status);
           }
         }
       )
@@ -235,6 +263,35 @@ export default function CustomerTrackOrder() {
     riderName !== "No driver assigned yet" &&
     riderName !== "Not Assigned" &&
     riderName.trim() !== "";
+
+  // ==========================================
+  // DELIVERY PROGRESS (base sa tunay na status)
+  // ==========================================
+  // Ang "Processing" ng admin/staff sa orders table ay HINDI binibilang dito.
+  // Ang stage ng customer ay base lang sa delivery_schedule (rider).
+  const currentStatus = (scheduleStatus || "").toLowerCase().trim();
+
+  const getProgress = () => {
+    if (!order) return { percent: 0, label: "Pending" };
+    if (isDelivered) return { percent: 100, label: "Delivered" };
+
+    // Inaccept na ni rider at umalis na
+    if (OUT_FOR_DELIVERY_STATUSES.includes(currentStatus)) {
+      return { percent: 75, label: "Out for Delivery" };
+    }
+
+    // May naka-assign na rider pero hindi pa niya inaaccept
+    if (activeDriver) {
+      return { percent: 50, label: "Processing" };
+    }
+
+    // Wala pang rider (kahit Processing na ito sa admin/staff)
+    return { percent: 25, label: "Order Received" };
+  };
+
+  const progress = getProgress();
+
+  const stageLabels = ["Received", "Processing", "On Delivery", "Delivered"];
 
   return (
     <>
@@ -282,23 +339,30 @@ export default function CustomerTrackOrder() {
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
                     <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b" }}>Delivery Progress</span>
                     <span style={{ fontSize: "12px", fontWeight: "700", color: "#2563eb" }}>
-                      {isDelivered ? "Delivered (100%)" : order ? "Out for Delivery (75%)" : "Pending (0%)"}
+                      {progress.label} ({progress.percent}%)
                     </span>
                   </div>
                   <div style={{ width: "100%", height: "8px", backgroundColor: "#e2e8f0", borderRadius: "999px", overflow: "hidden" }}>
                     <div style={{
-                      width: isDelivered ? "100%" : order ? "75%" : "0%",
+                      width: `${progress.percent}%`,
                       height: "100%",
                       backgroundColor: "#2563eb",
                       borderRadius: "999px",
                       transition: "width 0.6s ease"
                     }}></div>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginTop: "6px", fontSize: "11px", color: "#94a3b8", fontWeight: "500" }}>
-                    <span>Received</span>
-                    <span>Processing</span>
-                    <span>On Delivery</span>
-                    <span>Delivered</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginTop: "6px", fontSize: "11px", fontWeight: "500" }}>
+                    {stageLabels.map((label, index) => (
+                      <span
+                        key={label}
+                        style={{
+                          color: progress.percent >= (index + 1) * 25 ? "#2563eb" : "#94a3b8",
+                          fontWeight: progress.percent >= (index + 1) * 25 ? "700" : "500",
+                        }}
+                      >
+                        {label}
+                      </span>
+                    ))}
                   </div>
                 </div>
 
@@ -309,18 +373,22 @@ export default function CustomerTrackOrder() {
                     <h2>
                       {isDelivered 
                         ? "Order Completed" 
+                        : progress.percent < 75
+                        ? order
+                          ? "Not yet on the way"
+                          : "Waiting for order ID"
                         : etaMinutes 
                         ? `${etaMinutes} mins away` 
-                        : order 
-                        ? "Calculating ETA..." 
-                        : "Waiting for order ID"}
+                        : "Calculating ETA..."}
                     </h2>
                     <p>
                       {isDelivered 
                         ? "Your order has been successfully delivered." 
-                        : order 
-                        ? "Our rider is on the way to you." 
-                        : "-"}
+                        : !order
+                        ? "-"
+                        : progress.percent >= 75
+                        ? "Our rider is on the way to you."
+                        : "Your order is being prepared."}
                     </p>
                   </div>
                 </div>
