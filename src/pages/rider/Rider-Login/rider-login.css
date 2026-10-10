@@ -57,9 +57,7 @@
   align-items: center;
   position: relative;
   overflow: hidden;
-  min-height: 100vh;
-  background: white;
-  height: 100vh;
+  height: 100%;
 }
 
 .login-right::before {
@@ -251,10 +249,11 @@
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    height: 100vh !important;
     min-height: 100vh !important;
     min-height: 100dvh !important;
-    padding: 24px 16px !important;
+    height: auto !important;
+    padding: 28px 16px !important;
+    gap: 0 !important;
     background-image: url("../../../assets/aqua-bg.png") !important;
     background-size: cover !important;
     background-position: center top !important;
@@ -268,16 +267,22 @@
   .login-wrapper .riderlogin-left {
     position: relative !important;
     inset: auto !important;
-    flex: none !important;
+    flex: 0 0 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
     z-index: 1;
+    display: flex !important;
+    flex-direction: column !important;
     align-items: center !important;
+    justify-content: center !important;
     text-align: center !important;
-    padding: 0 0 28px 0 !important;
-    margin-bottom: 8px !important;
-    background: none !important;
+    padding: 0 !important;
+    margin: 0 auto 16px auto !important;
+    background: transparent !important;
     color: #0f172a !important;
     width: 100% !important;
-    max-width: 390px !important;
+    max-width: 400px !important;
   }
 
   .login-wrapper .riderlogin-left .overlay {
@@ -285,25 +290,28 @@
   }
 
   .login-wrapper .brand-logo {
-    width: 90px !important;
-    margin: 0 auto 10px auto !important;
+    width: 76px !important;
+    height: auto !important;
+    margin: 0 auto 8px auto !important;
     animation: none !important;
     filter: drop-shadow(0 4px 12px rgba(14, 165, 233, 0.2));
   }
 
   .login-wrapper .branding h1 {
-    font-size: 22px !important;
+    font-size: 20px !important;
     font-weight: 800 !important;
     color: #0f172a !important;
     line-height: 1.25 !important;
     margin: 0 0 4px 0 !important;
+    text-align: center !important;
   }
 
   .login-wrapper .branding p {
-    font-size: 13.5px !important;
+    font-size: 13px !important;
     margin: 0 !important;
     color: #64748b !important;
     opacity: 1 !important;
+    text-align: center !important;
   }
 
   /* ----- Form area: elevated card container ----- */
@@ -311,14 +319,16 @@
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: flex-start !important;
-    flex: none !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
     height: auto !important;
     min-height: 0 !important;
+    max-height: none !important;
     overflow: visible !important;
-    z-index: auto;
+    z-index: 2;
     background: transparent !important;
     padding: 0 !important;
+    margin: 0 auto !important;
     width: 100% !important;
     max-width: 400px !important;
   }
@@ -330,10 +340,12 @@
   .login-wrapper .login-card {
     width: 100% !important;
     max-width: 400px !important;
-    margin: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 auto !important;
     padding: 24px 20px !important;
     background: #ffffff !important;
-    border-radius: 22px !important;
+    border-radius: 20px !important;
     border: 1px solid rgba(226, 232, 240, 0.9) !important;
     box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04) !important;
     backdrop-filter: none !important;
