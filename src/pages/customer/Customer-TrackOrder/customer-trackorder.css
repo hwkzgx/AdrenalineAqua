@@ -4,7 +4,8 @@
   background-image: url("../../../assets/aqua-bg.png");
   background-size: cover;
   background-position: center;
-  font-family: Arial, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  box-sizing: border-box;
 }
 
 .track-order-container {
@@ -232,7 +233,7 @@
 }
 
 /* ADDRESS */
-.delivery-card {
+.track-order-page .delivery-card {
   margin-top: 25px;
   display: flex;
   gap: 15px;
@@ -240,17 +241,17 @@
   padding: 10px;
 }
 
-.delivery-icon {
+.track-order-page .delivery-icon {
   color: #1686ff;
 }
 
-.delivery-card h3 {
+.track-order-page .delivery-card h3 {
   margin: 0;
   color: #1686ff;
   font-size: 28px;
 }
 
-.delivery-card p {
+.track-order-page .delivery-card p {
   margin-top: 10px;
   color: #4e6487;
   font-size: 22px;
@@ -430,13 +431,15 @@
 
   /* Page background */
   .track-order-page {
-    padding: 12px 12px 28px;
+    padding: 16px 16px 32px 16px;
     background-image: none;
     background: linear-gradient(180deg, #e3f0ff 0%, #f3f7fc 45%);
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .track-order-container {
-    gap: 14px;
+    gap: 16px;
   }
 
   /* Wala nang malaking puting panel; bawat bahagi ay sariling card */
@@ -449,7 +452,7 @@
     box-shadow: none;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
   }
 
   /* ----- Header = blue banner ----- */
@@ -457,8 +460,8 @@
     gap: 12px;
     padding: 20px 18px;
     background: linear-gradient(135deg, #2aa0ff, #0050b8);
-    border-radius: 24px;
-    box-shadow: 0 14px 30px rgba(0, 80, 184, 0.3);
+    border-radius: 18px;
+    box-shadow: 0 10px 24px rgba(0, 80, 184, 0.25);
   }
 
   .track-icon {
@@ -681,11 +684,11 @@
     border-radius: 18px !important;
   }
 
-  .delivery-card h3 {
+  .track-order-page .delivery-card h3 {
     font-size: 20px;
   }
 
-  .delivery-card p {
+  .track-order-page .delivery-card p {
     font-size: 15px;
   }
 }

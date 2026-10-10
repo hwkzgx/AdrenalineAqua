@@ -2,9 +2,10 @@
    PAGE WRAPPER & GENERAL
 ========================= */
 .Ord-page {
-  background-color: #f1f5f9;
-  padding: 32px;
-  min-height: 100vh;
+  width: 100%;
+  background-color: transparent;
+  padding: 24px 30px 40px 30px;
+  box-sizing: border-box;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
@@ -16,20 +17,27 @@
 
 /* HEADER */
 .Ord-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
   margin-bottom: 24px;
 }
 
 .Ord-header h1 {
-  margin: 0;
-  font-size: 26px;
+  margin: 0 0 4px 0;
+  font-size: 28px;
   font-weight: 700;
   color: #0f172a;
+  letter-spacing: -0.01em;
 }
 
 .Ord-header p {
   color: #64748b;
   font-size: 14px;
-  margin-top: 4px;
+  margin: 0;
+  line-height: 1.5;
 }
 
 /* CONTROLS */
@@ -37,14 +45,15 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
   margin-bottom: 20px;
   position: relative;
   z-index: 5;
 }
 
 .Ord-search {
-  width: 300px;
+  width: 260px;
   height: 44px;
   padding: 0 16px;
   border: 1px solid #cbd5e1;
@@ -62,7 +71,7 @@
 }
 
 .Ord-filter {
-  width: 160px;
+  width: 150px;
   height: 44px;
   padding: 0 14px;
   border: 1px solid #cbd5e1;
@@ -81,9 +90,9 @@
 }
 
 .Ord-addBtn {
-  margin-left: 300px;
+  margin-left: 0;
   margin-top: 0;
-  width: 150px;
+  padding: 0 18px;
   height: 44px;
   border: none;
   border-radius: 10px;
@@ -94,9 +103,10 @@
   cursor: pointer;
   transition: background 0.2s ease, transform 0.1s ease;
   box-shadow: 0 4px 6px -1px rgba(2, 69, 122, 0.2);
-  position: relative;
-  z-index: 99999;
-  pointer-events: auto !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
 }
 
 .Ord-addBtn:hover {
@@ -671,4 +681,57 @@
 
 .export-pdf-btn:hover {
   background-color: #013259;
+}
+
+/* =========================
+   RESPONSIVE (MOBILE)
+========================= */
+@media (max-width: 768px) {
+  .Ord-page {
+    padding: 16px 16px 32px 16px;
+  }
+
+  .Ord-header {
+    margin-bottom: 18px;
+  }
+
+  .Ord-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .Ord-search {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .Ord-filter {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .Ord-addBtn {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  .export-pdf-btn {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+  }
+
+  .table-container table {
+    min-width: 700px;
+  }
 }

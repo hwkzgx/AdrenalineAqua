@@ -224,8 +224,10 @@ export default function CoExpenses() {
   return (
     <div className="coexpenses-page">
       <div className="coexpenses-header">
-        <h1>Expenses</h1>
-        <p>Real-time cash outflow tracking and category cost analysis</p>
+        <div>
+          <h1>Expenses</h1>
+          <p>Real-time cash outflow tracking and category cost analysis</p>
+        </div>
       </div>
 
       <div className="inventory-summary-cards">

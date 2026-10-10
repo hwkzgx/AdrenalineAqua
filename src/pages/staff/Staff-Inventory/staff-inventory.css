@@ -2,45 +2,52 @@
    INVENTORY PAGE LAYOUT & HEADERS
    ========================================== */
 .staffinventory-page {
-  padding: 24px;
-  background-color: #f8fafc;
-  min-height: 100vh;
-  font-family: 'Inter', sans-serif;
+  padding: 24px 30px 40px 30px;
+  background: transparent;
+  min-height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-.stafforders-header {
+.staffinventory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 24px;
 }
 
-.stafforders-header h1 {
+.staffinventory-header h1 {
   font-size: 28px;
   color: #0f172a;
-  margin: 0 0 4px 0;
+  margin: 0;
   font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
-.stafforders-header p {
+.staffinventory-header p {
   font-size: 14px;
   color: #64748b;
-  margin: 0;
+  margin: 4px 0 0 0;
+  line-height: 1.5;
 }
 
 /* ==========================================
    SUMMARY DASHBOARD CARDS
    ========================================== */
 .staffinventory-summary-cards {
-  display: flex;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
   margin-bottom: 24px;
-  margin-top: 10px;
+  width: 100%;
 }
 
 .staffsummary-card {
-  flex: 1;
   background: white;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  padding: 20px;
+  padding: 18px 20px;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -48,10 +55,11 @@
 }
 
 .staffsummary-card .card-icon {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   padding: 10px;
   border-radius: 10px;
+  flex-shrink: 0;
 }
 
 .staffsummary-card h3 {
@@ -60,6 +68,7 @@
   margin: 0 0 4px 0;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-weight: 600;
 }
 
 .staffsummary-card h2 {
@@ -100,7 +109,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
   margin-bottom: 20px;
 }
 
@@ -108,17 +118,14 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  flex: 1;
-  margin-left: 0;
+  flex-wrap: wrap;
 }
 
 .staffright-controls {
   display: flex;
   align-items: center;
-  gap: 12px;
-  justify-content: flex-end; /* Palaging nakadikit sa kanan si Add Product */
-  position: relative;        /* Basehan para sa paglutang ni Bulk Delete */
-  min-width: 250px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .staffsearch-input {
@@ -781,7 +788,6 @@
   border: none;
   padding: 0 16px;
   height: 48px;
-  borderRadius: 12px; /* Kung standard CSS, 'border-radius' dapat */
   border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
@@ -1140,6 +1146,54 @@
   font-size: 12px;
   font-weight: 600;
   color: #b91c1c;
+}
+
+@media (max-width: 768px) {
+  .staffinventory-page {
+    padding: 16px 16px 32px 16px;
+  }
+
+  .staffinventory-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .staffinventory-summary-cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .staffcontrols-row,
+  .staffleft-controls,
+  .staffright-controls {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .staffsearch-input,
+  .stafffilter-select,
+  .staffadd-btn,
+  .staffbulk-delete-btn,
+  .export-pdf-btn {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    justify-content: center;
+  }
+
+  .staffinventory-table {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+  }
+
+  .staffinventory-table table {
+    min-width: 700px;
+  }
 }
 
 @media (max-width: 520px) {

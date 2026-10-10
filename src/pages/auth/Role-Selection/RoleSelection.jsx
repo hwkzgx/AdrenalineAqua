@@ -15,8 +15,8 @@ export default function RoleSelection() {
 
   const roles = [
     { name: "Admin", path: "/login", state: "admin", icon: faUserShield },
-    { name: "Co-Associate", path: "/register", state: "co", icon: faUsers },
-    { name: "Staff", path: "/register", state: "staff", icon: faUserTie },
+    { name: "Co-Associate", path: "/login", state: "co", icon: faUsers },
+    { name: "Staff", path: "/login", state: "staff", icon: faUserTie },
     { name: "Rider", path: "/rider/Riderlogin", state: "rider", icon: faMotorcycle },
   ];
 

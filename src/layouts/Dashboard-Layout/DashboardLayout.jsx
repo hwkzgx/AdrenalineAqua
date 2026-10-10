@@ -19,6 +19,8 @@ import CoSidebar from "../../pages/co-assoc/sidebar/CoSidebar";
 import StaffSidebar from "../../pages/staff/sidebar/StaffSidebar";
 
 import AquaLogo from "../../assets/AquaLogo.png";
+import { clearInsightsStorage } from "../../services/aiInsightsService";
+
 
 import "./dashboard-layout.css";
 
@@ -839,6 +841,7 @@ export default function DashboardLayout() {
                   localStorage.removeItem("token");
                   localStorage.removeItem("userRole");
                   localStorage.removeItem("role");
+                  clearInsightsStorage();
 
                   setShowLogoutModal(false);
 

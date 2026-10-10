@@ -249,16 +249,14 @@ export default function StaffDashboard() {
   
         pointStyle: "circle",
   
-        pointRadius: 8,
-        pointHoverRadius: 10,
-  
+        pointRadius: 4,
+        pointHoverRadius: 6,
         pointBackgroundColor: "#bfdbfe",
         pointBorderColor: "#2563eb",
         pointBorderWidth: 2,
-  
-       pointHoverBackgroundColor: "#ffffff",  
+        pointHoverBackgroundColor: "#ffffff",
         pointHoverBorderColor: "#2563eb",
-        pointHoverBorderWidth: 3,
+        pointHoverBorderWidth: 2,
       },
     ],
   };
@@ -266,26 +264,29 @@ export default function StaffDashboard() {
   const lineOptions = {
     responsive: true,
     maintainAspectRatio: false,
-  
     interaction: {
       mode: "nearest",
       intersect: true,
     },
-  
     plugins: {
       legend: {
         display: true,
         position: "top",
       },
     },
-  
     scales: {
       x: {
         grid: {
           color: "#e5e7eb",
         },
+        ticks: {
+          autoSkip: true,
+          maxTicksLimit: 6,
+          font: {
+            size: 11,
+          },
+        },
       },
-  
       y: {
         beginAtZero: true,
         grid: {
@@ -293,20 +294,23 @@ export default function StaffDashboard() {
         },
         ticks: {
           callback: (value) => `₱${value}`,
+          font: {
+            size: 11,
+          },
         },
       },
     },
   };
 
   return (
-
-      <div className="staffdashboard-container">
-
-        {/* HEADER */}
-        <div className="staffdashboard-header">
+    <div className="staffdashboard-container">
+      {/* HEADER */}
+      <div className="staffdashboard-header">
+        <div>
           <h1>Staff Dashboard</h1>
           <p>Overview of your system performance</p>
         </div>
+      </div>
 
         {/* CARDS */}
         <div className="staffdashboard-grid">

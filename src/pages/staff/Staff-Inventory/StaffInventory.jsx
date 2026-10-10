@@ -457,7 +457,7 @@ function StaffInventory() {
       )}
 
       {/* TITLE HEADER */}
-      <div className="stafforders-header">
+      <div className="staffinventory-header">
         <div>
           <h1>Inventory</h1>
           <p>Real-time stock management and automated tracking</p>

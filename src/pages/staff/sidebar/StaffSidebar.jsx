@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./staff-sidebar.css";
 
@@ -15,76 +15,101 @@ import {
   faBox,
   faUser,
   faArrowRightFromBracket,
+  faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function StaffSidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [openProfile, setOpenProfile] = useState(false);
 
-const [user, setUser] = useState(() =>
-  JSON.parse(localStorage.getItem("user") || "{}")
-);
+  const [user, setUser] = useState(() =>
+    JSON.parse(localStorage.getItem("user") || "{}")
+  );
 
-useEffect(() => {
-  const handleUserUpdated = () => {
-    const updatedUser = JSON.parse(
-      localStorage.getItem("user") || "{}"
-    );
+  useEffect(() => {
+    const handleUserUpdated = () => {
+      const updatedUser = JSON.parse(
+        localStorage.getItem("user") || "{}"
+      );
+      setUser(updatedUser);
+    };
 
-    setUser(updatedUser);
-  };
+    window.addEventListener("userUpdated", handleUserUpdated);
 
-  window.addEventListener("userUpdated", handleUserUpdated);
+    return () => {
+      window.removeEventListener("userUpdated", handleUserUpdated);
+    };
+  }, []);
 
-  return () => {
-    window.removeEventListener("userUpdated", handleUserUpdated);
-  };
-}, []);
-
-    const toggleProfile = () => {
+  const toggleProfile = () => {
     setOpenProfile(!openProfile);
   };
+
+  const isActive = (path) =>
+    location.pathname === path || location.pathname.startsWith(path + "/");
+
   return (
     <div className="sidebar">
-
-    
       <img src={AquaLogo} alt="Aqua Logo" className="logo" />
 
-      
-      <button onClick={() => navigate("/staff/dashboard")}>
-        <FontAwesomeIcon icon={faChartLine} /> Dashboard
-      </button>
+      <div className="sidebar-nav">
+        <button
+          className={isActive("/staff/dashboard") ? "active" : ""}
+          onClick={() => navigate("/staff/dashboard")}
+        >
+          <FontAwesomeIcon icon={faChartLine} /> Dashboard
+        </button>
 
-      <button onClick={() => navigate("/staff/orders")}>
-        <FontAwesomeIcon icon={faShoppingCart} /> Orders
-      </button>
+        <button
+          className={isActive("/staff/orders") ? "active" : ""}
+          onClick={() => navigate("/staff/orders")}
+        >
+          <FontAwesomeIcon icon={faShoppingCart} /> Orders
+        </button>
 
-      <button onClick={() => navigate("/staff/delivery-schedule")}>
-        <FontAwesomeIcon icon={faTruck} /> Delivery Schedule
-      </button>
+        <button
+          className={isActive("/staff/delivery-schedule") ? "active" : ""}
+          onClick={() => navigate("/staff/delivery-schedule")}
+        >
+          <FontAwesomeIcon icon={faTruck} /> Delivery Schedule
+        </button>
 
-      <button onClick={() => navigate("/staff/inventory")}>
-        <FontAwesomeIcon icon={faBox} /> Inventory
-      </button>
+        <button
+          className={isActive("/staff/inventory") ? "active" : ""}
+          onClick={() => navigate("/staff/inventory")}
+        >
+          <FontAwesomeIcon icon={faBox} /> Inventory
+        </button>
 
-      <button onClick={() => navigate("/staff/sales")}>
-        <FontAwesomeIcon icon={faChartPie} /> Sales
-      </button>
+        <button
+          className={isActive("/staff/sales") ? "active" : ""}
+          onClick={() => navigate("/staff/sales")}
+        >
+          <FontAwesomeIcon icon={faChartPie} /> Sales
+        </button>
 
-     <button onClick={() => navigate("/staff/customers")}>
-        <FontAwesomeIcon icon={faUser} /> Customers
-      </button>
+        <button
+          className={isActive("/staff/insights") ? "active" : ""}
+          onClick={() => navigate("/staff/insights")}
+        >
+          <FontAwesomeIcon icon={faWandMagicSparkles} /> Insights
+        </button>
 
+        <button
+          className={isActive("/staff/customers") ? "active" : ""}
+          onClick={() => navigate("/staff/customers")}
+        >
+          <FontAwesomeIcon icon={faUser} /> Customers
+        </button>
+      </div>
 
       <div className="sidebar-bottom">
-
-      
         <div className="admin-profile" onClick={toggleProfile}>
-          <img src={Profile} alt="Admin Profile" />
-        
+          <img src={Profile} alt="Staff Profile" />
           <div>
-        <p className="name"> {user?.name || "User"} </p>
-        <p className="role">Staff</p>
+            <p className="name">{user?.name || "Staff"}</p>
+            <p className="role">Staff</p>
           </div>
         </div>
       </div>

@@ -11,6 +11,7 @@ import {
   Search,
 } from "lucide-react";
 import "../../../styles/user-management.css";
+import "../../admin/users/staff.css";
 import "./staff-customer.css";
 import Table from "../../../components/Table";
 import { supabase } from "../../../supabase";

@@ -135,18 +135,20 @@ export default function CustomerDashboard() {
 
         {/* TOP CARDS */}
         <div className="top-cards">
-          <div className="card">
-            <div className="icon-box">
-              <Package size={24} />
+          {/* Card 1: Pending Deliveries */}
+          <div className="card stat-card pending-card">
+            <div className="pending-card-main">
+              <div className="icon-box stat-blue">
+                <Package size={22} />
+              </div>
+              <div className="card-body">
+                <span className="card-tag-label">Pending Deliveries</span>
+                <h2 className="card-metric-val">
+                  {pendingDeliveries.length} <span className="unit-text">order/s</span>
+                </h2>
+                <p className="card-helper-text">Here's your pending orders</p>
+              </div>
             </div>
-            <div>
-              <h3>Pending Deliveries</h3>
-              <h2>{pendingDeliveries.length} <span>order/s</span></h2>
-            </div>
-            <div className="card-bottom">
-              <p>Here's your pending orders</p>
-            </div>
-            {/* NEW: mobile only (hidden on desktop via css) */}
             <button
               type="button"
               className="view-orders-btn"
@@ -160,26 +162,34 @@ export default function CustomerDashboard() {
             </button>
           </div>
 
-          <div className="card">
-            <div className="icon-box">
-              <BarChart3 size={24} />
+          {/* Card 2: Order Frequency */}
+          <div className="card stat-card frequency-card">
+            <div className="card-top-row">
+              <div className="icon-box stat-purple">
+                <BarChart3 size={22} />
+              </div>
+              <span className="card-pill-tag">{month}</span>
             </div>
-            <div>
-              <h3>Order Frequency</h3>
-              <h2>{orders.length} <span>order/s</span></h2>
-            </div>
-            <div className="card-bottom">
-              <p>{month}</p>
+            <div className="card-body">
+              <span className="card-tag-label">Order Frequency</span>
+              <h2 className="card-metric-val">
+                {orders.length} <span className="unit-text">order/s</span>
+              </h2>
+              <p className="card-helper-text">Total orders placed</p>
             </div>
           </div>
 
-          <div className="card">
-            <div className="icon-box">
-              <CalendarDays size={24} />
+          {/* Card 3: Member Since */}
+          <div className="card stat-card member-card">
+            <div className="card-top-row">
+              <div className="icon-box stat-teal">
+                <CalendarDays size={22} />
+              </div>
+              <span className="card-pill-tag">Customer</span>
             </div>
-            <div>
-              <h3>Member Since</h3>
-              <h2>
+            <div className="card-body">
+              <span className="card-tag-label">Member Since</span>
+              <h2 className="card-metric-val">
                 {customer
                   ? new Date(customer.created_at).toLocaleDateString("en-US", {
                       month: "short",
@@ -187,9 +197,7 @@ export default function CustomerDashboard() {
                     })
                   : "-"}
               </h2>
-            </div>
-            <div className="card-bottom">
-              <p>Regular Customer</p>
+              <p className="card-helper-text">Regular customer</p>
             </div>
           </div>
         </div>

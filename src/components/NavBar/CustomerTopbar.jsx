@@ -3,6 +3,8 @@ import { NavLink, useNavigate, Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import AquaLogo from "../../assets/AquaLogo.png";
 import { supabase } from "../../supabase";
+import { clearInsightsStorage } from "../../services/aiInsightsService";
+
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -113,6 +115,7 @@ export default function CustomerTopbar() {
     { to: "/customer/make-order", label: "Make Order" },
     { to: "/customer/track-order", label: "Track Order" },
     { to: "/customer/order-history", label: "Order History" },
+    { to: "/customer/insights", label: "Insights" },
     { to: "/customer/about-us", label: "About Us" },
     { to: "/customer/contact-us", label: "Contact Us" },
   ];
@@ -308,6 +311,7 @@ export default function CustomerTopbar() {
                 onClick={() => {
                   localStorage.removeItem("token");
                   localStorage.removeItem("user");
+                  clearInsightsStorage();
                   setShowLogoutModal(false);
                   navigate("/customer/home");
                 }}

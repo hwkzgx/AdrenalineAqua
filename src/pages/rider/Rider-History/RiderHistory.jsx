@@ -7,6 +7,7 @@ import {
   Home,
   Truck,
   History,
+  Sparkles,
   CheckCircle,
   MapPin,
   Clock,
@@ -189,6 +190,9 @@ export default function RiderHistory() {
         </NavLink>
         <NavLink to="/rider/history" className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}>
           <History size={22} /><span>History</span>
+        </NavLink>
+        <NavLink to="/rider/insights" className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}>
+          <Sparkles size={22} /><span>Insights</span>
         </NavLink>
       </nav>
     </div>

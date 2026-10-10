@@ -175,8 +175,10 @@ function CoInventory() {
     <div className="coinventory-page">
       {/* HEADER */}
       <div className="coinventory-header">
-        <h1> Co- Associate Inventory</h1>
-        <p>Manage stock, availability, and product tracking</p>
+        <div>
+          <h1>Co-Associate Inventory</h1>
+          <p>Manage stock, availability, and product tracking</p>
+        </div>
       </div>
 
       {/* DASHBOARD SUMMARY CARDS */}

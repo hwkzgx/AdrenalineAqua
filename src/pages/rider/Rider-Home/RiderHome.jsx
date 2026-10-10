@@ -7,6 +7,7 @@ import {
   Home,
   Truck,
   History,
+  Sparkles,
   Package,
   CheckCircle2,
   Wallet,
@@ -183,99 +184,116 @@ export default function RiderHome() {
 
       </div>
 
-      {/* TODAY'S PROGRESS */}
-      <div className="progress-card">
+      {/* LOWER DASHBOARD CONTENT */}
+      <div className="rider-home-section">
+        {/* ROW 1: TODAY'S PROGRESS + NEXT DELIVERY (Equal height side-by-side cards) */}
+        <div className="rider-highlight-row">
+          {/* TODAY'S PROGRESS */}
+          <div className="progress-card">
+            <div className="progress-header">
+              <h3>Today's Progress</h3>
+              <span className="progress-header-sub">{stats.completed} completed</span>
+            </div>
 
-        <div className="progress-header">
-          <h3>Today's Progress</h3>
-          <span>{stats.completed} completed</span>
-        </div>
+            <div className="progress-content">
+              <div
+                className="progress-circle"
+                style={{
+                  background: `conic-gradient(
+                    #2563eb ${
+                      deliveries.length === 0
+                        ? 0
+                        : (stats.completed / deliveries.length) * 360
+                    }deg,
+                    #e5e7eb 0deg
+                  )`,
+                }}
+              >
+                <span>
+                  {deliveries.length === 0
+                    ? "0%"
+                    : `${Math.round((stats.completed / deliveries.length) * 100)}%`}
+                </span>
+              </div>
+            </div>
 
-        <div className="progress-content">
-          <div
-            className="progress-circle"
-            style={{
-              background: `conic-gradient(
-                #2563eb ${
-                  deliveries.length === 0
-                    ? 0
-                    : (stats.completed / deliveries.length) * 360
-                }deg,
-                #e5e7eb 0deg
-              )`,
-            }}
-          >
-            <span>
-              {deliveries.length === 0
-                ? "0%"
-                : `${Math.round((stats.completed / deliveries.length) * 100)}%`}
-            </span>
+            <div className="progress-footer-note">
+              <span>{stats.completed} of {deliveries.length} deliveries completed today</span>
+            </div>
+          </div>
+
+          {/* NEXT DELIVERY */}
+          <div className="next-delivery-card">
+            <div className="card-header">
+              <h3>Next Delivery</h3>
+              <ChevronRight size={18} />
+            </div>
+
+            {loading ? (
+              <p className="loading-state-text">Loading...</p>
+            ) : deliveries.length > 0 ? (
+              <div className="next-delivery-body">
+                <h2 className="next-customer-name">{deliveries[0].customer}</h2>
+
+                <div className="next-delivery-meta">
+                  <div className="delivery-info">
+                    <Truck size={16} />
+                    <span>{deliveries[0].deliveryId || deliveries[0].orderId}</span>
+                  </div>
+
+                  <div className="delivery-info">
+                    <CalendarDays size={16} />
+                    <span>{deliveries[0].date}</span>
+                  </div>
+
+                  <div className="delivery-info">
+                    <Clock3 size={16} />
+                    <span>{deliveries[0].address}</span>
+                  </div>
+                </div>
+
+                <Link
+                  to={`/rider/delivery-details/${deliveries[0].id}`}
+                  className="view-delivery-btn"
+                >
+                  View Details
+                </Link>
+              </div>
+            ) : (
+              <div className="no-deliveries-state">
+                <p>No deliveries available.</p>
+              </div>
+            )}
           </div>
         </div>
 
-      </div>
-
-      {/* NEXT DELIVERY */}
-      <div className="next-delivery-card">
-
-        <div className="card-header">
-          <h3>Next Delivery</h3>
-          <ChevronRight size={18} />
-        </div>
-
-        {loading ? (
-          <p>Loading...</p>
-        ) : deliveries.length > 0 ? (
-          <>
-            <h2>{deliveries[0].customer}</h2>
-
-            <div className="delivery-info">
-              <Truck size={16} />
-              <span>{deliveries[0].deliveryId}</span>
-            </div>
-
-            <div className="delivery-info">
-              <CalendarDays size={16} />
-              <span>{deliveries[0].date}</span>
-            </div>
-
-            <div className="delivery-info">
-              <Clock3 size={16} />
-              <span>{deliveries[0].address}</span>
-            </div>
-
-            <Link
-              to={`/rider/delivery-details/${deliveries[0].id}`}
-              className="view-delivery-btn"
-            >
-              View Details
-            </Link>
-          </>
-        ) : (
-          <p>No deliveries available.</p>
-        )}
-
-      </div>
-
-      {/* TODAY'S SCHEDULE */}
-      <div className="schedule-card">
-
-        <div className="card-header">
-          <h3>Today's Schedule</h3>
-          <CalendarDays size={18} />
-        </div>
-
-        {deliveries.slice(0, 3).map((item) => (
-          <div className="schedule-item" key={item.id}>
-            <Clock3 size={16} />
-
-            <div>
-              <strong>{item.customer}</strong>
-              <p>{item.date}</p>
-            </div>
+        {/* ROW 2: TODAY'S SCHEDULE (Full-width clean card with multi-column schedule grid on desktop) */}
+        <div className="schedule-card">
+          <div className="card-header">
+            <h3>Today's Schedule</h3>
+            <CalendarDays size={18} />
           </div>
-        ))}
 
+          {deliveries.length === 0 ? (
+            <p className="no-schedule-text">No deliveries scheduled today.</p>
+          ) : (
+            <div className="schedule-grid">
+              {deliveries.slice(0, 3).map((item) => (
+                <div className="schedule-item" key={item.id}>
+                  <div className="schedule-icon-wrap">
+                    <Clock3 size={16} />
+                  </div>
+
+                  <div className="schedule-info">
+                    <strong className="schedule-name">{item.customer}</strong>
+                    <p className="schedule-date">{item.date}</p>
+                    <span className="schedule-address">{item.address}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Bottom Navigation */}
@@ -293,6 +311,11 @@ export default function RiderHome() {
         <Link to="/rider/history" className="nav-item">
           <History size={22} />
           <span>History</span>
+        </Link>
+
+        <Link to="/rider/insights" className="nav-item">
+          <Sparkles size={22} />
+          <span>Insights</span>
         </Link>
       </nav>
     </div>

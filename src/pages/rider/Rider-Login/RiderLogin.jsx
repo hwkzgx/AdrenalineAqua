@@ -2,7 +2,10 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "./rider-login.css";
 import AquaLogo from "../../../assets/AquaLogo.png";
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "../../../supabase";
+import { clearInsightsStorage } from "../../../services/aiInsightsService";
+
 
 export default function RiderLogin() {
   const nav = useNavigate();
@@ -10,6 +13,7 @@ export default function RiderLogin() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,41 +28,61 @@ export default function RiderLogin() {
 
     setLoading(true);
 
-    // LOGIN USING SUPABASE AUTH
-    const { data: authData, error: authError } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    let riderData = null;
 
-    if (authError) {
-      setLoading(false);
-      setError("Invalid email or password.");
-      return;
+    // 1. Try Supabase Auth first
+    try {
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password: password.trim(),
+        });
+
+      if (!authError && authData?.user) {
+        const { data: userData } = await supabase
+          .from("users")
+          .select("*")
+          .eq("email", email.trim())
+          .eq("role", "rider")
+          .maybeSingle();
+
+        riderData = userData;
+      }
+    } catch (e) {
+      console.warn("Supabase auth check skipped:", e.message);
     }
 
-    // CHECK IF USER IS A RIDER
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("*")
-      .eq("email", email)
-      .eq("role", "rider")
-      .single();
+    // 2. Fallback to direct database check from public.users table
+    if (!riderData) {
+      const { data: dbUser, error: dbError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", email.trim())
+        .eq("password", password.trim())
+        .eq("role", "rider")
+        .maybeSingle();
 
-    if (userError || !userData) {
-      await supabase.auth.signOut();
-      setLoading(false);
-      setError("This account is not registered as a rider.");
-      return;
+      if (dbUser) {
+        riderData = dbUser;
+      }
     }
 
     setLoading(false);
 
-    // SAVE LOGGED IN RIDER
-    localStorage.setItem("user", JSON.stringify(userData));
+    if (!riderData) {
+      setError("Invalid email or password.");
+      return;
+    }
+
+    // Save logged in rider
+    clearInsightsStorage();
+    localStorage.setItem("user", JSON.stringify(riderData));
+    localStorage.setItem("role", "rider");
 
     if (remember) {
       localStorage.setItem("rememberUser", "true");
+    } else {
+      localStorage.removeItem("rememberUser");
     }
 
     nav("/rider/home");
@@ -86,7 +110,7 @@ export default function RiderLogin() {
             <button
               type="button"
               className="riderlogback-btn"
-              onClick={() => nav(-1)}
+              onClick={() => nav("/roles")}
             >
               ← Back
             </button>
@@ -103,13 +127,24 @@ export default function RiderLogin() {
               onChange={(e) => setEmail(e.target.value)}
             />
 
-            <input
-              className="login-input"
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="password-input-wrapper">
+              <input
+                className="login-input"
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
 
             <div className="login-options">
 

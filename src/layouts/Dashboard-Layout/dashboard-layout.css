@@ -27,11 +27,13 @@
 ========================= */
 .topbar,
 .co-topbar {
-  height: 50px;
+  height: 60px;
+  min-height: 60px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding: 0 20px;
+  padding: 14px 30px 6px 30px;
+  box-sizing: border-box;
 }
 
 .topbar-right,
@@ -415,7 +417,8 @@
     width: 100% !important;
     min-width: 0 !important;
     margin-left: 0 !important;
-    padding: 12px 14px !important;
+    padding: 0 !important;
+    background: #f8fafc;
   }
 
   /* ----- Topbar: logo sa kaliwa, icons sa kanan, pantay ang linya ----- */
@@ -423,15 +426,23 @@
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 10px;
-    min-height: 48px;
-    padding: 0 !important;
-    margin: 0 0 10px !important;
+    gap: 12px;
+    height: 56px !important;
+    min-height: 56px !important;
+    max-height: 56px !important;
+    padding: 0 16px !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    box-sizing: border-box !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
   }
 
   .topbar-logo {
     display: block;
-    height: 36px;
+    height: 32px;
     width: auto;
     object-fit: contain;
     flex-shrink: 0;
@@ -441,7 +452,7 @@
     display: flex !important;
     align-items: center !important;
     justify-content: flex-end;
-    gap: 4px !important;
+    gap: 6px !important;
     margin-left: auto;
   }
 
@@ -451,22 +462,22 @@
     align-items: center;
   }
 
-  /* ----- Icons: pare-parehong bilog na 40px, madaling pindutin ----- */
+  /* ----- Icons: pare-parehong sukat na 36px, madaling pindutin ----- */
   .layout .topbar .icon-btn,
   .hamburger-btn {
     position: relative;
     display: flex !important;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     margin: 0 !important;
     border: none;
-    border-radius: 50%;
+    border-radius: 8px;
     background: transparent;
     color: #0f172a;
-    font-size: 19px;
+    font-size: 16px;
     line-height: 1;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
@@ -475,30 +486,32 @@
 
   .layout .topbar .icon-btn:hover,
   .hamburger-btn:hover {
-    background: #e2e8f0;
+    background: #f1f5f9;
   }
 
   .layout .topbar .icon-btn:active,
   .hamburger-btn:active {
-    background: #cbd5e1;
-    transform: scale(0.92);
+    background: #e2e8f0;
+    transform: scale(0.94);
   }
 
   .hamburger-btn {
     display: flex;
-    margin-left: 4px !important;
-    font-size: 20px;
+    margin-left: 2px !important;
+    font-size: 18px;
   }
 
   /* ----- Badge ng messages (bilang) at dot ng notification ----- */
   .layout .topbar .icon-btn > span {
-    top: 3px !important;
-    right: 1px !important;
+    top: -4px !important;
+    right: -4px !important;
   }
 
   .layout .topbar .icon-btn.has-notif::after {
-    top: 8px !important;
-    right: 9px !important;
+    top: 5px !important;
+    right: 5px !important;
+    width: 7px;
+    height: 7px;
   }
 
   /* ----- Dropdowns: pantay ang kanang gilid sa sarili nilang icon ----- */
@@ -690,17 +703,21 @@
 /* ----- Maliliit na phone ----- */
 @media (max-width: 480px) {
   .layout .main {
-    padding: 10px 12px !important;
+    padding: 0 !important;
   }
 
   .topbar-logo {
-    height: 32px;
+    height: 30px;
+  }
+
+  .layout .topbar {
+    padding: 0 12px !important;
   }
 
   .layout .topbar .icon-btn,
   .hamburger-btn {
-    width: 38px;
-    height: 38px;
-    font-size: 18px;
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
   }
 }

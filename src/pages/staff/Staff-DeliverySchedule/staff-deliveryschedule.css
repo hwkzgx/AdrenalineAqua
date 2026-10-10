@@ -2,27 +2,35 @@
    PAGE WRAPPER
 ========================= */
 .staffdeliveryschedule-page {
-  background-color: #f8fafc;
-  padding: 30px;
-  min-height: 100vh;
+  padding: 24px 30px 40px 30px;
+  background: transparent;
+  min-height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 /* HEADER */
 .staffdeliveryschedule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 24px;
 }
 
 .staffdeliveryschedule-header h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
-  color: #1e293b;
+  color: #0f172a;
+  letter-spacing: -0.01em;
 }
 
 .staffdeliveryschedule-header p {
   color: #64748b;
   font-size: 14px;
-  margin-top: 4px;
+  margin: 4px 0 0 0;
+  line-height: 1.5;
 }
 
 /* =========================
@@ -32,38 +40,48 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
   margin-bottom: 20px;
 }
 
 .staffdeliveryschedule-search {
-  width: 280px;
-  height: 48px;
+  width: 260px;
+  height: 44px;
   padding: 0 16px;
-  border: 3px solid #02457A;
-  border-radius: 12px;
-  font-size: 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 14px;
   outline: none;
   background: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
 }
 
 .staffdeliveryschedule-search:focus {
-  border-color: #0ea5e9;
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+  border-color: #02457A;
+  box-shadow: 0 0 0 3px rgba(2, 69, 122, 0.15);
 }
 
 .staffdeliveryschedule-filter {
   width: 150px;
-  height: 48px;
+  height: 44px;
   padding: 0 14px;
-  border: 3px solid #02457A;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 600;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
   background: white;
-  color: #02457A;
+  color: #334155;
   cursor: pointer;
   outline: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.staffdeliveryschedule-filter:focus {
+  border-color: #02457A;
+  box-shadow: 0 0 0 3px rgba(2, 69, 122, 0.15);
 }
 
 /* =========================
@@ -510,14 +528,57 @@
   color: white;
   border: none;
   padding: 0 16px;
-  height: 48px;
-  border-radius: 12px;
+  height: 44px;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
-  transition: background-color 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .export-pdf-btn:hover {
   background-color: #013259;
+}
+
+/* =========================
+   MOBILE RESPONSIVENESS
+========================= */
+@media (max-width: 768px) {
+  .staffdeliveryschedule-page {
+    padding: 16px 16px 32px 16px;
+  }
+
+  .staffdeliveryschedule-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .staffdeliveryschedule-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .staffdeliveryschedule-search,
+  .staffdeliveryschedule-filter,
+  .export-pdf-btn {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    justify-content: center;
+  }
+
+  .staffdeliveryschedule-table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+  }
+
+  .staffdeliveryschedule-table {
+    min-width: 700px;
+  }
 }

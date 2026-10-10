@@ -136,6 +136,39 @@
   box-shadow: 0 0 5px rgba(14,165,233,0.5);
 }
 
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper .login-input {
+  padding-right: 44px !important;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: color 0.15s ease;
+  z-index: 2;
+}
+
+.password-toggle-btn:hover {
+  color: #1e3a8a;
+}
+
 .login-btn {
   width: 100%;
   margin-top: 15px;
@@ -281,9 +314,7 @@
 
 
 /* =====================================================
-   MOBILE ONLY (desktop hindi nagagalaw)
-   Flat form, maliit na header, naka-gitna
-   Parehong style ng customer login
+   MOBILE ONLY - Modern, Spacious & Elevated Card
    ===================================================== */
 @media (max-width: 768px) {
   .login-wrapper,
@@ -297,24 +328,42 @@
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
-    height: auto !important;
+    align-items: center !important;
+    min-height: 100vh !important;
     min-height: 100dvh !important;
-    padding: 24px 0 32px !important;
-    background: #fbfaf9 !important;
+    height: auto !important;
+    padding: 28px 16px !important;
+    gap: 0 !important;
+    background-image: url("../../../assets/aqua-bg.png") !important;
+    background-size: cover !important;
+    background-position: center top !important;
+    background-repeat: no-repeat !important;
+    background-color: #e0effc !important;
+    box-sizing: border-box !important;
+    overflow-y: auto !important;
   }
 
-  /* ----- Header: logo at pangalan lang, pinaliit gamit ang zoom ----- */
+  /* ----- Header: clean branding ----- */
   .login-wrapper .login-left {
     position: relative !important;
     inset: auto !important;
-    flex: none !important;
-    z-index: 1;
-    align-items: center !important;
+    flex: 0 0 auto !important;
     height: auto !important;
-    padding: 0 20px 6px !important;
-    background: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    z-index: 1;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 0 !important;
+    margin: 0 auto 16px auto !important;
+    background: transparent !important;
     color: #0f172a !important;
-    zoom: 0.8 !important;            /* baguhin dito: 0.55 mas maliit, 0.65 mas malaki */
+    width: 100% !important;
+    max-width: 400px !important;
+    zoom: 1 !important;
   }
 
   .login-wrapper .login-left .overlay {
@@ -322,34 +371,47 @@
   }
 
   .login-wrapper .brand-logo {
-    display: block;
-    width: 130px !important;
-    margin: 0 auto 14px !important;
+    width: 76px !important;
+    height: auto !important;
+    margin: 0 auto 8px auto !important;
     animation: none !important;
+    filter: drop-shadow(0 4px 12px rgba(14, 165, 233, 0.2));
   }
 
   .login-wrapper .branding h1 {
-    font-size: 28px !important;
-    line-height: 1.2 !important;
-    color: #1e3a8a !important;
+    font-size: 20px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    line-height: 1.25 !important;
+    margin: 0 0 4px 0 !important;
+    text-align: center !important;
   }
 
   .login-wrapper .branding p {
-    font-size: 15px !important;
-    margin: 6px 0 0 !important;
+    font-size: 13px !important;
+    margin: 0 !important;
     color: #64748b !important;
     opacity: 1 !important;
+    text-align: center !important;
   }
 
-  /* ----- Form area: flat, walang card ----- */
+  /* ----- Form area: elevated card container ----- */
   .login-wrapper .login-right {
-    flex: none !important;
-    display: block !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
     height: auto !important;
     min-height: 0 !important;
+    max-height: none !important;
     overflow: visible !important;
-    background: #fbfaf9 !important;
-    padding: 4px 20px 0 !important;
+    z-index: 2;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 400px !important;
   }
 
   .login-wrapper .login-right::before {
@@ -358,117 +420,154 @@
 
   .login-wrapper .login-card {
     width: 100% !important;
-    max-width: 360px !important;
+    max-width: 400px !important;
+    height: auto !important;
+    min-height: 0 !important;
     margin: 0 auto !important;
-    padding: 0 !important;
-    background: none !important;
+    padding: 24px 20px !important;
+    background: #ffffff !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    border: none !important;
-    box-shadow: none !important;
-    text-align: left;
-  }
-
-  .login-wrapper .login-body {
-    text-align: left;
+    text-align: left !important;
+    box-sizing: border-box !important;
   }
 
   .login-wrapper .login-header {
-    margin-bottom: 6px !important;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    margin-bottom: 14px !important;
   }
 
   .login-wrapper .logback-btn {
-    margin-left: 0 !important;       /* tanggal ang -10px sa desktop */
-    margin-bottom: 0 !important;
-    color: #64748b !important;
-    font-size: 13px !important;
-    font-weight: 600;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 6px 12px !important;
+    background: #eff6ff !important;
+    border: 1px solid #dbeafe !important;
+    border-radius: 999px !important;
+    color: #2563eb !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
   }
 
   .login-wrapper .login-card h2 {
-    margin: 0 0 4px !important;
+    margin: 0 0 18px 0 !important;
     font-size: 16px !important;
-    font-weight: 800;
-    color: #1e3a8a !important;
-    text-align: center !important;
-  }
-
-  .login-wrapper .subtitle {
-    font-size: 13px;
-    color: #64748b;
-    opacity: 1;
+    font-weight: 700 !important;
+    color: #0f172a !important;
     text-align: left !important;
   }
 
-  /* ----- Pill inputs ----- */
+  .login-wrapper .login-body {
+    text-align: left !important;
+    width: 100% !important;
+  }
+
+  /* ----- Form inputs ----- */
   .login-wrapper .login-input {
     height: 48px !important;
-    margin: 7px 0 !important;        /* kasama ang tanggal ng -10px sa kaliwa */
-    padding: 0 18px !important;
+    margin: 0 0 12px 0 !important;
+    padding: 0 16px !important;
     font-size: 15px !important;
-    border-radius: 999px !important;
-    border: 1px solid #e2e0dd !important;
-    background: #fff !important;
+    border-radius: 12px !important;
+    border: 1.5px solid #e2e8f0 !important;
+    background: #f8fafc !important;
+    color: #0f172a !important;
+    box-sizing: border-box !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease !important;
   }
 
   .login-wrapper .login-input:focus {
-    border-color: #0ea5e9 !important;
-    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15) !important;
+    border-color: #2563eb !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12) !important;
   }
 
   /* ----- Error message ----- */
   .login-wrapper .login-error {
-    margin: 8px 0 4px;
-    border-radius: 14px;
+    margin: 4px 0 12px 0 !important;
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
   }
 
-  /* ----- Remember me (kaliwa) at Forgot password (kanan) ----- */
+  /* ----- Options: Remember me & Forgot Password ----- */
   .login-wrapper .login-options {
     display: flex !important;
     flex-direction: row !important;
     justify-content: space-between !important;
     align-items: center !important;
-    flex-wrap: wrap;
-    gap: 8px 12px;
-    margin: 8px 0 0 !important;
+    margin: 4px 0 18px 0 !important;
+    width: 100% !important;
   }
 
   .login-wrapper .remember {
-    color: #475569 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    color: #64748b !important;
     font-size: 13px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
   }
 
   .login-wrapper .remember input {
-    accent-color: #1e3a8a;
+    accent-color: #2563eb !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 !important;
   }
 
   .login-wrapper .forgot {
-    display: block;
-    text-align: right;
-    color: #1e3a8a !important;
+    color: #2563eb !important;
     font-size: 13px !important;
-    font-weight: 700;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
   }
 
-  /* ----- Button: pill, full width ----- */
+  .login-wrapper .forgot:hover {
+    text-decoration: underline !important;
+  }
+
+  /* ----- Submit Button ----- */
   .login-wrapper .login-btn {
     height: 48px !important;
-    margin-top: 16px !important;
+    width: 100% !important;
     padding: 0 !important;
+    margin-top: 0 !important;
     font-size: 15px !important;
-    border-radius: 999px !important;
-    box-shadow: 0 10px 22px -8px rgba(30, 58, 138, 0.55);
+    font-weight: 700 !important;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: transform 0.1s ease, box-shadow 0.15s ease !important;
+  }
+
+  .login-wrapper .login-btn:active {
+    transform: scale(0.98) !important;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25) !important;
   }
 
   .login-wrapper .signup-text {
-    margin-top: 14px !important;
-    font-size: 13px !important;
-    color: #64748b;
+    margin-top: 18px !important;
+    font-size: 13.5px !important;
+    color: #64748b !important;
+    text-align: center !important;
   }
 
   .login-wrapper .signup-text span {
-    color: #1e3a8a;
-    font-weight: 700;
+    color: #2563eb !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
   }
 }
 

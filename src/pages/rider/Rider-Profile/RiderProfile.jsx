@@ -236,9 +236,13 @@ export default function RiderProfile() {
           style={{ position: "relative", cursor: "pointer" }}
         >
           <img
-            src={rider.profile_picture}
+            src={rider.profile_picture || DEFAULT_PICTURE}
             alt="Profile"
             className="profile-image"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = DEFAULT_PICTURE;
+            }}
           />
           <label htmlFor="pfp-input" className="camera-badge">
             <Camera size={18} />
