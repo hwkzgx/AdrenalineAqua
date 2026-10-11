@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../../supabase";
+import { CheckCircle, XCircle } from "lucide-react";
 import "./register.css";
 import AquaLogo from "../../../assets/AquaLogo.png";
 
@@ -17,6 +18,34 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+
+  // ===============================
+  // MODAL (pamalit sa alert)
+  // ===============================
+  const [modal, setModal] = useState({ show: false, type: "success", title: "", message: "" });
+  const redirectTimer = useRef(null);
+
+  const showModal = (message, type = "success", title) => {
+    setModal({
+      show: true,
+      type,
+      title: title || (type === "success" ? "Account Created!" : "Oops!"),
+      message,
+    });
+  };
+
+  const closeModal = () => {
+    setModal((m) => ({ ...m, show: false }));
+    if (modal.type === "success") {
+      clearTimeout(redirectTimer.current);
+      nav("/accountcreated");
+    }
+  };
+
+  useEffect(() => {
+    return () => clearTimeout(redirectTimer.current);
+  }, []);
 
   // 🔥 ROLE PREFIX
   const getPrefix = (role) => {
@@ -78,78 +107,102 @@ export default function Register() {
   };
 
   // 🔥 REGISTER
- // 🔥 REGISTER
-const handleRegister = async () => {
-  if (
-    !name ||
-    !email ||
-    !address ||
-    !contactNumber ||
-    !password ||
-    !confirmPassword
-  ) {
-    alert("Please fill all fields");
-    return;
-  }
+  const handleRegister = async () => {
+    if (
+      !name ||
+      !email ||
+      !address ||
+      !contactNumber ||
+      !password ||
+      !confirmPassword
+    ) {
+      showModal("Please fill all fields.", "error");
+      return;
+    }
 
-  if (password !== confirmPassword) {
-    alert("Passwords do not match");
-    return;
-  }
+    if (password !== confirmPassword) {
+      showModal("Passwords do not match.", "error");
+      return;
+    }
 
-  const passError = validatePassword(password);
+    const passError = validatePassword(password);
 
-  if (passError) {
-    alert(passError);
-    return;
-  }
+    if (passError) {
+      showModal(passError, "error");
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  // Create account in Supabase Authentication
-  const { data, error: authError } = await supabase.auth.signUp({
-    email,
-    password,
-  });
-  
-  console.log("SIGNUP DATA:", data);
-console.log("SIGNUP ERROR:", authError);
-
-  if (authError) {
-    setLoading(false);
-    alert("Registration failed: " + authError.message);
-    return;
-  }
-
-  const customId = await generateUserId(role);
-
-  // Save additional user information
-  const { error: userError } = await supabase.from("users").insert([
-    {
-      user_id: customId,
-      name,
+    // Create account in Supabase Authentication
+    const { data, error: authError } = await supabase.auth.signUp({
       email,
-      address,
-      contact_number: contactNumber,
       password,
-      role,
-    },
-  ]);
+    });
 
-  setLoading(false);
+    console.log("SIGNUP DATA:", data);
+    console.log("SIGNUP ERROR:", authError);
 
-  if (userError) {
-    console.log(userError.message);
-    alert("Registration failed: " + userError.message);
-    return;
-  }
+    if (authError) {
+      setLoading(false);
+      showModal("Registration failed: " + authError.message, "error");
+      return;
+    }
 
-  alert("Account created! Please check your email to verify your account.");
-  nav("/accountcreated");
-};
+    const customId = await generateUserId(role);
+
+    // Save additional user information
+    const { error: userError } = await supabase.from("users").insert([
+      {
+        user_id: customId,
+        name,
+        email,
+        address,
+        contact_number: contactNumber,
+        password,
+        role,
+      },
+    ]);
+
+    setLoading(false);
+
+    if (userError) {
+      console.log(userError.message);
+      showModal("Registration failed: " + userError.message, "error");
+      return;
+    }
+
+    // SUCCESS: toast muna, tapos lipat sa next page
+    setDone(true);
+    showModal(
+      "Please check your email to verify your account.",
+      "success"
+    );
+    redirectTimer.current = setTimeout(() => nav("/accountcreated"), 3500);
+  };
 
   return (
     <div className="login-wrapper">
+
+      {/* MODAL */}
+      {modal.show && (
+        <div className="reg-modal-overlay" onClick={closeModal}>
+          <div
+            className={`reg-modal ${modal.type}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="reg-modal-icon">
+              {modal.type === "success" ? <CheckCircle size={44} /> : <XCircle size={44} />}
+            </div>
+            <h3>{modal.title}</h3>
+            <p>{modal.message}</p>
+            <button className="reg-modal-btn" onClick={closeModal}>
+              {modal.type === "success" ? "Continue" : "Okay"}
+            </button>
+            {modal.type === "success" && <div className="reg-modal-bar" />}
+          </div>
+        </div>
+      )}
 
       <div className="login-left">
         <div className="overlay"></div>
@@ -218,9 +271,9 @@ console.log("SIGNUP ERROR:", authError);
           <button
             className="register-btn"
             onClick={handleRegister}
-            disabled={loading}
+            disabled={loading || done}
           >
-            {loading ? "Creating..." : "Register"}
+            {loading ? "Creating..." : done ? "Account created ✓" : "Register"}
           </button>
 
         {/* FOOTER LINK */}

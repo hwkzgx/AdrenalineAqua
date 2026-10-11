@@ -58,6 +58,9 @@ export default function CustomerTrackOrder() {
   const [riderId, setRiderId] = useState(null);
   const [showChat, setShowChat] = useState(false);
 
+  // RED DOT (unread message indicator)
+  const [hasUnread, setHasUnread] = useState(false);
+
   const [riderPosition, setRiderPosition] = useState(null);
   const [destinationPosition, setDestinationPosition] = useState(null);
 
@@ -134,6 +137,7 @@ export default function CustomerTrackOrder() {
       setIsRiderMoving(false);
       setDestinationPosition(null);
       setRiderPosition(null);
+      setHasUnread(false);
       return;
     }
 
@@ -254,6 +258,73 @@ export default function CustomerTrackOrder() {
       supabase.removeChannel(channel);
     };
   }, [order?.order_id, order?.id]);
+
+  // RED DOT: i-check kung may unread message galing sa rider
+  useEffect(() => {
+    const currentOrderId = order?.order_id || order?.id;
+
+    if (!currentOrderId || !riderId) {
+      setHasUnread(false);
+      return;
+    }
+
+    const me = JSON.parse(localStorage.getItem("user") || "null");
+    const myId = me?.users_id || me?.id;
+    const seenKey = `chatSeen_${currentOrderId}_${myId}`;
+
+    const checkUnread = async () => {
+      const lastSeen =
+        localStorage.getItem(seenKey) || "1970-01-01T00:00:00.000Z";
+
+      const { count, error } = await supabase
+        .from("messages")
+        .select("*", { count: "exact", head: true })
+        .eq("order_id", currentOrderId)
+        .eq("sender_id", riderId)
+        .gt("created_at", lastSeen);
+
+      if (!error) setHasUnread((count || 0) > 0);
+    };
+
+    checkUnread();
+
+    // Real-time: lalabas agad ang dot pag may bagong message
+    const channel = supabase
+      .channel(`chat-badge-${currentOrderId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `order_id=eq.${currentOrderId}`,
+        },
+        (payload) => {
+          if (String(payload.new.sender_id) === String(riderId)) {
+            setHasUnread(true);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [order?.order_id, order?.id, riderId]);
+
+  // Markahan na "seen" kapag binuksan o isinara ang chat
+  const markChatSeen = () => {
+    const currentOrderId = order?.order_id || order?.id;
+    if (!currentOrderId) return;
+
+    const me = JSON.parse(localStorage.getItem("user") || "null");
+    const myId = me?.users_id || me?.id;
+    localStorage.setItem(
+      `chatSeen_${currentOrderId}_${myId}`,
+      new Date().toISOString()
+    );
+    setHasUnread(false);
+  };
 
   const isDelivered =
     deliveryStatus?.toLowerCase() === "delivered" ||
@@ -403,13 +474,17 @@ export default function CustomerTrackOrder() {
                       <button
                         className="message-btn"
                         disabled={!activeDriver || !riderId}
-                        onClick={() => setShowChat(true)}
+                        onClick={() => {
+                          markChatSeen();
+                          setShowChat(true);
+                        }}
                         style={{
                           opacity: activeDriver && riderId ? 1 : 0.6,
                           cursor: activeDriver && riderId ? "pointer" : "not-allowed"
                         }}
                       >
                         <MessageCircle size={16} /> Message
+                        {hasUnread && <span className="unread-dot" />}
                       </button>
                     </div>
                   </div>
@@ -552,7 +627,10 @@ export default function CustomerTrackOrder() {
               otherUserId={riderId}
               otherUserName={riderName}
               otherUserRole="Delivery Rider"
-              onClose={() => setShowChat(false)}
+              onClose={() => {
+                markChatSeen();
+                setShowChat(false);
+              }}
             />
           </div>
         </div>

@@ -1,12 +1,32 @@
-/* MAIN CONTAINER */
+/* =========================================
+   BASE / MAIN CONTAINER
+========================================= */
+.cusdashboard-container,
+.cusdashboard-container *,
+.cusdashboard-container *::before,
+.cusdashboard-container *::after {
+  box-sizing: border-box;
+}
+
 .cusdashboard-container {
   background-image: url("../../../assets/aqua-bg.png");
   background-size: cover;
   background-position: center;
-  padding: 24px 32px;
+  padding: clamp(16px, 2.5vw, 24px) clamp(16px, 3vw, 32px);
   min-height: 100vh;
+  width: 100%;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  box-sizing: border-box;
+}
+
+/* sa sobrang lapad na screen, hindi mag-uunat ang laman */
+.welcome-section,
+.top-cards,
+.graph-card,
+.customer-bottom-grid {
+  width: 100%;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* =========================
@@ -15,14 +35,15 @@
 
 .welcome-section {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
-  gap: 20px;
+  gap: 16px 20px;
 }
 
 .welcome-section h1 {
-  font-size: 28px;
+  font-size: clamp(22px, 2.6vw, 28px);
   color: #111827;
   font-weight: 700;
   letter-spacing: -0.3px;
@@ -48,6 +69,7 @@
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   background: #fff;
   padding: 10px 16px;
+  min-height: 40px;
   border-radius: 12px;
   display: flex;
   gap: 8px;
@@ -76,7 +98,7 @@
 
 .graph-header h2 {
   margin: 0;
-  font-size: 19px;
+  font-size: clamp(17px, 2vw, 19px);
   color: #111827;
   font-weight: 700;
 }
@@ -89,6 +111,7 @@
 
 .graph-header .month-btn.small {
   padding: 8px 14px;
+  min-height: 36px;
   font-size: 13px;
 }
 
@@ -98,11 +121,13 @@
   top: calc(100% + 8px);
   right: 0;
   width: 180px;
+  max-width: calc(100vw - 32px);
+  max-height: 60vh;
+  overflow-y: auto;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.18), 0 4px 10px rgba(15, 23, 42, 0.06);
   border: 1px solid #eef2f7;
-  overflow: hidden;
   z-index: 9999;
   animation: dropFade 0.15s ease;
 }
@@ -148,22 +173,22 @@
 
 .top-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 1.6vw, 20px);
   margin-bottom: 24px;
 }
 
 .stat-card {
   background: #fff;
   border-radius: 18px;
-  padding: 22px;
+  padding: clamp(16px, 1.8vw, 22px);
   border: 1px solid #eef2f7;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 8px 20px -8px rgba(15, 23, 42, 0.06);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   min-height: 168px;
-  box-sizing: border-box;
+  min-width: 0;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -226,8 +251,9 @@
   border: 1px solid #e2e8f0;
 }
 
+/* mobile-only na button: nakatago sa desktop */
 .view-orders-btn {
-  display: inline-flex;
+  display: none;
   align-items: center;
   justify-content: center;
   border: 1px solid #dbeafe;
@@ -252,6 +278,7 @@
   flex-direction: column;
   gap: 3px;
   text-align: left;
+  min-width: 0;
 }
 
 .card-tag-label {
@@ -262,7 +289,7 @@
 }
 
 .card-metric-val {
-  font-size: 26px;
+  font-size: clamp(22px, 2.2vw, 26px);
   color: #0f172a;
   font-weight: 800;
   line-height: 1.2;
@@ -289,7 +316,7 @@
 .graph-card {
   background: #fff;
   border-radius: 20px;
-  padding: 24px 28px;
+  padding: clamp(16px, 2vw, 24px) clamp(16px, 2.2vw, 28px);
   border: 1px solid #eef2f7;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 8px 20px -8px rgba(15, 23, 42, 0.06);
   margin-bottom: 24px;
@@ -297,7 +324,7 @@
 
 .graph {
   position: relative;
-  height: 260px;
+  height: clamp(200px, 26vw, 260px);
   border-left: 1px solid #e2e8f0;
   border-bottom: 1px solid #e2e8f0;
   margin: 15px 0 16px 0;
@@ -369,6 +396,7 @@
 
 .graph-labels span {
   flex: 1;
+  min-width: 0;
   word-break: break-word;
 }
 
@@ -378,7 +406,7 @@
 
 .customer-bottom-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
 }
 
@@ -386,9 +414,10 @@
 .recent-card {
   background: white;
   border-radius: 20px;
-  padding: 24px;
+  padding: clamp(16px, 2vw, 24px);
   border: 1px solid #eef2f7;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 8px 20px -8px rgba(15, 23, 42, 0.06);
+  min-width: 0;
 }
 
 .customer-section-header,
@@ -396,6 +425,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-bottom: 18px;
 }
 
@@ -414,6 +445,10 @@
   padding: 16px;
   border-radius: 14px;
   border: 1px solid #eef2f7;
+}
+
+.customer-delivery-content > div {
+  min-width: 0;
 }
 
 .customer-delivery-content img {
@@ -454,6 +489,7 @@
   background: #ffffff;
   border-radius: 12px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table-container table {
@@ -485,52 +521,56 @@
   background: #f8fafc;
 }
 
-/* =========================
-   RESPONSIVE DESIGN
-========================= */
-
-/* TABLET (<=1200px): 3 cards still fit, tighten bottom grid */
-@media (max-width: 1200px) {
-  .customer-bottom-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* TABLET (<=1024px): cards go 2-column */
-@media (max-width: 1024px) {
-  .top-cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* =====================================================
-   MOBILE REDESIGN (<= 768px)
-===================================================== */
-
-/* mobile-only elements: hidden by default (desktop) */
-.view-orders-btn,
+/* mobile-only elements: nakatago sa desktop */
 .range-seg,
 .graph-line,
 .lbl-short {
   display: none;
 }
 
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+/* ---------- LAPTOP / SMALL DESKTOP (<=1200px) ---------- */
+@media (max-width: 1200px) {
+  .customer-bottom-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- TABLET (<=1024px) ---------- */
+@media (max-width: 1024px) {
+  .top-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* para walang mag-isang card sa ilalim */
+  .stat-card.pending-card {
+    grid-column: 1 / -1;
+    min-height: auto;
+  }
+
+  .stat-card {
+    min-height: 150px;
+  }
+}
+
+/* ---------- MOBILE (<=768px) ---------- */
 @media (max-width: 768px) {
-  /* ---------- BACKGROUND + PAGE ---------- */
+  /* PAGE */
   .cusdashboard-container {
     background-size: 100% auto;
     background-position: top center;
     background-repeat: no-repeat;
     background-color: #e0effc;
     padding: 16px 16px 32px 16px;
-    width: 100%;
-    box-sizing: border-box;
   }
 
   .welcome-section {
     padding: 6px 0 0 0;
     margin-bottom: 16px;
-    gap: 8px;
+    gap: 8px 12px;
   }
 
   .welcome-section h1 {
@@ -543,17 +583,15 @@
     color: #6a7d9c;
   }
 
-  /* ---------- TOP CARDS ---------- */
+  /* TOP CARDS */
   .top-cards {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
     margin-bottom: 16px;
   }
 
   .stat-card {
     border: 1px solid rgba(255, 255, 255, 0.85);
-    border-radius: 18px;
     background: rgba(255, 255, 255, 0.94);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
@@ -561,16 +599,15 @@
     padding: 16px 14px;
     min-height: 125px;
     transform: none;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
   }
 
-  /* Pending card: compact horizontal hero card on mobile */
+  .stat-card:hover {
+    transform: none;
+  }
+
+  /* Pending card: horizontal hero card */
   .stat-card.pending-card {
     grid-column: 1 / -1;
-    display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
@@ -581,36 +618,25 @@
   }
 
   .stat-card.pending-card .pending-card-main {
-    display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: flex-start;
     gap: 12px;
     min-width: 0;
     flex: 1;
+    height: auto;
   }
 
   .stat-card.pending-card .icon-box {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
     margin-bottom: 0;
-    flex-shrink: 0;
   }
 
   .stat-card.pending-card .view-orders-btn {
     position: static;
     display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #dbeafe;
-    background: #eff6ff;
-    color: #2563eb;
-    font-weight: 600;
     font-size: 12px;
     padding: 8px 14px;
-    border-radius: 999px;
     white-space: nowrap;
-    cursor: pointer;
     flex-shrink: 0;
   }
 
@@ -619,7 +645,6 @@
     transform: scale(0.98);
   }
 
-  /* Frequency & Member mini cards */
   .stat-card.frequency-card,
   .stat-card.member-card {
     padding: 16px 14px 14px;
@@ -627,52 +652,33 @@
   }
 
   .card-top-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px; /* Distinct gap between icon row and card name */
-    width: 100%;
+    margin-bottom: 14px;
   }
 
   .icon-box {
     width: 36px;
     height: 36px;
     border-radius: 10px;
-    margin-bottom: 0;
-    flex-shrink: 0;
   }
 
   .card-pill-tag {
     font-size: 11px;
-    font-weight: 600;
     padding: 3px 8px;
-    border-radius: 999px;
-    background: #f1f5f9;
-    color: #475569;
-    border: 1px solid #e2e8f0;
     white-space: nowrap;
   }
 
   .card-body {
-    display: flex;
-    flex-direction: column;
     gap: 2px;
-    text-align: left;
   }
 
   .card-tag-label {
     font-size: 11.5px;
-    color: #64748b;
-    font-weight: 600;
     margin-bottom: 2px;
   }
 
   .card-metric-val {
     font-size: 19px;
-    font-weight: 800;
     color: #0e1f3f;
-    line-height: 1.2;
-    margin: 0;
     white-space: nowrap;
   }
 
@@ -682,8 +688,6 @@
 
   .card-metric-val .unit-text {
     font-size: 12px;
-    font-weight: 500;
-    color: #64748b;
     margin-left: 2px;
   }
 
@@ -696,7 +700,7 @@
     text-overflow: ellipsis;
   }
 
-  /* ---------- GRAPH ---------- */
+  /* GRAPH */
   .graph-card {
     padding: 18px 16px 14px;
     margin-bottom: 16px;
@@ -826,7 +830,7 @@
     display: inline;
   }
 
-  /* ---------- BOTTOM SECTION ---------- */
+  /* BOTTOM SECTION */
   .customer-bottom-grid {
     display: flex;
     flex-direction: column;
@@ -841,25 +845,79 @@
     background: rgba(255, 255, 255, 0.94);
     box-shadow: 0 4px 18px rgba(40, 100, 190, 0.08);
     width: 100%;
-    box-sizing: border-box;
   }
 
   .table-container {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
     border-radius: 10px;
     border: 1px solid #e2e8f0;
   }
 }
 
-/* Small screens adjustment */
+/* ---------- SMALL PHONES (<=480px) ---------- */
+@media (max-width: 480px) {
+  .cusdashboard-container {
+    padding: 14px 12px 28px 12px;
+  }
+
+  /* title sa taas, month dropdown sa ilalim, buong lapad */
+  .welcome-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .welcome-section .month-dropdown {
+    width: 100%;
+  }
+
+  .welcome-section .month-btn {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .welcome-section .month-dropdown-menu {
+    width: 100%;
+  }
+
+  .graph-card {
+    padding: 16px 12px 12px;
+  }
+
+  .graph {
+    height: 180px;
+  }
+
+  .graph-labels {
+    font-size: 9.5px;
+  }
+
+  /* delivery card: bababa ang button para hindi sumikip */
+  .customer-delivery-content {
+    flex-wrap: wrap;
+    padding: 14px;
+  }
+
+  .customer-delivery-content button {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .customer-section-header h2,
+  .section-header h2 {
+    font-size: 16px;
+  }
+}
+
+/* ---------- VERY SMALL (<=360px) ---------- */
 @media (max-width: 360px) {
   .top-cards {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .stat-card.pending-card {
     grid-column: auto;
+  }
+
+  .stat-card.pending-card .view-orders-btn {
+    padding: 7px 10px;
   }
 }

@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../supabase";
+import { CheckCircle, XCircle } from "lucide-react";
 import "./customer-register.css";
 import AquaLogo from "../../assets/AquaLogo.png";
 
@@ -18,8 +19,33 @@ export default function CustomerRegister() {
 
   const [loading, setLoading] = useState(false);
 
-  const [error, setError] = useState("");
+  const [done, setDone] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+
+  // MODAL (pamalit sa alert / inline error)
+  const [modal, setModal] = useState({ show: false, type: "success", title: "", message: "" });
+  const redirectTimer = useRef(null);
+
+  const showModal = (message, type = "success", title) => {
+    setModal({
+      show: true,
+      type,
+      title: title || (type === "success" ? "Account Created!" : "Oops!"),
+      message,
+    });
+  };
+
+  const closeModal = () => {
+    setModal((m) => ({ ...m, show: false }));
+    if (modal.type === "success") {
+      clearTimeout(redirectTimer.current);
+      nav("/customer/account-created");
+    }
+  };
+
+  useEffect(() => {
+    return () => clearTimeout(redirectTimer.current);
+  }, []);
 
   // 🔥 PASSWORD VALIDATION
   const validatePassword = (pass) => {
@@ -60,8 +86,6 @@ export default function CustomerRegister() {
 
   // 🔥 REGISTER
   const handleRegister = async () => {
-    setError("");
-
     if (
       !name ||
       !email ||
@@ -70,12 +94,12 @@ export default function CustomerRegister() {
       !password ||
       !confirmPassword
     ) {
-      setError("Please fill all fields");
+      showModal("Please fill all fields.", "error");
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      showModal("Passwords do not match.", "error");
       return;
     }
 
@@ -83,6 +107,7 @@ export default function CustomerRegister() {
 
     if (passError) {
       setPasswordError(passError);
+      showModal(passError, "error");
       return;
     }
 
@@ -100,7 +125,7 @@ const { data: authData, error: authError } = await supabase.auth.signUp({
 if (authError) {
   setLoading(false);
   console.log("AUTH ERROR:", authError);
-  setError(authError.message);
+  showModal("Registration failed: " + authError.message, "error");
   return;
 }
 
@@ -124,15 +149,41 @@ const customerId = await generateCustomerId();
 
     if (error) {
       console.log(error.message);
-      setError("Registration failed");
+      showModal("Registration failed: " + error.message, "error");
       return;
     }
 
-    nav("/customer/account-created");
+    // SUCCESS: modal muna, tapos lipat sa next page
+    setDone(true);
+    showModal("Please check your email to verify your account.", "success");
+    redirectTimer.current = setTimeout(
+      () => nav("/customer/account-created"),
+      3500
+    );
   };
 
   return (
     <div className="login-wrapper">
+
+      {/* MODAL */}
+      {modal.show && (
+        <div className="reg-modal-overlay" onClick={closeModal}>
+          <div
+            className={`reg-modal ${modal.type}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="reg-modal-icon">
+              {modal.type === "success" ? <CheckCircle size={44} /> : <XCircle size={44} />}
+            </div>
+            <h3>{modal.title}</h3>
+            <p>{modal.message}</p>
+            <button className="reg-modal-btn" onClick={closeModal}>
+              {modal.type === "success" ? "Continue" : "Okay"}
+            </button>
+            {modal.type === "success" && <div className="reg-modal-bar" />}
+          </div>
+        </div>
+      )}
 
       {/* LEFT SIDE */}
       <div className="login-left">
@@ -213,22 +264,15 @@ const customerId = await generateCustomerId();
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
 
-          {/* GENERAL ERROR */}
-          <div style={{ minHeight: "15px", margin: "2px 0" }}>
-            {error && (
-              <p style={{ color: "red", fontSize: "11px", margin: 0 }}>
-                {error}
-              </p>
-            )}
-          </div>
+          <div style={{ minHeight: "15px", margin: "2px 0" }} />
 
           {/* BUTTON */}
           <button
             className="custregister-btn"
             onClick={handleRegister}
-            disabled={loading}
+            disabled={loading || done}
           >
-            {loading ? "Creating..." : "Register"}
+            {loading ? "Creating..." : done ? "Account created ✓" : "Register"}
           </button>
 
           {/* LOGIN LINK */}

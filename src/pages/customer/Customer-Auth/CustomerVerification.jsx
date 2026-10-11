@@ -121,7 +121,7 @@ export default function CustomerVerification() {
       <div className="login-left">
         <div className="overlay"></div>
         <div className="branding">
-          <h1>AQUA SYSTEM</h1>
+          <h1>ADRENALINE AQUA WATER STATION</h1>
           <p>Secure & Smart Access</p>
         </div>
       </div>

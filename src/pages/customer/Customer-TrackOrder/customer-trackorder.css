@@ -202,6 +202,7 @@
 }
 
 .message-btn {
+  position: relative; /* para sa red dot */
   margin-top: 15px;
   border: 1px solid #d5dbe7;
   background: white;
@@ -213,6 +214,30 @@
   align-items: center;
   gap: 8px;
   cursor: pointer;
+}
+
+/* RED DOT (unread message) */
+.unread-dot {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 12px;
+  height: 12px;
+  background: #ef4444;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  animation: dotPop 0.25s ease;
+}
+
+@keyframes dotPop {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* MAP */

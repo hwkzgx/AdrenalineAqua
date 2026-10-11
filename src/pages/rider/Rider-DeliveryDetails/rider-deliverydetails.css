@@ -137,6 +137,7 @@
 
 /* MESSAGE BUTTON */
 .message-btn {
+  position: relative; /* para sa red dot */
   height: 40px;
   padding: 0 18px;
   border: none;
@@ -151,6 +152,19 @@
 
 .message-btn:hover {
   background: #dbeafe;
+}
+
+/* RED DOT (unread message) */
+.unread-dot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 12px;
+  height: 12px;
+  background: #ef4444;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  animation: toastIn 0.25s ease;
 }
 
 /* SCHEDULE */
@@ -735,7 +749,6 @@ h3::after,
 
 /* ===============================
    TOAST NOTIFICATION (lower right, compact)
-   (palitan ang dating .toast styles sa rider-deliverydetails.css)
    =============================== */
 .toast {
   position: fixed;

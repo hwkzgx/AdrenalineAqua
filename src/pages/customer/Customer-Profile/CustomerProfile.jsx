@@ -4,6 +4,12 @@ import { Pencil, Check, CheckCircle2, XCircle } from "lucide-react";
 import "./customer-profile.css";
 import { supabase } from "../../../supabase";
 
+// Gumagawa ng ligtas na filename (walang espasyo/special characters)
+const makeFileName = (usersId, file) => {
+  const ext = (file.name.split(".").pop() || "png").toLowerCase();
+  return `${usersId}-${Date.now()}.${ext}`;
+};
+
 function CustomerProfile() {
   const navigate = useNavigate();
 
@@ -39,7 +45,7 @@ function CustomerProfile() {
 
     toastTimer.current = setTimeout(() => {
       setToast(null);
-    }, 3000);
+    }, 4000);
   };
 
   useEffect(() => {
@@ -77,10 +83,7 @@ function CustomerProfile() {
 
       if (error) {
         console.log("Fetch profile error:", error.message);
-        return;
-      }
-
-      if (data) {
+      } else if (data) {
         setProfile({
           fullname: data.name || "",
           email: data.email || "",
@@ -94,13 +97,16 @@ function CustomerProfile() {
       }
 
       // Kunin ang existing profile picture mula sa customer_profiles
+      // (tumatakbo kahit nag-error ang users query)
       const { data: profileData, error: profileError } = await supabase
         .from("customer_profiles")
         .select("id_photo")
         .eq("users_id", storedUser.users_id)
         .maybeSingle();
 
-      if (!profileError && profileData?.id_photo) {
+      if (profileError) {
+        console.log("Fetch profile picture error:", profileError.message);
+      } else if (profileData?.id_photo) {
         setProfilePic(profileData.id_photo);
       }
     };
@@ -161,7 +167,8 @@ function CustomerProfile() {
   // UPLOAD PROFILE PICTURE (actual upload sa Storage + save sa DB)
   // ===============================
   const handleProfilePicUpload = async (e) => {
-    const file = e.target.files[0];
+    const input = e.target;
+    const file = input.files[0];
     if (!file) return;
 
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -169,16 +176,17 @@ function CustomerProfile() {
 
     setUploadingPic(true);
 
-    const fileName = `${storedUser.users_id}-${Date.now()}-${file.name}`;
+    const fileName = makeFileName(storedUser.users_id, file);
 
     const { error: uploadError } = await supabase.storage
       .from("profile_pictures")
-      .upload(fileName, file, { upsert: true });
+      .upload(fileName, file, { upsert: true, contentType: file.type });
 
     if (uploadError) {
-      console.log("Profile picture upload error:", uploadError.message);
+      console.log("Profile picture upload error:", uploadError);
       setUploadingPic(false);
-      showToast("error", "Failed to upload profile photo. Please try again.");
+      showToast("error", `Upload failed: ${uploadError.message}`);
+      input.value = "";
       return;
     }
 
@@ -196,15 +204,17 @@ function CustomerProfile() {
       );
 
     if (dbError) {
-      console.log("Save profile picture error:", dbError.message);
+      console.log("Save profile picture error:", dbError);
       setUploadingPic(false);
-      showToast("error", "Failed to save profile photo. Please try again.");
+      showToast("error", `Save failed: ${dbError.message}`);
+      input.value = "";
       return;
     }
 
     setProfilePic(publicUrl);
     setUploadingPic(false);
     showToast("success", "Profile photo updated!");
+    input.value = ""; // para puwedeng piliin ulit ang parehong file
   };
 
   // ===============================
@@ -240,16 +250,19 @@ function CustomerProfile() {
     let finalValidIdUrl = validId;
 
     if (validIdFile) {
-      const fileName = `${storedUser.users_id}-${Date.now()}-${validIdFile.name}`;
+      const fileName = makeFileName(storedUser.users_id, validIdFile);
 
       const { error: uploadError } = await supabase.storage
         .from("valid_ids")
-        .upload(fileName, validIdFile, { upsert: true });
+        .upload(fileName, validIdFile, {
+          upsert: true,
+          contentType: validIdFile.type,
+        });
 
       if (uploadError) {
-        console.log("Valid ID upload error:", uploadError.message);
+        console.log("Valid ID upload error:", uploadError);
         setUploadingId(false);
-        showToast("error", "Failed to upload valid ID. Please try again.");
+        showToast("error", `Upload failed: ${uploadError.message}`);
         return;
       }
 
@@ -267,9 +280,9 @@ function CustomerProfile() {
       .eq("users_id", storedUser.users_id);
 
     if (updateError) {
-      console.log("Submit verification error:", updateError.message);
+      console.log("Submit verification error:", updateError);
       setUploadingId(false);
-      showToast("error", "Failed to submit verification. Please try again.");
+      showToast("error", `Submit failed: ${updateError.message}`);
       return;
     }
 

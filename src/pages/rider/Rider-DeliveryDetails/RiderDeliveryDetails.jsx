@@ -22,6 +22,9 @@ export default function RiderDeliveryDetails() {
   const [showChat, setShowChat] = useState(false);
   const navigate = useNavigate();
 
+  // RED DOT (unread message indicator)
+  const [hasUnread, setHasUnread] = useState(false);
+
   // TOAST
   const [toast, setToast] = useState(null); // { message, type: "success" | "error" }
   const toastTimer = useRef(null);
@@ -168,6 +171,66 @@ export default function RiderDeliveryDetails() {
 
     geocodeAddress();
   }, [mapQuery]);
+
+  // RED DOT: i-check kung may unread message galing sa customer
+  useEffect(() => {
+    if (!delivery?.orderId || !delivery?.customerId) return;
+
+    const me = JSON.parse(localStorage.getItem("user") || "null");
+    const myId = me?.users_id || me?.id;
+    const seenKey = `chatSeen_${delivery.orderId}_${myId}`;
+
+    const checkUnread = async () => {
+      const lastSeen =
+        localStorage.getItem(seenKey) || "1970-01-01T00:00:00.000Z";
+
+      const { count, error } = await supabase
+        .from("messages")
+        .select("*", { count: "exact", head: true })
+        .eq("order_id", delivery.orderId)
+        .eq("sender_id", delivery.customerId)
+        .gt("created_at", lastSeen);
+
+      if (!error) setHasUnread((count || 0) > 0);
+    };
+
+    checkUnread();
+
+    // Real-time: lalabas agad ang dot pag may bagong message
+    const channel = supabase
+      .channel(`chat-badge-${delivery.orderId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `order_id=eq.${delivery.orderId}`,
+        },
+        (payload) => {
+          if (String(payload.new.sender_id) === String(delivery.customerId)) {
+            setHasUnread(true);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [delivery?.orderId, delivery?.customerId]);
+
+  // Markahan na "seen" kapag binuksan o isinara ang chat
+  const markChatSeen = () => {
+    if (!delivery?.orderId) return;
+    const me = JSON.parse(localStorage.getItem("user") || "null");
+    const myId = me?.users_id || me?.id;
+    localStorage.setItem(
+      `chatSeen_${delivery.orderId}_${myId}`,
+      new Date().toISOString()
+    );
+    setHasUnread(false);
+  };
 
   const fetchDeliveryDetails = async () => {
     const { data, error } = await supabase
@@ -382,8 +445,15 @@ export default function RiderDeliveryDetails() {
 
             <div className="customer-row">
               <h3 className="customer-name">{delivery.full_name}</h3>
-              <button className="message-btn" onClick={() => setShowChat(true)}>
+              <button
+                className="message-btn"
+                onClick={() => {
+                  markChatSeen();
+                  setShowChat(true);
+                }}
+              >
                 Message
+                {hasUnread && <span className="unread-dot" />}
               </button>
             </div>
 
@@ -865,7 +935,10 @@ export default function RiderDeliveryDetails() {
               otherUserId={delivery.customerId}
               otherUserName={delivery.full_name}
               otherUserRole="Customer"
-              onClose={() => setShowChat(false)}
+              onClose={() => {
+                markChatSeen();
+                setShowChat(false);
+              }}
             />
           </div>
         </div>

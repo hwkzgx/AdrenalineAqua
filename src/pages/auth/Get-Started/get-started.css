@@ -23,7 +23,7 @@
   position: relative;
   z-index: 2;
 
-  padding: 60px 70px; 
+  padding: 60px 70px;
   border-radius: 25px;
 
   background: rgba(145, 143, 143, 0.15);
@@ -37,7 +37,7 @@
   text-align: center;
   color: #0f172a;
 
-  width: 450px; 
+  width: 450px;
 }
 
 
@@ -70,7 +70,7 @@
   border: none;
   padding: 16px 45px;
   border-radius: 14px;
-  font-size: 16px; 
+  font-size: 16px;
   cursor: pointer;
   border: 2px solid #1e3a8a;
   backdrop-filter: blur(5px);
@@ -88,4 +88,128 @@
 
 .start-btn:active {
   transform: scale(0.95);
+}
+
+
+/* =====================================================
+   RESPONSIVE - TABLET / PHONE (hanggang 768px)
+   Hindi nagagalaw ang desktop
+   ===================================================== */
+@media (max-width: 768px) {
+  .getstarted-container {
+    height: 100vh;
+    height: 100dvh; /* tama ang taas kahit may address bar sa phone */
+    padding: 16px;
+    box-sizing: border-box;
+  }
+
+  .glass-card {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 420px;
+    padding: 40px 28px;
+    border-radius: 22px;
+  }
+
+  .logo {
+    width: 100%;
+    max-width: 340px;
+    height: auto;
+    margin-bottom: 20px;
+  }
+
+  .tagline {
+    font-size: 16px;
+    margin-bottom: 28px;
+  }
+
+  .start-btn {
+    width: 100%;
+    padding: 15px 24px;
+    font-size: 16px;
+  }
+}
+
+
+/* =====================================================
+   RESPONSIVE - MALILIIT NA PHONE (hanggang 400px)
+   ===================================================== */
+@media (max-width: 400px) {
+  .getstarted-container {
+    padding: 12px;
+  }
+
+  .glass-card {
+    padding: 32px 20px;
+    border-radius: 18px;
+  }
+
+  .logo {
+    max-width: 260px;
+    margin-bottom: 16px;
+  }
+
+  .tagline {
+    font-size: 14px;
+    margin-bottom: 22px;
+  }
+
+  .start-btn {
+    padding: 14px 20px;
+    font-size: 15px;
+  }
+}
+
+
+/* =====================================================
+   PHONE NAKAHIGA (landscape) - maikli ang taas ng screen
+   ===================================================== */
+@media (max-height: 520px) and (orientation: landscape) {
+  .getstarted-container {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-y: auto;
+    padding: 16px;
+    box-sizing: border-box;
+  }
+
+  .glass-card {
+    padding: 22px 28px;
+    max-width: 380px;
+  }
+
+  .logo {
+    max-width: 180px;
+    margin-bottom: 10px;
+  }
+
+  .tagline {
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+
+  .start-btn {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}
+
+
+/* =====================================================
+   TOUCH SCREEN - walang dumidikit na hover pagka-tap
+   ===================================================== */
+@media (hover: none) {
+  .start-btn:hover {
+    background: rgba(255, 255, 255, 0.575);
+    color: #1e3a8a;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .start-btn:active {
+    background: rgba(30, 64, 175, 1);
+    color: white;
+    transform: scale(0.97);
+  }
 }

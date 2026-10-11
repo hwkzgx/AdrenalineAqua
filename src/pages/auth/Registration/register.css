@@ -373,3 +373,103 @@
   width: 100%;
   text-align: center !important;
 }
+
+/* =========================
+   REGISTER MODAL (pamalit sa alert)
+========================= */
+.reg-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(3px);
+  animation: regFade 0.2s ease;
+}
+
+.reg-modal {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 380px;
+  padding: 32px 28px 26px;
+  background: #fff;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  animation: regPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reg-modal::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+}
+.reg-modal.success::before { background: linear-gradient(90deg, #22c55e, #16a34a); }
+.reg-modal.error::before { background: linear-gradient(90deg, #f87171, #dc2626); }
+
+.reg-modal-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+}
+.reg-modal.success .reg-modal-icon { background: #dcfce7; color: #16a34a; }
+.reg-modal.error .reg-modal-icon { background: #fee2e2; color: #dc2626; }
+
+.reg-modal h3 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.reg-modal p {
+  margin: 0 0 22px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+.reg-modal-btn {
+  width: 100%;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.reg-modal.success .reg-modal-btn { background: #16a34a; }
+.reg-modal.error .reg-modal-btn { background: #dc2626; }
+.reg-modal-btn:hover { filter: brightness(0.92); }
+.reg-modal-btn:active { transform: scale(0.98); }
+
+/* countdown bar bago mag-redirect */
+.reg-modal-bar {
+  position: absolute;
+  left: 0; bottom: 0;
+  height: 4px;
+  background: #16a34a;
+  animation: regBar 3.5s linear forwards;
+}
+
+@keyframes regFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes regPop {
+  from { opacity: 0; transform: scale(0.85) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes regBar { from { width: 100%; } to { width: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .reg-modal-overlay, .reg-modal, .reg-modal-bar { animation: none; }
+}

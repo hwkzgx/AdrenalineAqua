@@ -59,6 +59,7 @@ function MyProfile() {
 
   const [tempProfile, setTempProfile] = useState(profile);
   const [profilePic, setProfilePic] = useState(null);
+  const [uploadingPic, setUploadingPic] = useState(false);
 
   // TOAST
   const [toast, setToast] = useState(null);
@@ -106,6 +107,23 @@ function MyProfile() {
           contact: storedUser.contact_number || data.contact_number || "",
           address: storedUser.address || data.address || "",
         });
+      }
+
+      // Kunin ang naka-save na profile picture
+      const uid = data?.users_id ?? storedUser.users_id;
+
+      if (uid) {
+        const { data: picData, error: picError } = await supabase
+          .from("customer_profiles")
+          .select("id_photo")
+          .eq("users_id", uid)
+          .maybeSingle();
+
+        if (picError) {
+          console.log("Fetch profile picture error:", picError.message);
+        } else if (picData?.id_photo) {
+          setProfilePic(picData.id_photo);
+        }
       }
     };
 
@@ -177,13 +195,79 @@ function MyProfile() {
     showToast("success", "Profile updated successfully!");
   };
 
-  const handleProfilePicUpload = (e) => {
-    const file = e.target.files[0];
+  // Upload sa Storage (profile_pictures) + save ang URL sa customer_profiles
+  const handleProfilePicUpload = async (e) => {
+    const input = e.target;
+    const file = input.files[0];
+    if (!file) return;
 
-    if (file) {
-      setProfilePic(URL.createObjectURL(file));
-      showToast("success", "Profile photo uploaded!");
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser) return;
+
+    setUploadingPic(true);
+
+    // Kunin ang users_id (kung wala sa localStorage, hanapin sa users table)
+    let uid = storedUser.users_id;
+
+    if (!uid) {
+      const lookup = applyUserFilter(
+        supabase.from("users").select("users_id"),
+        storedUser
+      );
+
+      if (lookup) {
+        const { data: found } = await lookup.limit(1).maybeSingle();
+        uid = found?.users_id;
+      }
     }
+
+    if (!uid) {
+      setUploadingPic(false);
+      showToast("error", "Unable to upload photo. Please log in again.");
+      input.value = "";
+      return;
+    }
+
+    const ext = (file.name.split(".").pop() || "png").toLowerCase();
+    const fileName = `${uid}-${Date.now()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("profile_pictures")
+      .upload(fileName, file, { upsert: true, contentType: file.type });
+
+    if (uploadError) {
+      console.log("Profile picture upload error:", uploadError);
+      setUploadingPic(false);
+      showToast("error", `Upload failed: ${uploadError.message}`);
+      input.value = "";
+      return;
+    }
+
+    const { data } = supabase.storage
+      .from("profile_pictures")
+      .getPublicUrl(fileName);
+
+    const publicUrl = data.publicUrl;
+
+    const { error: dbError } = await supabase
+      .from("customer_profiles")
+      .upsert(
+        { users_id: uid, id_photo: publicUrl },
+        { onConflict: "users_id" }
+      );
+
+    if (dbError) {
+      console.log("Save profile picture error:", dbError);
+      setUploadingPic(false);
+      showToast("error", `Save failed: ${dbError.message}`);
+      input.value = "";
+      return;
+    }
+
+    setProfilePic(publicUrl);
+    setUploadingPic(false);
+    showToast("success", "Profile photo updated!");
+    input.value = ""; // para puwedeng piliin ulit ang parehong file
   };
 
   return (
@@ -284,10 +368,11 @@ function MyProfile() {
           <button
             type="button"
             className="change-photo-trigger-btn"
+            disabled={uploadingPic}
             onClick={() => document.getElementById("profileUpload").click()}
           >
             <Camera size={14} />
-            <span>Change Photo</span>
+            <span>{uploadingPic ? "Uploading..." : "Change Photo"}</span>
           </button>
         </div>
 

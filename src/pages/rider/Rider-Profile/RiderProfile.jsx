@@ -24,7 +24,7 @@ export default function RiderProfile() {
   const showToast = (message, type = "success") => {
     if (toastTimer.current) clearTimeout(toastTimer.current);
     setToast({ message, type });
-    toastTimer.current = setTimeout(() => setToast(null), 30000);
+    toastTimer.current = setTimeout(() => setToast(null), 3000);
   };
 
   useEffect(() => {
@@ -35,6 +35,9 @@ export default function RiderProfile() {
 
   // Dito itatago kung anong column/value ang ginamit ng row sa users table
   const userKey = useRef(null);
+
+  // users_id ng rider (ginagamit sa customer_profiles para sa profile picture)
+  const usersIdRef = useRef(null);
 
   const [originalRider, setOriginalRider] = useState({
     name: "",
@@ -99,6 +102,24 @@ export default function RiderProfile() {
         (c) => data[c] !== undefined && data[c] !== null
       );
       userKey.current = keyCol ? { col: keyCol, value: data[keyCol] } : null;
+      usersIdRef.current = data.users_id ?? null;
+
+      // Kunin ang naka-save na profile picture
+      let picUrl = null;
+
+      if (usersIdRef.current) {
+        const { data: picData, error: picError } = await supabase
+          .from("customer_profiles")
+          .select("id_photo")
+          .eq("users_id", usersIdRef.current)
+          .maybeSingle();
+
+        if (picError) {
+          console.log("Fetch profile picture error:", picError.message);
+        } else {
+          picUrl = picData?.id_photo || null;
+        }
+      }
 
       // I-load ang data mula sa `users` table
       const fetchedData = {
@@ -107,7 +128,7 @@ export default function RiderProfile() {
         contact: data.contact_number || data.phone || data.contact || "",
         address: data.address || "",
         role: data.role || "Delivery Rider",
-        profile_picture: data.profile_picture || DEFAULT_PICTURE,
+        profile_picture: picUrl || data.profile_picture || DEFAULT_PICTURE,
       };
 
       setOriginalRider(fetchedData);
@@ -124,41 +145,83 @@ export default function RiderProfile() {
     setRider((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Upload sa Storage (profile_pictures) + save agad ang URL sa customer_profiles
   const handleImageChange = async (e) => {
-    const file = e.target.files[0];
+    const input = e.target;
+    const file = input.files[0];
     if (!file) return;
 
+    const uid = usersIdRef.current;
+
+    if (!uid) {
+      showToast("Hindi mahanap ang account. Please log in again.", "error");
+      input.value = "";
+      return;
+    }
+
     setSaving(true);
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `${fileName}`;
+
+    const fileExt = (file.name.split(".").pop() || "png").toLowerCase();
+    const filePath = `${uid}-${Date.now()}.${fileExt}`;
 
     const { error: uploadError } = await supabase.storage
-      .from("profiles")
-      .upload(filePath, file);
+      .from("profile_pictures")
+      .upload(filePath, file, { upsert: true, contentType: file.type });
 
     if (uploadError) {
-      console.log("Upload error:", uploadError.message);
-      showToast("Failed to upload image.", "error");
+      console.log("Upload error:", uploadError);
+      showToast(`Upload failed: ${uploadError.message}`, "error");
       setSaving(false);
+      input.value = "";
       return;
     }
 
     const { data: publicUrlData } = supabase.storage
-      .from("profiles")
+      .from("profile_pictures")
       .getPublicUrl(filePath);
 
-    setRider((prev) => ({ ...prev, profile_picture: publicUrlData.publicUrl }));
+    const publicUrl = publicUrlData.publicUrl;
+
+    const { error: dbError } = await supabase
+      .from("customer_profiles")
+      .upsert(
+        { users_id: uid, id_photo: publicUrl },
+        { onConflict: "users_id" }
+      );
+
+    if (dbError) {
+      console.log("Save profile picture error:", dbError);
+      showToast(`Save failed: ${dbError.message}`, "error");
+      setSaving(false);
+      input.value = "";
+      return;
+    }
+
+    // Best-effort: i-sync din sa users.profile_picture kung may ganoong column
+    if (userKey.current) {
+      const { error: syncError } = await supabase
+        .from("users")
+        .update({ profile_picture: publicUrl })
+        .eq(userKey.current.col, userKey.current.value);
+
+      if (syncError) {
+        console.log("users.profile_picture not synced:", syncError.message);
+      }
+    }
+
+    setRider((prev) => ({ ...prev, profile_picture: publicUrl }));
+    setOriginalRider((prev) => ({ ...prev, profile_picture: publicUrl }));
     setSaving(false);
-    showToast("Photo uploaded. Tap Save Changes to apply.");
+    showToast("Profile photo updated!");
+    input.value = ""; // para puwedeng piliin ulit ang parehong file
   };
 
+  // Hindi na kasama ang profile_picture dahil nase-save na ito agad pagka-upload
   const hasChanges =
     rider.name !== originalRider.name ||
     rider.email !== originalRider.email ||
     rider.contact !== originalRider.contact ||
-    rider.address !== originalRider.address ||
-    rider.profile_picture !== originalRider.profile_picture;
+    rider.address !== originalRider.address;
 
   const handleSave = async () => {
     if (!hasChanges) return;
@@ -178,7 +241,6 @@ export default function RiderProfile() {
         email: rider.email,
         contact_number: rider.contact,
         address: rider.address,
-        profile_picture: rider.profile_picture,
       })
       .eq(userKey.current.col, userKey.current.value)
       .select();

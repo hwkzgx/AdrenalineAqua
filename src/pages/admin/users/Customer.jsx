@@ -371,10 +371,6 @@ const handleAddCustomer = async () => {
           <span className="um-count">
             {filtered.length} {filtered.length === 1 ? "record" : "records"}
           </span>
-
-          <button className="um-add-btn" onClick={() => setShowAdd(true)}>
-            <Plus size={16} /> Add Customer
-          </button>
         </div>
       </div>
 
@@ -507,8 +503,19 @@ const handleAddCustomer = async () => {
                     <img
                       src={selectedCustomer?.valid_id || ID_PLACEHOLDER}
                       alt="Valid ID"
+                      onError={(e) => {
+                        // kapag sira o hindi ma-load ang URL, bumalik sa placeholder
+                        console.log("Valid ID failed to load:", selectedCustomer?.valid_id);
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = ID_PLACEHOLDER;
+                      }}
                     />
                   </div>
+                  {!selectedCustomer?.valid_id && (
+                    <span style={{ fontSize: 12, color: "#888" }}>
+                      No valid ID uploaded yet.
+                    </span>
+                  )}
                   {selectedCustomer?.valid_id && (
                     <a
                       href={selectedCustomer.valid_id}

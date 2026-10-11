@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./admin-sidebar.css";
+import { supabase } from "../../../supabase";
 
 // Assets
 import AquaLogo from "../../../assets/AquaLogo.png";
@@ -35,12 +36,52 @@ export default function AdminSidebar() {
     JSON.parse(localStorage.getItem("user") || "{}")
   );
 
+  // Profile picture mula sa customer_profiles (null = gamitin ang default na Profile.png)
+  const [profilePic, setProfilePic] = useState(null);
+
   useEffect(() => {
+    const loadProfilePic = async (u) => {
+      if (!u) return;
+
+      // Kunin ang users_id (kung wala sa localStorage, hanapin sa users table)
+      let uid = u.users_id;
+
+      if (!uid) {
+        let lookup = supabase.from("users").select("users_id");
+
+        if (u.email) lookup = lookup.ilike("email", String(u.email).trim());
+        else if (u.user_id) lookup = lookup.eq("user_id", u.user_id);
+        else return;
+
+        const { data: found } = await lookup.limit(1).maybeSingle();
+        uid = found?.users_id;
+      }
+
+      if (!uid) return;
+
+      const { data, error } = await supabase
+        .from("customer_profiles")
+        .select("id_photo")
+        .eq("users_id", uid)
+        .maybeSingle();
+
+      if (error) {
+        console.log("Sidebar profile picture error:", error.message);
+        return;
+      }
+
+      setProfilePic(data?.id_photo || null);
+    };
+
+    // Unang load
+    loadProfilePic(JSON.parse(localStorage.getItem("user") || "{}"));
+
     const handleUserUpdated = () => {
       const updatedUser = JSON.parse(
         localStorage.getItem("user") || "{}"
       );
       setUser(updatedUser);
+      loadProfilePic(updatedUser);
     };
 
     window.addEventListener("userUpdated", handleUserUpdated);
@@ -165,7 +206,15 @@ export default function AdminSidebar() {
       <div className="sidebar-bottom">
         {/* ADMIN PROFILE */}
         <div className="admin-profile" onClick={toggleProfile}>
-          <img src={Profile} alt="Admin Profile" />
+          <img
+            src={profilePic || Profile}
+            alt="Admin Profile"
+            style={{ objectFit: "cover" }}
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = Profile;
+            }}
+          />
 
           <div>
             <p className="name">{user?.name || "Kenn"}</p>
