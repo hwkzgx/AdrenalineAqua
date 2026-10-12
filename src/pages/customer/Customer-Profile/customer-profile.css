@@ -676,3 +676,20 @@
     margin: 0 !important;
   }
 }
+
+/* STATUS COLORS */
+.verified-badge.pending {
+  background: #ffe8a3;
+  color: #9b6a00;
+}
+
+.verified-badge.verified {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.verified-badge.rejected,
+.verified-badge.unverified {
+  background: #fee2e2;
+  color: #b91c1c;
+}

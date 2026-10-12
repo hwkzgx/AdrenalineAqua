@@ -8,6 +8,7 @@ import {
   Calendar,
   Phone,
   User,
+  ShieldAlert,
 } from "lucide-react";
 import { supabase } from "../../../supabase";
 
@@ -26,13 +27,24 @@ export default function CustomerMakeOrder() {
   const [address, setAddress] = useState("");
   const [logoFile, setLogoFile] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
-  const [orderType, setOrderType] = useState("Delivery");
+  // Walang default: "Select order type" ay display lang (disabled placeholder)
+  const [orderType, setOrderType] = useState("");
 
   const [distance, setDistance] = useState(0);
   const [deliveryFee, setDeliveryFee] = useState(0);
 
   const [destinationCoords, setDestinationCoords] = useState(null);
   const [isCheckingAddress, setIsCheckingAddress] = useState(false);
+
+  // ===============================
+  // VERIFICATION (ID na-verify ng admin = taga-Hagonoy)
+  // ===============================
+  // Galing sa users.status na itinatakda ng admin:
+  // "Verified" | "Pending" | "Unverified" (Rejected) | null
+  // Dito ay ginagawang: "unverified" | "pending" | "verified"
+  const [verificationStatus, setVerificationStatus] = useState("unverified");
+  const [verificationLoading, setVerificationLoading] = useState(true);
+  const isVerified = verificationStatus === "verified";
 
   // ===============================
   // GCASH MODAL STATES
@@ -61,6 +73,49 @@ export default function CustomerMakeOrder() {
       setToast({ message: "", type: "", show: false });
     }, 3000);
   };
+
+  // ===============================
+  // CHECK KUNG VERIFIED NA ANG USER
+  // (kinukuha fresh sa database, hindi sa localStorage)
+  // ===============================
+  // Ibinabalik: "verified" | "pending" | "unverified"
+  const fetchVerificationStatus = async (userId) => {
+    if (!userId) {
+      console.log("verification check: walang users_id sa localStorage.user");
+      return "unverified";
+    }
+
+    const { data, error } = await supabase
+      .from("users")
+      .select("status")
+      .eq("users_id", userId)
+      .maybeSingle();
+
+    console.log("verification check:", { userId, data, error });
+
+    if (error) {
+      console.log("Error checking verification:", error.message);
+      return "unverified";
+    }
+
+    const status = String(data?.status || "").toLowerCase().trim();
+
+    if (status === "verified" || status === "pending") return status;
+    return "unverified"; // kasama ang blank/null at "Unverified" (rejected)
+  };
+
+  useEffect(() => {
+    const checkVerification = async () => {
+      const currentUser = JSON.parse(localStorage.getItem("user") || "null");
+      const userId = currentUser?.users_id || currentUser?.id;
+
+      const status = await fetchVerificationStatus(userId);
+      setVerificationStatus(status);
+      setVerificationLoading(false);
+    };
+
+    checkVerification();
+  }, []);
 
   // ===============================
   // FETCH INVENTORY
@@ -303,6 +358,22 @@ export default function CustomerMakeOrder() {
   };
 
   // ===============================
+  // ORDER TYPE CHANGE
+  // ===============================
+  const getNotVerifiedMessage = (status) =>
+    status === "pending"
+      ? "Your ID verification is still pending. Delivery is available once the admin verifies you. You can order for pickup."
+      : "Your account is not verified. Delivery is only for verified Hagonoy residents. You can order for pickup.";
+
+  const handleOrderTypeChange = (value) => {
+    if (value === "Delivery" && !isVerified) {
+      showToast(getNotVerifiedMessage(verificationStatus), "error");
+      return;
+    }
+    setOrderType(value);
+  };
+
+  // ===============================
   // PLACE ORDER
   // ===============================
   const handlePlaceOrder = async () => {
@@ -311,6 +382,31 @@ export default function CustomerMakeOrder() {
     if (!currentUser) {
       showToast("Please login first.", "error");
       return;
+    }
+
+    // ===========================
+    // ORDER TYPE REQUIRED
+    // ===========================
+    if (!orderType) {
+      showToast("Please select an order type.", "error");
+      return;
+    }
+
+    // ===========================
+    // VERIFICATION CHECK (delivery needs verified account)
+    // ===========================
+    if (orderType === "Delivery") {
+      const statusNow = await fetchVerificationStatus(
+        currentUser.users_id || currentUser.id
+      );
+
+      setVerificationStatus(statusNow);
+
+      if (statusNow !== "verified") {
+        setOrderType("Pickup");
+        showToast(getNotVerifiedMessage(statusNow), "error");
+        return;
+      }
     }
 
     // ===========================
@@ -589,6 +685,43 @@ export default function CustomerMakeOrder() {
               </div>
             </div>
 
+            {/* NOT VERIFIED NOTICE */}
+            {!verificationLoading && !isVerified && (
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  alignItems: "flex-start",
+                  padding: "12px 14px",
+                  marginBottom: "16px",
+                  background: "#fffbeb",
+                  border: "1px solid #fde68a",
+                  borderRadius: "12px",
+                  color: "#92400e",
+                  fontSize: "13px",
+                  lineHeight: 1.5,
+                }}
+              >
+                <ShieldAlert
+                  size={20}
+                  style={{ flexShrink: 0, marginTop: "1px" }}
+                />
+                {verificationStatus === "pending" ? (
+                  <span>
+                    Your ID verification is <b>pending</b>. Please wait for the
+                    admin to verify you. Until then, you can only place a{" "}
+                    <b>Pickup</b> order.
+                  </span>
+                ) : (
+                  <span>
+                    Your account is <b>not verified</b>. Delivery is only
+                    available to verified Hagonoy residents (ID checked by the
+                    admin). For now, you can only place a <b>Pickup</b> order.
+                  </span>
+                )}
+              </div>
+            )}
+
             {/* PRODUCT */}
             <div className="section">
               <h3>1. Product Selection</h3>
@@ -610,7 +743,9 @@ export default function CustomerMakeOrder() {
                     onChange={(e) => setSize(e.target.value)}
                     value={size}
                   >
-                    <option value="">Select size/variant</option>
+                    <option value="" disabled hidden>
+                      Select size/variant
+                    </option>
                     {inventoryItems.map((item) => (
                       <option
                         key={item.id || item.item_name}
@@ -660,10 +795,19 @@ export default function CustomerMakeOrder() {
               <label>Order Type</label>
               <select
                 value={orderType}
-                onChange={(e) => setOrderType(e.target.value)}
+                onChange={(e) => handleOrderTypeChange(e.target.value)}
               >
-                <option value="">Select order type</option>
-                <option value="Delivery">Delivery</option>
+                {/* Display lang: hindi pwedeng piliin */}
+                <option value="" disabled hidden>
+                  Select order type
+                </option>
+                <option value="Delivery" disabled={!isVerified}>
+                  {isVerified || verificationLoading
+                    ? "Delivery"
+                    : verificationStatus === "pending"
+                    ? "Delivery (Verification pending)"
+                    : "Delivery (Verified accounts only)"}
+                </option>
                 <option value="Pickup">Pickup</option>
               </select>
             </div>
@@ -708,7 +852,7 @@ export default function CustomerMakeOrder() {
                     type="date"
                     min={new Date().toISOString().split("T")[0]}
                     value={date}
-                    disabled={orderType === "Pickup"}
+                    disabled={orderType !== "Delivery"}
                     onChange={(e) => setDate(e.target.value)}
                   />
                 </div>
@@ -720,11 +864,13 @@ export default function CustomerMakeOrder() {
                 <input
                   type="text"
                   value={address}
-                  disabled={orderType === "Pickup"}
+                  disabled={orderType !== "Delivery"}
                   placeholder={
                     orderType === "Pickup"
                       ? "Not required for pickup"
-                      : "Enter full delivery address"
+                      : orderType === "Delivery"
+                      ? "Enter full delivery address"
+                      : "Select order type first"
                   }
                   onChange={(e) => {
                     setAddress(e.target.value);
@@ -845,7 +991,7 @@ export default function CustomerMakeOrder() {
               <button
                 className="place-order"
                 onClick={handlePlaceOrder}
-                disabled={isCheckingAddress}
+                disabled={isCheckingAddress || verificationLoading}
               >
                 {isCheckingAddress ? "Checking Address..." : "Place Order"}
               </button>
@@ -870,7 +1016,7 @@ export default function CustomerMakeOrder() {
                 <p>Unit Price: ₱{unitPrice}</p>
                 <p>Logo Fee: ₱{logoFee}</p>
                 <p>Quantity: {quantity}</p>
-                <p>Order Type: {orderType}</p>
+                <p>Order Type: {orderType || "—"}</p>
                 <p>Delivery Fee: ₱{deliveryFee}</p>
               </div>
 

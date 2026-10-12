@@ -26,6 +26,10 @@ import "./dashboard-layout.css";
 
 const CO_ROLES = ["co", "co_associate", "co-associate"];
 
+// Hanapin kung "notification_id" o "id" ang primary key ng notifications table
+const notifPk = (n) => (n && "notification_id" in n ? "notification_id" : "id");
+const notifId = (n) => n[notifPk(n)];
+
 export default function DashboardLayout() {
   const [openProfile, setOpenProfile] = useState(false);
   const [openNotif, setOpenNotif] = useState(false);
@@ -127,11 +131,14 @@ export default function DashboardLayout() {
           const newNotif = payload.new;
 
           const isCoAssociate = CO_ROLES.includes(userRole);
+          const targetRole = String(newNotif.target_role || "")
+            .toLowerCase()
+            .trim();
 
           const isForCurrentRole =
-            newNotif.target_role === userRole ||
-            newNotif.target_role === "all" ||
-            (isCoAssociate && CO_ROLES.includes(newNotif.target_role));
+            targetRole === userRole ||
+            targetRole === "all" ||
+            (isCoAssociate && CO_ROLES.includes(targetRole));
 
           if (isForCurrentRole) {
             setNotifications((prev) => [newNotif, ...prev]);
@@ -152,47 +159,67 @@ export default function DashboardLayout() {
       ? [...CO_ROLES, "all"]
       : [currentRole, "all"];
 
+    // ilike = hindi sensitive sa laki/liit ng letra ("Admin" = "admin")
+    const roleFilter = allowedRoles
+      .map((role) => `target_role.ilike.${role}`)
+      .join(",");
+
     const { data, error } = await supabase
       .from("notifications")
       .select("*")
-      .in("target_role", allowedRoles)
-      .order("created_at", { ascending: false });
+      .or(roleFilter)
+      .order("created_at", { ascending: false })
+      .limit(200);
 
     if (error) {
       console.error("Error fetching notifications:", error.message);
     } else {
+      // 0 = walang nabasa (check ang RLS policy o kung may laman ang table)
+      console.log("Notifications loaded:", allowedRoles, data?.length);
       setNotifications(data || []);
     }
 
     setLoadingNotifs(false);
   };
 
-  const handleMarkAsRead = async (id) => {
+  const handleMarkAsRead = async (notif) => {
+    const pk = notifPk(notif);
+    const id = notif[pk];
+
     const { error } = await supabase
       .from("notifications")
       .update({ is_read: true })
-      .eq("id", id);
+      .eq(pk, id);
 
-    if (!error) {
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
-      );
+    if (error) {
+      console.error("Mark as read error:", error.message);
+      return;
     }
+
+    setNotifications((prev) =>
+      prev.map((n) => (notifId(n) === id ? { ...n, is_read: true } : n))
+    );
   };
 
   const handleMarkAllAsRead = async () => {
-    const unreadIds = notifications.filter((n) => !n.is_read).map((n) => n.id);
+    const unread = notifications.filter((n) => !n.is_read);
 
-    if (unreadIds.length === 0) return;
+    if (unread.length === 0) return;
+
+    const pk = notifPk(unread[0]);
+    const ids = unread.map((n) => n[pk]);
 
     const { error } = await supabase
       .from("notifications")
       .update({ is_read: true })
-      .in("id", unreadIds);
+      .in(pk, ids);
 
-    if (!error) {
-      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    if (error) {
+      console.error("Mark all as read error:", error.message);
+      return;
     }
+
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
   };
 
   // =========================================================
@@ -697,13 +724,13 @@ export default function DashboardLayout() {
                     ) : (
                       filteredNotifs.map((notif) => (
                         <div
-                          key={notif.id}
+                          key={notifId(notif)}
                           className={`notif-item ${
                             !notif.is_read ? "unread" : ""
                           }`}
                           onClick={() => {
                             if (!notif.is_read) {
-                              handleMarkAsRead(notif.id);
+                              handleMarkAsRead(notif);
                             }
                           }}
                         >

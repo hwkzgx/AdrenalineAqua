@@ -1,6 +1,6 @@
 import "./customer-topbar.css";
 import { NavLink, useNavigate, Outlet } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import AquaLogo from "../../assets/AquaLogo.png";
 import { supabase } from "../../supabase";
 import { clearInsightsStorage } from "../../services/aiInsightsService";
@@ -19,6 +19,17 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
+// notifications.user_id = users.users_id (bigint)
+const getUserId = () => {
+  try {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const id = user?.users_id;
+    return id === undefined || id === null || id === "" ? null : Number(id);
+  } catch {
+    return null;
+  }
+};
+
 export default function CustomerTopbar() {
   const navigate = useNavigate();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -33,49 +44,66 @@ export default function CustomerTopbar() {
   const role = "customer";
 
   // FETCH NOTIFICATIONS FROM SUPABASE
-  // notifications.user_id = users.users_id (bigint)
-  const fetchNotifications = async () => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user || !user.users_id) return;
+  const fetchNotifications = useCallback(async () => {
+    const userId = getUserId();
+    if (!userId) {
+      console.log("notif: walang users_id sa localStorage.user");
+      return;
+    }
 
     const { data, error } = await supabase
       .from("notifications")
       .select("*")
-      .eq("user_id", user.users_id)
+      .eq("user_id", userId)
       .order("created_at", { ascending: false });
+
+    console.log("notif fetch:", { users_id: userId, count: data?.length, error });
 
     if (!error && data) {
       setNotifications(data);
     }
-  };
+  }, []);
 
   useEffect(() => {
+    const userId = getUserId();
+    if (!userId) {
+      console.log("notif: walang users_id sa localStorage.user");
+      return;
+    }
+
     fetchNotifications();
 
-    // Real-time listener para sa bagong notifications
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user || !user.users_id) return;
+    // Backup: kumuha ulit kada 20 segundo (kung sakaling hindi gumana ang realtime)
+    const timer = setInterval(fetchNotifications, 20000);
 
+    // Real-time listener para sa bagong notifications
     const channel = supabase
-      .channel("customer-notifications")
+      .channel(`customer-notifications-${userId}`)
       .on(
         "postgres_changes",
         {
           event: "INSERT",
           schema: "public",
           table: "notifications",
-          filter: `user_id=eq.${user.users_id}`,
+          filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          setNotifications((prev) => [payload.new, ...prev]);
+          setNotifications((prev) =>
+            prev.some((n) => n.id === payload.new.id)
+              ? prev
+              : [payload.new, ...prev]
+          );
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("notif realtime:", status);
+      });
 
     return () => {
+      clearInterval(timer);
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [fetchNotifications]);
 
   // MARK SINGLE NOTIFICATION AS READ
   const markAsRead = async (id) => {
@@ -91,13 +119,13 @@ export default function CustomerTopbar() {
 
   // MARK ALL AS READ
   const markAllAsRead = async () => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user || !user.users_id) return;
+    const userId = getUserId();
+    if (!userId) return;
 
     await supabase
       .from("notifications")
       .update({ is_read: true })
-      .eq("user_id", user.users_id)
+      .eq("user_id", userId)
       .eq("is_read", false);
 
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
@@ -148,6 +176,8 @@ export default function CustomerTopbar() {
             <div
               className="icon-btn"
               onClick={() => {
+                // kumuha ng pinakabago tuwing bubuksan ang bell
+                if (!openNotif) fetchNotifications();
                 setOpenNotif(!openNotif);
                 setOpenProfile(false);
                 setMobileMenuOpen(false);
