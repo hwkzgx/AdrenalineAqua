@@ -8,7 +8,7 @@ import Chat from "../../../components/Chat";
 
 function calculateETA(lat1, lon1, lat2, lon2) {
   if (!lat1 || !lon1 || !lat2 || !lon2) return null;
-  const R = 6371; 
+  const R = 6371;
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLon = (lon2 - lon1) * (Math.PI / 180);
   const a =
@@ -18,7 +18,7 @@ function calculateETA(lat1, lon1, lat2, lon2) {
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const distanceKm = R * c;
 
-  const speedKmH = 20; 
+  const speedKmH = 20;
   const timeHours = distanceKm / speedKmH;
   const timeMinutes = Math.round(timeHours * 60);
 
@@ -53,7 +53,6 @@ export default function CustomerTrackOrder() {
   const [errorMessage, setErrorMessage] = useState("");
   const [mapQuery, setMapQuery] = useState(hagonoyDefaultCenter);
   const [mapCoordinates, setMapCoordinates] = useState([14.8311, 120.7358]);
-  const [isRiderMoving, setIsRiderMoving] = useState(false);
 
   const [riderId, setRiderId] = useState(null);
   const [showChat, setShowChat] = useState(false);
@@ -79,8 +78,8 @@ export default function CustomerTrackOrder() {
       .eq("order_id", currentOrderId)
       .maybeSingle();
 
-      console.log("Delivery schedule data:", schedData);
-      console.log("Assigned rider ID:", schedData?.assigned_rider_id);
+    console.log("Delivery schedule data:", schedData);
+    console.log("Assigned rider ID:", schedData?.assigned_rider_id);
 
     if (error) {
       console.log("Error fetching delivery schedule:", error.message);
@@ -95,7 +94,7 @@ export default function CustomerTrackOrder() {
 
     setDeliveryStatus(schedData?.delivery_status || orderData.status);
     setScheduleStatus(schedData?.delivery_status || "");
-    
+
     if (schedData?.rider_lat && schedData?.rider_lng) {
       setRiderPosition([
         Number(schedData.rider_lat),
@@ -134,7 +133,6 @@ export default function CustomerTrackOrder() {
       setScheduleStatus("");
       setEtaMinutes(null);
       setMapQuery(hagonoyDefaultCenter);
-      setIsRiderMoving(false);
       setDestinationPosition(null);
       setRiderPosition(null);
       setHasUnread(false);
@@ -198,10 +196,8 @@ export default function CustomerTrackOrder() {
         destinationPosition[1]
       );
       setEtaMinutes(minutes);
-      setIsRiderMoving(true);
     } else {
       setEtaMinutes(null);
-      setIsRiderMoving(false);
     }
   }, [riderPosition, destinationPosition]);
 
@@ -364,13 +360,71 @@ export default function CustomerTrackOrder() {
 
   const stageLabels = ["Received", "Processing", "On Delivery", "Delivered"];
 
+  // ==========================================
+  // LIVE RIDER TRACKER BADGE (base sa progress)
+  //   100% -> Order delivered (green)
+  //   75%  -> Tricycle is moving... (blue)
+  //   50%  -> Driver is preparing (orange)
+  //   25%  -> Waiting for driver assignment (gray)
+  // ==========================================
+  const trackerState = isDelivered
+    ? { icon: "✅", color: "#16a34a", text: "Order delivered" }
+    : progress.percent >= 75
+    ? { icon: "🛺", color: "#2563eb", text: "Tricycle is moving..." }
+    : progress.percent >= 50
+    ? { icon: "⏳", color: "#ea580c", text: "Driver is preparing" }
+    : { icon: "🕒", color: "#64748b", text: "Waiting for driver assignment" };
+
+  const trackerBadge = (
+    <div
+      style={{
+        position: "absolute",
+        bottom: "20px",
+        left: "20px",
+        background: "white",
+        padding: "8px 14px",
+        borderRadius: "30px",
+        boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+        zIndex: 1000,
+        border: "1px solid #e2e8f0",
+      }}
+    >
+      <div
+        style={{
+          background: trackerState.color,
+          color: "white",
+          width: "36px",
+          height: "36px",
+          borderRadius: "50%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "18px",
+        }}
+      >
+        {trackerState.icon}
+      </div>
+      <div>
+        <p style={{ fontSize: "11px", fontWeight: "700", color: trackerState.color, margin: 0 }}>
+          LIVE RIDER TRACKER
+        </p>
+        <p style={{ fontSize: "12px", fontWeight: "600", color: "#1e293b", margin: 0 }}>
+          {trackerState.text}
+        </p>
+      </div>
+    </div>
+  );
+
   return (
     <>
       <CustomerTopbar />
 
       <div className="track-order-page">
         <div className="track-order-container">
-          
+
           {/* LEFT SIDE */}
           <div className="track-order-left">
             <div className="track-header">
@@ -442,19 +496,19 @@ export default function CustomerTrackOrder() {
                   <div>
                     <h4>Estimated Arrival</h4>
                     <h2>
-                      {isDelivered 
-                        ? "Order Completed" 
+                      {isDelivered
+                        ? "Order Completed"
                         : progress.percent < 75
                         ? order
                           ? "Not yet on the way"
                           : "Waiting for order ID"
-                        : etaMinutes 
-                        ? `${etaMinutes} mins away` 
+                        : etaMinutes
+                        ? `${etaMinutes} mins away`
                         : "Calculating ETA..."}
                     </h2>
                     <p>
-                      {isDelivered 
-                        ? "Your order has been successfully delivered." 
+                      {isDelivered
+                        ? "Your order has been successfully delivered."
                         : !order
                         ? "-"
                         : progress.percent >= 75
@@ -537,59 +591,44 @@ export default function CustomerTrackOrder() {
               </div>
             ) : order && order?.order_type?.toLowerCase() !== "pickup" ? (
               isDelivered ? (
-                <div className="map-card-placeholder" style={{ height: "100%", minHeight: "350px", display: "flex", alignItems: "center", justifyContent: "center", background: "#f0fdf4", border: "2px solid #bbf7d0", borderRadius: "12px", color: "#166534", textAlign: "center", padding: "30px" }}>
+                <div
+                  className="map-card-placeholder"
+                  style={{
+                    position: "relative",
+                    height: "100%",
+                    minHeight: "350px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: "#f0fdf4",
+                    border: "2px solid #bbf7d0",
+                    borderRadius: "12px",
+                    color: "#166534",
+                    textAlign: "center",
+                    padding: "30px"
+                  }}
+                >
                   <div>
                     <PackageCheck size={50} style={{ color: "#22c55e", marginBottom: "12px" }} />
                     <h3 style={{ fontSize: "18px", fontWeight: "600", marginBottom: "6px" }}>Your order is delivered already!</h3>
                     <p style={{ fontSize: "13px", color: "#15803d" }}>Thank you for ordering with us. Hope you enjoy your items!</p>
                   </div>
+
+                  {/* LIVE RIDER TRACKER BADGE (Delivered) */}
+                  {trackerBadge}
                 </div>
               ) : (
-                <>
-                  <div className="map-card" style={{ position: "relative", height: "450px", width: "100%", borderRadius: "16px", overflow: "hidden" }}>
-                    <LeafletDeliveryMap
-                      center={mapCoordinates}
-                      riderPosition={riderPosition}
-                      destinationPosition={destinationPosition}
-                    />
+                <div className="map-card" style={{ position: "relative", height: "450px", width: "100%", borderRadius: "16px", overflow: "hidden" }}>
+                  <LeafletDeliveryMap
+                    center={mapCoordinates}
+                    riderPosition={riderPosition}
+                    destinationPosition={destinationPosition}
+                    deliveryStatus={deliveryStatus}
+                  />
 
-                    {/* TRICYCLE INDICATOR BADGE */}
-                    <div style={{
-                      position: "absolute",
-                      bottom: "20px",
-                      left: "20px",
-                      background: "white",
-                      padding: "8px 14px",
-                      borderRadius: "30px",
-                      boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                      zIndex: 1000,
-                      border: "1px solid #e2e8f0"
-                    }}>
-                      <div style={{
-                        background: "#2563eb",
-                        color: "white",
-                        width: "36px",
-                        height: "36px",
-                        borderRadius: "50%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "18px"
-                      }}>
-                        🛺
-                      </div>
-                      <div>
-                        <p style={{ fontSize: "11px", fontWeight: "700", color: "#2563eb", margin: 0 }}>LIVE RIDER TRACKER</p>
-                        <p style={{ fontSize: "12px", fontWeight: "600", color: "#1e293b", margin: 0 }}>
-                          {isRiderMoving ? "Tricycle is moving..." : "Driver is preparing"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </>
+                  {/* LIVE RIDER TRACKER BADGE */}
+                  {trackerBadge}
+                </div>
               )
             ) : null}
           </div>

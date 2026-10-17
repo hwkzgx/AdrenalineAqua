@@ -10,8 +10,20 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
+// Mga status na ibig sabihin ay "inaccept na ni rider at on the way na"
+const OUT_FOR_DELIVERY_STATUSES = [
+  "out_for_delivery",
+  "on_delivery",
+  "on_the_way",
+  "in_transit",
+  "delivering",
+];
+
+const normalizeStatus = (value) =>
+  (value || "").toString().toLowerCase().trim().replace(/[\s-]+/g, "_");
+
 // ===============================
-// CUSTOM RIDER ICON (TRICYCLE SVG - CSS BASED)
+// RIDER ICON (KOLONG-KOLONG SVG - CSS BASED)
 // ===============================
 const riderIcon = L.divIcon({
   className: "custom-rider-marker",
@@ -19,13 +31,10 @@ const riderIcon = L.divIcon({
     <div class="custom-rider-container">
       <div class="custom-rider-pulse"></div>
       <div class="custom-rider-icon-box">
-        <!-- Kolong-Kolong / Tricycle SVG -->
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <!-- Wheels -->
           <circle cx="5" cy="19" r="2"></circle>
           <circle cx="16" cy="19" r="2"></circle>
           <circle cx="19" cy="13" r="1.5"></circle>
-          <!-- Cabin / Roof Structure -->
           <path d="M3 17V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v9"></path>
           <path d="M15 9h3l2 4v4"></path>
           <path d="M3 13h12"></path>
@@ -39,7 +48,7 @@ const riderIcon = L.divIcon({
 });
 
 // ===============================
-// CUSTOM DESTINATION ICON (CSS BASED)
+// DESTINATION ICON 📍
 // ===============================
 const destinationIcon = L.divIcon({
   className: "custom-destination-marker",
@@ -58,85 +67,128 @@ const destinationIcon = L.divIcon({
 });
 
 // ===============================
-// FIT MAP TO MARKERS
+// DELIVERED ICON (green + checkmark)
+// ===============================
+const deliveredIcon = L.divIcon({
+  className: "custom-destination-marker",
+  html: `
+    <svg width="40" height="40" viewBox="0 0 40 40" style="filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));">
+      <path d="M20 0C11.7 0 5 6.7 5 15c0 11 15 25 15 25s15-14 15-25C35 6.7 28.3 0 20 0z" fill="#16a34a"/>
+      <circle cx="20" cy="15" r="9" fill="#fff"/>
+      <path d="M14.5 15.5l4 4 7-8" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  `,
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+});
+
+// ===============================
+// MAP UPDATER
 // ===============================
 function MapUpdater({
   center,
   riderPosition,
   destinationPosition,
+  isTracking,
+  isDelivered,
 }) {
   const map = useMap();
 
   useEffect(() => {
-    if (riderPosition && destinationPosition) {
-      const bounds = L.latLngBounds([
-        riderPosition,
-        destinationPosition,
-      ]);
-
-      map.fitBounds(bounds, {
-        padding: [50, 50],
-        maxZoom: 16,
-      });
-
+    // Delivered: ipakita ang destination
+    if (isDelivered && destinationPosition) {
+      map.setView(destinationPosition, 18);
       return;
     }
 
+    // Out for delivery: ipakita pareho (rider + customer)
+    if (isTracking && riderPosition && destinationPosition) {
+      const bounds = L.latLngBounds([riderPosition, destinationPosition]);
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
+      return;
+    }
+
+    // Processing/Preparing: location ni rider ang ipakita
     if (riderPosition) {
-      map.setView(riderPosition, 15);
+      map.setView(riderPosition, 17);
       return;
     }
 
+    // Fallback kung wala pang rider location
     if (destinationPosition) {
-      map.setView(destinationPosition, 15);
+      map.setView(destinationPosition, 18);
       return;
     }
 
     if (center) {
       map.setView(center, 13);
     }
-  }, [
-    map,
-    center,
-    riderPosition,
-    destinationPosition,
-  ]);
+  }, [map, center, riderPosition, destinationPosition, isTracking, isDelivered]);
 
   return null;
 }
 
 // ===============================
-// MAIN COMPONENT
+// MAIN MAP
 // ===============================
-export default function LeafletDeliveryMap({
+// Tumatanggap ng `status` O `deliveryStatus` (pareho gagana).
+// Kung hindi ipinasa ang `isTracking`, kusa itong huhulaan mula sa status.
+export default function RiderLeafletMap({
   center,
   riderPosition,
   destinationPosition,
+  isTracking,
+  status,
+  deliveryStatus,
 }) {
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [routeLoading, setRouteLoading] = useState(false);
 
+  const normalizedStatus = normalizeStatus(status ?? deliveryStatus);
+  const isDelivered = normalizedStatus === "delivered";
+
+  // Kung may ipinasang isTracking, gamitin yun. Kung wala, base sa status.
+  const tracking =
+    typeof isTracking === "boolean"
+      ? isTracking
+      : OUT_FOR_DELIVERY_STATUSES.includes(normalizedStatus);
+
+  // Status chip sa mapa (kapareho ng sa customer)
+  const statusChip = !normalizedStatus
+    ? null
+    : isDelivered
+    ? { text: "Delivered", bg: "#dcfce7", color: "#166534" }
+    : tracking
+    ? { text: "On the way!", bg: "#dbeafe", color: "#1e40af" }
+    : { text: "Preparing", bg: "#ffedd5", color: "#9a3412" };
+
+  const riderLat = riderPosition ? Number(riderPosition[0]) : null;
+  const riderLng = riderPosition ? Number(riderPosition[1]) : null;
+  const destLat = destinationPosition ? Number(destinationPosition[0]) : null;
+  const destLng = destinationPosition ? Number(destinationPosition[1]) : null;
+
   useEffect(() => {
-    if (!riderPosition || !destinationPosition) {
+    // Route: tracking lang (Out for Delivery), mawawala kapag Delivered
+    if (
+      !tracking ||
+      isDelivered ||
+      riderLat === null ||
+      riderLng === null ||
+      destLat === null ||
+      destLng === null
+    ) {
       setRouteCoordinates([]);
       return;
     }
+
+    let cancelled = false;
 
     const getRoute = async () => {
       try {
         setRouteLoading(true);
 
-        const riderLat = Number(riderPosition[0]);
-        const riderLng = Number(riderPosition[1]);
-
-        const destinationLat = Number(destinationPosition[0]);
-        const destinationLng = Number(destinationPosition[1]);
-
-        const url =
-          `https://router.project-osrm.org/route/v1/driving/` +
-          `${riderLng},${riderLat};` +
-          `${destinationLng},${destinationLat}` +
-          `?overview=full&geometries=geojson`;
+        // BACKTICKS ito (template literal) para gumana ang ${...}
+        const url = `https://router.project-osrm.org/route/v1/driving/${riderLng},${riderLat};${destLng},${destLat}?overview=full&geometries=geojson`;
 
         const response = await fetch(url);
 
@@ -146,30 +198,45 @@ export default function LeafletDeliveryMap({
 
         const data = await response.json();
 
+        if (cancelled) return;
+
         if (
           data.routes &&
           data.routes.length > 0 &&
           data.routes[0].geometry
         ) {
-          const coordinates =
-            data.routes[0].geometry.coordinates.map(
-              ([lng, lat]) => [lat, lng]
-            );
+          const coordinates = data.routes[0].geometry.coordinates.map(
+            ([lng, lat]) => [lat, lng]
+          );
 
           setRouteCoordinates(coordinates);
         } else {
-          setRouteCoordinates([]);
+          // Fallback: tuwid na linya kung walang nakuhang route
+          setRouteCoordinates([
+            [riderLat, riderLng],
+            [destLat, destLng],
+          ]);
         }
       } catch (error) {
         console.error("OSRM route error:", error);
-        setRouteCoordinates([]);
+        if (!cancelled) {
+          // Fallback: tuwid na linya para may makita pa rin
+          setRouteCoordinates([
+            [riderLat, riderLng],
+            [destLat, destLng],
+          ]);
+        }
       } finally {
-        setRouteLoading(false);
+        if (!cancelled) setRouteLoading(false);
       }
     };
 
     getRoute();
-  }, [riderPosition, destinationPosition]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [riderLat, riderLng, destLat, destLng, tracking, isDelivered]);
 
   const defaultCenter = center || [14.8311, 120.7358];
 
@@ -178,8 +245,8 @@ export default function LeafletDeliveryMap({
       style={{
         width: "100%",
         height: "100%",
-        minHeight: "420px",
-        borderRadius: "16px",
+        minHeight: "350px",
+        borderRadius: "12px",
         overflow: "hidden",
         position: "relative",
       }}
@@ -191,7 +258,7 @@ export default function LeafletDeliveryMap({
         style={{
           width: "100%",
           height: "100%",
-          minHeight: "420px",
+          minHeight: "350px",
         }}
       >
         <TileLayer
@@ -203,18 +270,17 @@ export default function LeafletDeliveryMap({
           center={center}
           riderPosition={riderPosition}
           destinationPosition={destinationPosition}
+          isTracking={tracking}
+          isDelivered={isDelivered}
         />
 
-        {/* RIDER */}
-        {riderPosition && (
-          <Marker
-            position={riderPosition}
-            icon={riderIcon}
-          >
+        {/* RIDER (kita na kahit Preparing/Processing, nawawala lang kapag Delivered) */}
+        {riderPosition && !isDelivered && (
+          <Marker position={riderPosition} icon={riderIcon}>
             <Popup>
               <strong>🛺 Rider</strong>
               <br />
-              Your delivery rider is on the way.
+              Current rider location
             </Popup>
           </Marker>
         )}
@@ -223,12 +289,22 @@ export default function LeafletDeliveryMap({
         {destinationPosition && (
           <Marker
             position={destinationPosition}
-            icon={destinationIcon}
+            icon={isDelivered ? deliveredIcon : destinationIcon}
           >
             <Popup>
-              <strong>📍 Delivery Destination</strong>
-              <br />
-              Customer location
+              {isDelivered ? (
+                <>
+                  <strong>✅ Delivered</strong>
+                  <br />
+                  Successfully delivered na ang order.
+                </>
+              ) : (
+                <>
+                  <strong>📍 Customer</strong>
+                  <br />
+                  Delivery destination
+                </>
+              )}
             </Popup>
           </Marker>
         )}
@@ -256,7 +332,26 @@ export default function LeafletDeliveryMap({
         )}
       </MapContainer>
 
-      {/* ROUTE LOADING */}
+      {statusChip && (
+        <div
+          style={{
+            position: "absolute",
+            top: "15px",
+            left: "65px",
+            background: statusChip.bg,
+            color: statusChip.color,
+            padding: "6px 12px",
+            borderRadius: "999px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+            fontSize: "12px",
+            fontWeight: "700",
+            zIndex: 1000,
+          }}
+        >
+          {statusChip.text}
+        </div>
+      )}
+
       {routeLoading && (
         <div
           style={{

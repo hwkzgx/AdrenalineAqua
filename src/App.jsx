@@ -1,5 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+// ROUTE GUARD
+import ProtectedRoute from "./ProtectedRoute";
+import PublicOnlyRoute from "./PublicOnlyRoute";
+
 // AUTH
 import GetStarted from "./pages/auth/Get-Started/GetStarted";
 import RoleSelection from "./pages/auth/Role-Selection/RoleSelection";
@@ -85,98 +89,145 @@ function App() {
     <BrowserRouter>
       <Routes>
 
+        {/* ========================================= */}
+        {/* PUBLIC (hindi kailangan ng login)         */}
+        {/* ========================================= */}
+
         {/* AUTH */}
         <Route path="/" element={<GetStarted />} />
         <Route path="/roles" element={<RoleSelection />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
         <Route path="/ForgotPass" element={<ForgotPass />} />
         <Route path="/accountcreated" element={<AccountCreated />} />
         <Route path="/verification" element={<Verification />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/password-changed" element={<PassChanged />} />
 
-        {/* ADMIN LAYOUT */}
-        <Route element={<DashboardLayout role="admin" />}>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/orders" element={<Orders />} />
-          <Route path="/admin/delivery" element={<Delivery />} />
-          <Route path="/admin/inventory" element={<Inventory />} />
-          <Route path="/admin/expenses" element={<Expenses />} />
-          <Route path="/admin/sales" element={<Sales />} />
-          <Route path="/admin/insights" element={<AdminInsights />} />
-          <Route path="/admin/users/co" element={<CoAssociates />} />
-          <Route path="/admin/users/customer" element={<Customer />} />
-          <Route path="/admin/users/staff" element={<Staff />} />
-          <Route path="/admin/users/rider" element={<Rider />} />
-
-        {/*  ADMIN PROFILE */}
-          <Route path="/admin/profile" element={<MyProfile />} />
-        </Route>
-
-        {/* CO LAYOUT */}
-        <Route element={<DashboardLayout role="co" />}>
-          <Route path="/co/dashboard" element={<CoDashboard />} />
-          <Route path="/co/expenses" element={<CoExpenses />} />
-          <Route path="/co/sales" element={<CoSales />} />
-          <Route path="/co/inventory" element={<CoInventory />} />
-          <Route path="/co/insights" element={<CoInsights />} />
-
-        {/* CO PROFILE */}
-          <Route path="/co/profile" element={<MyProfile />} />
-        </Route>
-
-        {/* STAFF */}
-       <Route element={<DashboardLayout role="staff" />}>
-       <Route path="/staff/dashboard" element={<StaffDashboard />} />
-       <Route path="/staff/orders" element={<StaffOrders />} />
-       <Route path="/staff/delivery-schedule" element={<StaffDeliverySchedule />} />
-       <Route path="/staff/inventory" element={<StaffInventory />} />
-       <Route path="/staff/sales" element={<StaffSales />} />
-       <Route path="/staff/insights" element={<StaffInsights />} />
-       <Route path="/staff/customers" element={<StaffCustomers />} />
-
-        {/* STAFF PROFILE */}
-          <Route path="/staff/profile" element={<MyProfile />} />
-        </Route>
-
-        {/* CUSTOMER */}
-        <Route path="/customer/customerlogin" element={<CustomerLogin />} />
-        <Route path="/customer/customer-register" element={<CustomerRegister />} />
-        <Route path="/customer/home" element={<CustomerHome />} />
-        <Route path="/customer/aboutus" element={<CustomerAboutUs />} />
-        <Route path="/customer/contacts" element={<CustomerContacts />} />
-        <Route path="/customer/dashboard" element={<CustomerDashboard />} />
-        <Route path="/customer/make-order" element={<CustomerMakeOrder />} />
-        <Route path="/customer/track-order" element={<CustomerTrackOrder />} />
-        <Route path="/customer/order-history" element={<CustomerOrderHistory />} />
-        <Route path="/customer/insights" element={<CustomerInsights />} />
-
-        {/* CUSTOMER AUTH */}
+        {/* CUSTOMER LOGIN / REGISTER / AUTH */}
         <Route path="/customer/forgot-password" element={<CustomerForgotPassword />} />
         <Route path="/customer/account-created" element={<CustomerAccountCreated />} />
         <Route path="/customer/reset-password" element={<CustomerResetPassword />} />
         <Route path="/customer/password-changed" element={<CustomerPasswordChanged />} />
         <Route path="/customer/verification" element={<CustomerVerification />} />
 
+        <Route path="/customer/home" element={<CustomerHome />} />
+        <Route path="/customer/aboutus" element={<CustomerAboutUs />} />
+        <Route path="/customer/contacts" element={<CustomerContacts />} />
 
-        <Route path="/customer/about-us" element={<CAboutUs />} />
-        <Route path="/customer/contact-us" element={<CContactUs />} />
 
-        {/* CUSTOMER PROFILE */}
-          <Route path="/customer/customerprofile" element={<CustomerProfile />} />
-
-        {/* RIDER */}
+        {/* LOGIN / REGISTER: hindi na mapupuntahan kapag naka-login na */}
+        <Route element={<PublicOnlyRoute />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/customer/customerlogin" element={<CustomerLogin />} />
+          <Route path="/customer/customer-register" element={<CustomerRegister />} />
           <Route path="/rider/riderlogin" element={<RiderLogin />} />
-          <Route path="/rider/home" element={<RiderHome />}/>
-          <Route path="/rider/deliveries" element={<RiderDeliveries />}/>
-          <Route path="/rider/delivery-details/:id" element={<RiderDeliveryDetails />}/>
-          <Route path="/rider/history"element={<RiderHistory />}/>
+        </Route>
+
+        {/* ========================================= */}
+        {/* ADMIN (admin lang)                        */}
+        {/* ========================================= */}
+        <Route element={<ProtectedRoute allowedRoles={["admin"]} loginPath="/login" />}>
+          <Route element={<DashboardLayout role="admin" />}>
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/orders" element={<Orders />} />
+            <Route path="/admin/delivery" element={<Delivery />} />
+            <Route path="/admin/inventory" element={<Inventory />} />
+            <Route path="/admin/expenses" element={<Expenses />} />
+            <Route path="/admin/sales" element={<Sales />} />
+            <Route path="/admin/insights" element={<AdminInsights />} />
+            <Route path="/admin/users/co" element={<CoAssociates />} />
+            <Route path="/admin/users/customer" element={<Customer />} />
+            <Route path="/admin/users/staff" element={<Staff />} />
+            <Route path="/admin/users/rider" element={<Rider />} />
+
+            {/* ADMIN PROFILE */}
+            <Route path="/admin/profile" element={<MyProfile />} />
+          </Route>
+        </Route>
+
+
+        {/* ========================================= */}
+        {/* CO-ASSOCIATE (co lang)                    */}
+        {/* ========================================= */}
+        <Route element={<ProtectedRoute allowedRoles={["co"]} loginPath="/login" />}>
+          <Route element={<DashboardLayout role="co" />}>
+            <Route path="/co/dashboard" element={<CoDashboard />} />
+            <Route path="/co/expenses" element={<CoExpenses />} />
+            <Route path="/co/sales" element={<CoSales />} />
+            <Route path="/co/inventory" element={<CoInventory />} />
+            <Route path="/co/insights" element={<CoInsights />} />
+
+            {/* CO PROFILE */}
+            <Route path="/co/profile" element={<MyProfile />} />
+          </Route>
+        </Route>
+
+
+        {/* ========================================= */}
+        {/* STAFF (staff lang)                        */}
+        {/* ========================================= */}
+        <Route element={<ProtectedRoute allowedRoles={["staff"]} loginPath="/login" />}>
+          <Route element={<DashboardLayout role="staff" />}>
+            <Route path="/staff/dashboard" element={<StaffDashboard />} />
+            <Route path="/staff/orders" element={<StaffOrders />} />
+            <Route path="/staff/delivery-schedule" element={<StaffDeliverySchedule />} />
+            <Route path="/staff/inventory" element={<StaffInventory />} />
+            <Route path="/staff/sales" element={<StaffSales />} />
+            <Route path="/staff/insights" element={<StaffInsights />} />
+            <Route path="/staff/customers" element={<StaffCustomers />} />
+
+            {/* STAFF PROFILE */}
+            <Route path="/staff/profile" element={<MyProfile />} />
+          </Route>
+        </Route>
+
+
+        {/* ========================================= */}
+        {/* CUSTOMER (customer lang)                  */}
+        {/* ========================================= */}
+        <Route
+          element={
+            <ProtectedRoute
+              allowedRoles={["customer"]}
+              loginPath="/customer/customerlogin"
+            />
+          }
+        >
+          <Route path="/customer/dashboard" element={<CustomerDashboard />} />
+          <Route path="/customer/make-order" element={<CustomerMakeOrder />} />
+          <Route path="/customer/track-order" element={<CustomerTrackOrder />} />
+          <Route path="/customer/order-history" element={<CustomerOrderHistory />} />
+          <Route path="/customer/insights" element={<CustomerInsights />} />
+
+          <Route path="/customer/about-us" element={<CAboutUs />} />
+          <Route path="/customer/contact-us" element={<CContactUs />} />
+
+          {/* CUSTOMER PROFILE */}
+          <Route path="/customer/customerprofile" element={<CustomerProfile />} />
+        </Route>
+
+
+        {/* ========================================= */}
+        {/* RIDER (rider lang)                        */}
+        {/* ========================================= */}
+        <Route
+          element={
+            <ProtectedRoute
+              allowedRoles={["rider"]}
+              loginPath="/rider/riderlogin"
+            />
+          }
+        >
+          <Route path="/rider/home" element={<RiderHome />} />
+          <Route path="/rider/deliveries" element={<RiderDeliveries />} />
+          <Route path="/rider/delivery-details/:id" element={<RiderDeliveryDetails />} />
+          <Route path="/rider/history" element={<RiderHistory />} />
           <Route path="/rider/insights" element={<RiderInsights />} />
 
           {/* RIDER PROFILE */}
-          <Route path="/rider/profile" element={<RiderProfile />}/>
-      
+          <Route path="/rider/profile" element={<RiderProfile />} />
+        </Route>
+
       </Routes>
     </BrowserRouter>
   );

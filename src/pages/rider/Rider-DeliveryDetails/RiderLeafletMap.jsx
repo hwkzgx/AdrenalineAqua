@@ -55,6 +55,22 @@ const destinationIcon = L.divIcon({
 });
 
 // ===============================
+// DELIVERED ICON (green + checkmark)
+// ===============================
+const deliveredIcon = L.divIcon({
+  className: "custom-destination-marker",
+  html: `
+    <svg width="40" height="40" viewBox="0 0 40 40" style="filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));">
+      <path d="M20 0C11.7 0 5 6.7 5 15c0 11 15 25 15 25s15-14 15-25C35 6.7 28.3 0 20 0z" fill="#16a34a"/>
+      <circle cx="20" cy="15" r="9" fill="#fff"/>
+      <path d="M14.5 15.5l4 4 7-8" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  `,
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+});
+
+// ===============================
 // MAP UPDATER
 // ===============================
 function MapUpdater({
@@ -111,12 +127,26 @@ export default function RiderLeafletMap({
   riderPosition,
   destinationPosition,
   isTracking,
+  status,
 }) {
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [routeLoading, setRouteLoading] = useState(false);
 
+  const isDelivered =
+    (status || "").toLowerCase().replace(/[\s-]+/g, "_") === "delivered";
+
+  // Status chip sa mapa (kapareho ng sa customer)
+  const statusChip = !status
+    ? null
+    : isDelivered
+    ? { text: "Delivered", bg: "#dcfce7", color: "#166534" }
+    : isTracking
+    ? { text: "On the way!", bg: "#dbeafe", color: "#1e40af" }
+    : { text: "Preparing", bg: "#ffedd5", color: "#9a3412" };
+
   useEffect(() => {
-    if (!riderPosition || !destinationPosition) {
+    // Route: tracking lang (Out for Delivery), mawawala kapag Delivered
+    if (!isTracking || isDelivered || !riderPosition || !destinationPosition) {
       setRouteCoordinates([]);
       return;
     }
@@ -168,7 +198,7 @@ export default function RiderLeafletMap({
     };
 
     getRoute();
-  }, [riderPosition, destinationPosition]);
+  }, [riderPosition, destinationPosition, isTracking, isDelivered]);
 
   const defaultCenter = center || [14.8311, 120.7358];
 
@@ -206,7 +236,7 @@ export default function RiderLeafletMap({
         />
 
         {/* RIDER */}
-        {riderPosition && (
+        {riderPosition && isTracking && !isDelivered && (
           <Marker
             position={riderPosition}
             icon={riderIcon}
@@ -223,12 +253,22 @@ export default function RiderLeafletMap({
         {destinationPosition && (
           <Marker
             position={destinationPosition}
-            icon={destinationIcon}
+            icon={isDelivered ? deliveredIcon : destinationIcon}
           >
             <Popup>
-              <strong>📍 Customer</strong>
-              <br />
-              Delivery destination
+              {isDelivered ? (
+                <>
+                  <strong>✅ Delivered</strong>
+                  <br />
+                  Successfully delivered na ang order.
+                </>
+              ) : (
+                <>
+                  <strong>📍 Customer</strong>
+                  <br />
+                  Delivery destination
+                </>
+              )}
             </Popup>
           </Marker>
         )}
@@ -255,6 +295,26 @@ export default function RiderLeafletMap({
           </>
         )}
       </MapContainer>
+
+      {statusChip && (
+        <div
+          style={{
+            position: "absolute",
+            top: "15px",
+            left: "65px",
+            background: statusChip.bg,
+            color: statusChip.color,
+            padding: "6px 12px",
+            borderRadius: "999px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+            fontSize: "12px",
+            fontWeight: "700",
+            zIndex: 1000,
+          }}
+        >
+          {statusChip.text}
+        </div>
+      )}
 
       {routeLoading && (
         <div

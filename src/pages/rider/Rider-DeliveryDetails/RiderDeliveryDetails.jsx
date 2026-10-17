@@ -813,12 +813,13 @@ export default function RiderDeliveryDetails() {
                   position: "relative",
                 }}
               >
-                <RiderLeafletMap
-                  center={mapCoordinates}
-                  riderPosition={riderPosition}
-                  destinationPosition={destinationPosition}
-                  isTracking={currentStatus === "Out for Delivery"}
-                />
+               <RiderLeafletMap
+  center={mapCoordinates}
+  riderPosition={riderPosition}
+  destinationPosition={destinationPosition}
+  isTracking={currentStatus === "Out for Delivery"}
+  status={currentStatus}   // <-- ito
+/>
 
                 {/* TRICYCLE INDICATOR BADGE */}
                 <div
