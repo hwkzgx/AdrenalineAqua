@@ -131,11 +131,13 @@
 .staffsearch-input {
   flex: 1;
   max-width: 320px;
-  padding: 10px 14px;
+  height: 44px;
+  padding: 0 14px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   font-size: 14px;
   outline: none;
+  box-sizing: border-box;
   transition: border-color 0.2s;
 }
 
@@ -144,13 +146,15 @@
 }
 
 .stafffilter-select {
-  padding: 10px 14px;
+  height: 44px;
+  padding: 0 14px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   font-size: 14px;
   background-color: white;
   outline: none;
   cursor: pointer;
+  box-sizing: border-box;
 }
 
 /* Sorting Options Dropdown Utilities */
@@ -164,13 +168,15 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 10px 14px;
+  height: 44px;
+  padding: 0 14px;
   background: white;
   border: 1px solid #cbd5e1;
   border-radius: 8px 0 0 8px;
   font-size: 14px;
   color: #475569;
   border-right: none;
+  box-sizing: border-box;
 }
 
 .staffsort-menu .stafffilter-select {
@@ -184,9 +190,10 @@
   align-items: center;
   gap: 8px;
   width: 150px;
+  height: 44px;
   background-color: #0ea5e9;
   color: white;
-  padding: 10px 16px;
+  padding: 0 16px;
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -204,9 +211,10 @@
   align-items: center;
   gap: 6px;
   width: 200px;
+  height: 44px;
   background-color: #fee2e2;
   color: #dc2626;
-  padding: 10px 14px;
+  padding: 0 14px;
   border: 1px solid #fca5a5;
   border-radius: 8px;
   font-size: 14px;
@@ -214,10 +222,12 @@
   cursor: pointer;
   transition: all 0.2s;
 
-  position: absolute;
-  right: 160px;
-  margin-right: 150px;
-  margin-top: 0;
+  /* In normal flow so it sits beside Add Product / Export PDF
+     and never overlaps the table (desktop + mobile) */
+  position: static;
+  margin: 0;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .staffbulk-delete-btn:hover {
@@ -249,7 +259,7 @@
   margin-top: 10px;
 }
 
-/* Checkbox styling */  
+/* Checkbox styling */
 .staffinventory-table input[type="checkbox"] {
   appearance: checkbox;
   -webkit-appearance: checkbox;
@@ -635,7 +645,7 @@
 }
 
 /* ========================================================
-   🔥 DELETE ORDER STYLE MODAL FOR INVENTORY
+   DELETE ORDER STYLE MODAL FOR INVENTORY
    ======================================================== */
 
 .staffdelete-order-style-modal {
@@ -787,8 +797,8 @@
   color: white;
   border: none;
   padding: 0 16px;
-  height: 48px;
-  border-radius: 12px;
+  height: 44px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
@@ -1148,6 +1158,9 @@
   color: #b91c1c;
 }
 
+/* ==========================================
+   RESPONSIVE (MOBILE)
+   ========================================== */
 @media (max-width: 768px) {
   .staffinventory-page {
     padding: 16px 16px 32px 16px;
@@ -1184,6 +1197,22 @@
     justify-content: center;
   }
 
+  /* Pantay na taas ng search, filter at buttons (iwas piga sa column layout) */
+  .staffsearch-input,
+  .stafffilter-select {
+    flex: none !important;
+    height: 48px !important;
+    padding: 0 14px !important;
+    font-size: 14px;
+  }
+
+  .staffadd-btn,
+  .staffbulk-delete-btn,
+  .export-pdf-btn {
+    height: 48px !important;
+    flex-shrink: 0;
+  }
+
   .staffinventory-table {
     width: 100%;
     overflow-x: auto;
@@ -1198,4 +1227,6 @@
 
 @media (max-width: 520px) {
   .staffinv-field-row { flex-direction: column; gap: 16px; }
+  .staffinv-modal-footer.split { flex-direction: column-reverse; }
+  .staffinv-modal-footer.split .staffinv-btn { flex: none; width: 100%; }
 }

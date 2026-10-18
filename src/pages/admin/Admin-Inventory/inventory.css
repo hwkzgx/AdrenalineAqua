@@ -1210,6 +1210,18 @@
     box-sizing: border-box;
   }
 
+  /* Delete Selected (bulk delete) button.
+     On desktop it is positioned with position: absolute; right: 160px;
+     margin-right: 150px (to sit beside Add Product). Those offsets were still
+     applied on mobile, which pushed the button off-screen to the left and took
+     it out of the layout. Put it back in the normal flow on small screens. */
+  .bulk-delete-btn {
+    position: static;
+    right: auto;
+    margin-right: 0;
+    width: 100%;
+  }
+
   .table-container {
     width: 100%;
     overflow-x: auto;
@@ -1224,4 +1236,9 @@
 
 @media (max-width: 520px) {
   .inv-field-row { flex-direction: column; gap: 16px; }
+
+  /* Delete confirmation modal: stack the buttons so "Delete Selected (n)"
+     is not squeezed next to "No, Cancel" on narrow phones */
+  .inv-modal-footer.split { flex-direction: column-reverse; }
+  .inv-modal-footer.split .inv-btn { flex: none; width: 100%; }
 }

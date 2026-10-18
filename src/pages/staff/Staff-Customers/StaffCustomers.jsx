@@ -366,9 +366,6 @@ function StaffCustomers() {
             {filtered.length} {filtered.length === 1 ? "record" : "records"}
           </span>
 
-          <button className="um-add-btn" onClick={() => setShowAdd(true)}>
-            <Plus size={16} /> Add Customer
-          </button>
         </div>
       </div>
 

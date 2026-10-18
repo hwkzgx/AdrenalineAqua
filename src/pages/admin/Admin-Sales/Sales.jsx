@@ -447,7 +447,7 @@ function Sales() {
         />
 
         <select
-          className="filter-select"
+          className="sales-filter-select"
           value={paymentFilter}
           onChange={(e) => setPaymentFilter(e.target.value)}
         >

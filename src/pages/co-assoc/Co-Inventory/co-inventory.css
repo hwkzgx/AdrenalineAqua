@@ -166,6 +166,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  margin-left: auto; /* itutulak sa right side (web view) */
 }
 
 .coinventory-page .export-pdf-btn:hover {
@@ -224,5 +225,6 @@
     width: 100%;
     justify-content: center;
     box-sizing: border-box;
+    margin-left: 0; /* i-reset sa mobile */
   }
 }

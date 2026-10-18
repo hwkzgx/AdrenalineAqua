@@ -141,6 +141,44 @@
 }
 
 /* =====================================================
+   OVERRIDES (higher specificity so global styles from other
+   pages/CSS files can't stretch the controls)
+   ===================================================== */
+.cosales-page .cosales-controls {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.cosales-page .cosales-search {
+  flex: 0 1 300px;
+  width: 300px;
+  max-width: 100%;
+  height: 44px;
+  margin: 0;
+}
+
+.cosales-page .cosales-filter {
+  flex: 0 0 auto;
+  width: 160px;
+  max-width: 100%;
+  height: 44px;
+  margin: 0;
+}
+
+.cosales-page .cosales-export-btn {
+  flex: 0 0 auto;
+  width: auto;
+  height: 44px;
+  margin: 0 0 0 auto; /* pushes Export PDF to the right edge on web view */
+}
+
+/* =====================================================
    RESPONSIVE (MOBILE)
    ===================================================== */
 @media (max-width: 768px) {
@@ -152,27 +190,19 @@
     margin-bottom: 18px;
   }
 
-  .cosales-controls {
+  .cosales-page .cosales-controls {
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
     width: 100%;
   }
 
-  .cosales-search {
+  .cosales-page .cosales-search,
+  .cosales-page .cosales-filter,
+  .cosales-page .cosales-export-btn {
+    flex: none;
     width: 100%;
-    box-sizing: border-box;
-  }
-
-  .cosales-filter {
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .cosales-export-btn {
-    width: 100%;
-    justify-content: center;
-    box-sizing: border-box;
+    margin: 0;
   }
 
   .cosales-graph-card {

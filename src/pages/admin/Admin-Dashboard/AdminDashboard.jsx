@@ -27,6 +27,24 @@ ChartJS.register(
 
 import "./admin-dashboard.css";
 
+// Returns the LOCAL calendar day ("YYYY-MM-DD") of a sales date value.
+// - A plain date column ("2026-10-18") is used as is, with no timezone shift.
+// - A timestamp is converted to the viewer's local day (Manila, UTC+8).
+const toLocalDateKey = (value) => {
+  if (!value) return null;
+
+  const str = String(value);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return null;
+
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
+
 export default function AdminDashboard() {
   const [salesData, setSalesData] = useState([]);
   const [deliveryData, setDeliveryData] = useState([]);
@@ -161,50 +179,48 @@ export default function AdminDashboard() {
   // =========================================================
   useEffect(() => {
     const fetchSales = async () => {
-      const now = new Date();
-      let startDate = new Date();
+        // Compare by LOCAL calendar day. The old code used
+        // startDate.toISOString(), which turns local midnight into UTC. In
+        // Manila (UTC+8) that is 4 PM of the previous day, so "Today" also
+        // counted yesterday's sales (and the card looked like the weekly total).
+        const now = new Date();
+        const todayKey = toLocalDateKey(now);
 
-      if (salesRange === "daily") {
-        startDate.setHours(0, 0, 0, 0);
-      } else if (
-        salesRange === "weekly"
-      ) {
-        startDate.setDate(
-          now.getDate() - 7
-        );
-      } else if (
-        salesRange === "monthly"
-      ) {
-        startDate.setMonth(
-          now.getMonth() - 1
-        );
-      }
-
-      const { data, error } =
-        await supabase
-          .from("sales")
-          .select("total_sales")
-          .gte(
-            "date",
-            startDate.toISOString()
+        let startKey;
+        if (salesRange === "daily") {
+          startKey = todayKey;
+        } else if (salesRange === "weekly") {
+          // last 7 days, including today
+          startKey = toLocalDateKey(
+            new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6)
           );
+        } else {
+          // monthly: one month back, same day
+          startKey = toLocalDateKey(
+            new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
+          );
+        }
 
-      if (!error && data) {
-        const total = data.reduce(
-          (acc, curr) =>
-            acc +
-            Number(
-              curr.total_sales || 0
-            ),
-          0
-        );
+        const { data, error } = await supabase
+          .from("sales")
+          .select("date, total_sales");
+
+        if (error) {
+          console.log(error.message);
+          return;
+        }
+
+        const total = (data || []).reduce((acc, curr) => {
+          const key = toLocalDateKey(curr.date);
+          if (!key || key < startKey || key > todayKey) return acc;
+          return acc + (Number(curr.total_sales) || 0);
+        }, 0);
 
         setSalesValue(total);
-      }
-    };
+      };
 
-    fetchSales();
-  }, [salesRange]);
+      fetchSales();
+    }, [salesRange]);
 
   // =========================================================
   // MONTHLY SALES CHART

@@ -27,6 +27,14 @@ ChartJS.register(
 
 import "./co-dashboard.css";
 
+// Local YYYY-MM-DD key (avoids the UTC shift of toISOString)
+const toLocalDateKey = (d) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
+
 export default function CoDashboard() {
  const [salesData, setSalesData] = useState([]);
   const [deliveryData, setDeliveryData] = useState([]);
@@ -72,28 +80,36 @@ export default function CoDashboard() {
   // sales
    useEffect(() => {
      const fetchSales = async () => {
+       // Compare by LOCAL calendar day (Manila), not UTC timestamps
        const now = new Date();
-       let startDate = new Date();
- 
-       if (salesRange === "daily") {
-         startDate.setHours(0, 0, 0, 0);
-       } else if (salesRange === "weekly") {
-         startDate.setDate(now.getDate() - 7);
+       const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+       if (salesRange === "weekly") {
+         startDate.setDate(startDate.getDate() - 6); // today + previous 6 days
        } else if (salesRange === "monthly") {
-         startDate.setMonth(now.getMonth() - 1);
+         startDate.setMonth(startDate.getMonth() - 1);
        }
- 
+
+       const startKey = toLocalDateKey(startDate);
+       const endKey = toLocalDateKey(now);
+
        const { data, error } = await supabase
          .from("sales")
-         .select("total_sales")
-         .gte("date", startDate.toISOString());
- 
+         .select("date, total_sales");
+
        if (!error && data) {
-         const total = data.reduce((acc, curr) => acc + (Number(curr.total_sales) || 0), 0);
+         const total = data.reduce((acc, curr) => {
+           if (!curr.date) return acc;
+           const key = toLocalDateKey(new Date(curr.date));
+           if (key >= startKey && key <= endKey) {
+             return acc + (Number(curr.total_sales) || 0);
+           }
+           return acc;
+         }, 0);
          setSalesValue(total);
        }
      };
-     fetchSales();
+    fetchSales();
    }, [salesRange]);
 
    useEffect(() => {

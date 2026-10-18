@@ -97,6 +97,24 @@ const fetchRiders = async () => {
     setLoading(false);
   };
 
+  // SYNC: refresh the table whenever anyone (staff, rider, another admin)
+  // changes a delivery_schedule row, so every account sees the same data
+  // without a manual refresh. Requires Realtime enabled on delivery_schedule.
+  useEffect(() => {
+    const channel = supabase
+      .channel("admin-delivery-sync")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "delivery_schedule" },
+        () => fetchDeliveries()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
   const [toast, setToast] = useState({
     message: "",
     type: "",
@@ -111,37 +129,75 @@ const fetchRiders = async () => {
     }, 2500);
   };
 
-  // DIRECT UPDATE NG RIDER
- 
-const handleAssignRider = async (row, newRiderId) => {
-  const selectedRider = riders.find(
-    (r) => String(r.users_id) === String(newRiderId)
-  );
-
-  const { error } = await supabase
-    .from("delivery_schedule")
-    .update({
-      assigned_rider: selectedRider?.name || null,
-      assigned_rider_id: selectedRider?.users_id || null,
-      delivery_status: selectedRider ? "Pending" : null,
-    })
-    .eq("order_id", row.scheduleOrderId);
-
-  if (error) {
-    console.error("Error assigning rider:", error.message);
-    showToast("Failed to assign rider", "error");
-  } else {
-    showToast(
-      selectedRider
-        ? `Rider ${selectedRider.name} assigned successfully!`
-        : "Rider unassigned successfully!",
-      "success"
+  // ASSIGN RIDER
+  // delivery_schedule.order_id is the same value as orders.order_id, so we use
+  // row.id. (row.scheduleOrderId is undefined when the order has no
+  // delivery_schedule row yet, and the update then silently matches 0 rows
+  // while the toast still says "assigned".)
+  // Both assigned_rider (name) and assigned_rider_id are saved: the id is what
+  // the admin dropdown, the rider page and the customer chat rely on.
+  const handleAssignRider = async (row, newRiderId) => {
+    const selectedRider = riders.find(
+      (r) => String(r.users_id) === String(newRiderId)
     );
 
-    await fetchDeliveries();
-  }
-};
+    // Never push an order that is already on the way / completed back to Pending
+    const isLocked =
+      row.status === "Out for Delivery" || row.status === "Delivered";
 
+    const payload = {
+      assigned_rider: selectedRider?.name || null,
+      assigned_rider_id: selectedRider?.users_id || null,
+      delivery_status: isLocked
+        ? row.status
+        : selectedRider
+        ? "Pending"
+        : null,
+    };
+
+    // 1. Update the existing schedule row
+    const { data: updated, error: updateError } = await supabase
+      .from("delivery_schedule")
+      .update(payload)
+      .eq("order_id", row.id)
+      .select();
+
+    let saveError = updateError;
+
+    // 2. No schedule row yet for this order: create it (only when assigning)
+    if (
+      !saveError &&
+      selectedRider &&
+      (!updated || updated.length === 0)
+    ) {
+      const { error: insertError } = await supabase
+        .from("delivery_schedule")
+        .insert([
+          {
+            order_id: row.id,
+            delivery_code:
+              row.orderId?.replace(/^ORD/, "DEL") || `DEL-${row.id}`,
+            ...payload,
+          },
+        ]);
+
+      saveError = insertError;
+    }
+
+    if (saveError) {
+      console.error("Error assigning rider:", saveError.message);
+      showToast("Failed to assign rider: " + saveError.message, "error");
+    } else {
+      showToast(
+        selectedRider
+          ? `Rider ${selectedRider.name} assigned successfully!`
+          : "Rider unassigned successfully!",
+        "success"
+      );
+
+      await fetchDeliveries();
+    }
+  };
 
   // DELETE
   const confirmDelete = async () => {
@@ -225,12 +281,21 @@ const handleAssignRider = async (row, newRiderId) => {
   key: "rider",
   label: "Assigned Rider",
   render: (row) => {
-    const assignedRiderId = row.assignedRiderId || "";
+    // Fallback for older rows that only saved the rider name (no id),
+    // e.g. assigned from the staff page before it saved assigned_rider_id.
+    const assignedRiderId =
+      row.assignedRiderId ||
+      riders.find((r) => r.name === row.rider)?.users_id ||
+      "";
 
     return (
       <select
         className="table-rider-dropdown"
         value={assignedRiderId}
+        // Rider can no longer be changed once the delivery is on the way or done
+        disabled={
+          row.status === "Out for Delivery" || row.status === "Delivered"
+        }
         onChange={(e) => handleAssignRider(row, e.target.value)}
       >
         <option value="">Not Assigned</option>

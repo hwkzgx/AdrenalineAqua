@@ -220,7 +220,7 @@ function CoInventory() {
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
         >
-          <option value="All">All Category</option>
+          <option value="All">All Categories</option>
           <option value="Water">Water</option>
           <option value="Bottle">Bottle</option>
           <option value="Equipment">Equipment</option>
