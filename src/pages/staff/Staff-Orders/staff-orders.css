@@ -143,6 +143,13 @@
 .StfOrd-status.verified { background: #dcfce7; color: #16a34a; }
 .StfOrd-status.rejected { background: #fee2e2; color: #dc2626; }
 
+/* Mga status na galing sa admin (Delivery + Pickup) */
+.StfOrd-status.out-for-delivery { background: #eff6ff; color: #1d4ed8; }
+.StfOrd-status.ready-for-pickup { background: #f5f3ff; color: #6d28d9; }
+.StfOrd-status.picked-up { background: #ecfdf5; color: #047857; }
+.StfOrd-status.cancelled { background: #fee2e2; color: #dc2626; }
+.StfOrd-status.returned { background: #dcfce7; color: #16a34a; }
+
 /* ACTION ICON BUTTONS */
 .StfOrd-actions {
   display: flex;

@@ -13,6 +13,68 @@ import {
   Calendar,
 } from "lucide-react";
 
+// ==========================================
+// PAYMENT (Paid / Unpaid) PARA SA RIDER
+// COD = Unpaid hangga't hindi pa Delivered (Delivered = Paid)
+// GCash = galing sa admin (Pending / Paid / Rejected)
+// Cash (walk-in) = galing sa admin (Unpaid / Paid)
+// ==========================================
+const getPaymentStatus = (method, rawStatus, deliveryStatus) => {
+  const m = String(method || "").toLowerCase();
+  if (m === "cod") return deliveryStatus === "Delivered" ? "Paid" : "Unpaid";
+
+  const r = String(rawStatus || "").toLowerCase();
+  if (r === "paid" || r === "verified") return "Paid";
+  if (r === "rejected") return "Rejected";
+  return m === "gcash" ? "Pending" : "Unpaid";
+};
+
+const methodLabel = (method) =>
+  String(method || "").toLowerCase() === "cod" ? "Cash on Delivery" : method || "—";
+
+const PaymentTag = ({ status }) => {
+  const colors =
+    status === "Paid"
+      ? { bg: "#dcfce7", fg: "#15803d" }
+      : status === "Pending"
+      ? { bg: "#fef9c3", fg: "#a16207" }
+      : { bg: "#fee2e2", fg: "#b91c1c" };
+
+  return (
+    <span
+      style={{
+        display: "inline-block",
+        padding: "3px 10px",
+        borderRadius: "999px",
+        fontSize: "12px",
+        fontWeight: 700,
+        background: colors.bg,
+        color: colors.fg,
+      }}
+    >
+      {status}
+    </span>
+  );
+};
+
+const peso = (n) => `₱${Number(n || 0).toLocaleString()}`;
+
+// Pending (nasa taas) -> Out for Delivery -> Delivered -> Cancelled
+// Sa bawat grupo, pinakabagong order muna
+const STATUS_ORDER = { Pending: 0, "Out for Delivery": 1, Delivered: 2, Completed: 2, Cancelled: 3 };
+const sortByPendingThenLatest = (list) =>
+  [...list].sort((a, b) => {
+    const ra = STATUS_ORDER[a.status] ?? 4;
+    const rb = STATUS_ORDER[b.status] ?? 4;
+    if (ra !== rb) return ra - rb;
+
+    const ta = new Date(a.orderDate || 0).getTime();
+    const tb = new Date(b.orderDate || 0).getTime();
+    if (tb !== ta) return tb - ta;
+
+    return Number(b.id || 0) - Number(a.id || 0);
+  });
+
 export default function RiderDeliveries() {
   const [deliveries, setDeliveries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,6 +103,10 @@ export default function RiderDeliveries() {
       .select(`
         order_id,
         order_code,
+        order_date,
+        total_amount,
+        payment_method,
+        payment_status,
         full_name,
         delivery_address,
         delivery_date,
@@ -52,8 +118,7 @@ export default function RiderDeliveries() {
           assigned_rider_id
         )
       `)
-      .eq("order_type", "Delivery")
-      .order("delivery_date", { ascending: true });
+      .eq("order_type", "Delivery");
 
     if (error) {
       console.log(error.message);
@@ -62,7 +127,7 @@ export default function RiderDeliveries() {
     }
 
     // 2. Salain para sa nakalogin na rider LANG, tapos i-format
-    const formatted = (data || [])
+    const formatted = sortByPendingThenLatest((data || [])
       .filter((item) => {
         const d = item.delivery_schedule?.[0];
         if (!d) return false;
@@ -78,6 +143,14 @@ export default function RiderDeliveries() {
       })
       .map((item) => ({
         id: item.order_id,
+        orderDate: item.order_date,
+        totalAmount: item.total_amount,
+        paymentMethod: item.payment_method,
+        paymentStatus: getPaymentStatus(
+          item.payment_method,
+          item.payment_status,
+          item.delivery_schedule?.[0]?.delivery_status || "Pending"
+        ),
         deliveryId: item.delivery_schedule?.[0]?.delivery_code,
         orderId: item.order_code,
         customer: item.full_name,
@@ -85,7 +158,7 @@ export default function RiderDeliveries() {
         date: item.delivery_date,
         status: item.delivery_schedule?.[0]?.delivery_status || "Pending",
         rider: item.delivery_schedule?.[0]?.assigned_rider,
-      }));
+      })));
 
     setDeliveries(formatted);
     setLoading(false);
@@ -170,6 +243,17 @@ export default function RiderDeliveries() {
                 <span className="rider-meta-item">
                   <Clock size={14} />
                   <span className="rider-meta-text">{item.date}</span>
+                </span>
+              </div>
+
+              {/* PAYMENT: Paid / Unpaid + halaga */}
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "6px", flexWrap: "wrap" }}>
+                <PaymentTag status={item.paymentStatus} />
+                <span style={{ fontSize: "13px", fontWeight: 700, color: "#1e293b" }}>
+                  {peso(item.totalAmount)}
+                </span>
+                <span style={{ fontSize: "12px", color: "#64748b" }}>
+                  {methodLabel(item.paymentMethod)}
                 </span>
               </div>
             </div>

@@ -14,6 +14,7 @@ import {
   Download,
   CheckCircle,
   XCircle,
+  Camera,
 } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -104,6 +105,34 @@ export const exportExpensesToPDF = (expensesData, filename = "expenses-report.pd
   doc.save(filename);
 };
 
+// ==========================================
+// RECEIPT PICTURES (Supabase Storage bucket)
+// ==========================================
+const RECEIPT_BUCKET = "expense-receipts";
+const MAX_RECEIPT_MB = 5;
+
+const uploadReceipt = async (file, code) => {
+  const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+  const path = `${code}-${Date.now()}.${ext}`;
+
+  const { error } = await supabase.storage
+    .from(RECEIPT_BUCKET)
+    .upload(path, file, { contentType: file.type, upsert: false });
+
+  if (error) throw error;
+
+  const { data } = supabase.storage.from(RECEIPT_BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+};
+
+const removeReceipt = async (url) => {
+  if (!url) return;
+  const path = decodeURIComponent(url.split(`/${RECEIPT_BUCKET}/`)[1] || "");
+  if (!path) return;
+  const { error } = await supabase.storage.from(RECEIPT_BUCKET).remove([path]);
+  if (error) console.log("Remove receipt error:", error.message);
+};
+
 function Expenses() {
   const [expenses, setExpenses] = useState([]);
   const [search, setSearch] = useState("");
@@ -116,6 +145,13 @@ function Expenses() {
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
+
+  // RECEIPT PICTURE STATES
+  const [receiptFile, setReceiptFile] = useState(null);
+  const [receiptPreview, setReceiptPreview] = useState("");
+  const [removeExistingReceipt, setRemoveExistingReceipt] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [viewReceiptUrl, setViewReceiptUrl] = useState("");
 
   // FORM STATES
   const [formData, setFormData] = useState({
@@ -150,6 +186,107 @@ function Expenses() {
   useEffect(() => {
     fetchExpenses();
   }, []);
+
+  const clearReceiptState = () => {
+    if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+    setReceiptFile(null);
+    setReceiptPreview("");
+    setRemoveExistingReceipt(false);
+  };
+
+  const handleReceiptChange = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      showToast("Please choose an image file (JPG, PNG, etc.).", "error");
+      return;
+    }
+    if (file.size > MAX_RECEIPT_MB * 1024 * 1024) {
+      showToast(`Image is too large. Max is ${MAX_RECEIPT_MB}MB.`, "error");
+      return;
+    }
+
+    if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+    setReceiptFile(file);
+    setReceiptPreview(URL.createObjectURL(file));
+    setRemoveExistingReceipt(false);
+  };
+
+  // Picture field (ginagamit sa Add at Edit)
+  const renderReceiptField = (existingUrl) => {
+    const shownUrl = receiptPreview || (!removeExistingReceipt ? existingUrl : "");
+
+    return (
+      <div className="exp-field">
+        <label>Receipt / Proof Picture (optional)</label>
+        {shownUrl && (
+          <img
+            src={shownUrl}
+            alt="Receipt"
+            onClick={() => setViewReceiptUrl(shownUrl)}
+            style={{
+              width: "100%",
+              maxHeight: "180px",
+              objectFit: "contain",
+              borderRadius: "8px",
+              border: "1px solid #e2e8f0",
+              background: "#f8fafc",
+              marginBottom: "8px",
+              cursor: "zoom-in",
+            }}
+          />
+        )}
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+            padding: "12px",
+            border: "1.5px dashed #cbd5e1",
+            borderRadius: "10px",
+            background: "#f8fafc",
+            color: "#475569",
+            fontSize: "13px",
+            fontWeight: 500,
+            cursor: "pointer",
+          }}
+        >
+          <Camera size={16} />
+          {receiptFile
+            ? receiptFile.name
+            : shownUrl
+            ? "Change picture"
+            : "Choose a picture"}
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleReceiptChange}
+            style={{ display: "none" }}
+          />
+        </label>
+        {(receiptFile || (existingUrl && !removeExistingReceipt)) && (
+          <button
+            type="button"
+            onClick={() => {
+              if (receiptFile) {
+                if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+                setReceiptFile(null);
+                setReceiptPreview("");
+              } else {
+                setRemoveExistingReceipt(true);
+              }
+            }}
+            style={{ marginTop: "6px", background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: "12px", padding: 0 }}
+          >
+            Remove picture
+          </button>
+        )}
+      </div>
+    );
+  };
 
   // FETCH FROM SUPABASE
   const fetchExpenses = async () => {
@@ -191,7 +328,19 @@ function Expenses() {
       return;
     }
 
+    setSaving(true);
     const code = await generateExpenseCode();
+
+    let receiptUrl = null;
+    if (receiptFile) {
+      try {
+        receiptUrl = await uploadReceipt(receiptFile, code);
+      } catch (err) {
+        showToast("Failed to upload picture: " + err.message, "error");
+        setSaving(false);
+        return;
+      }
+    }
 
     const { error } = await supabase.from("expenses").insert([
       {
@@ -200,10 +349,14 @@ function Expenses() {
         description: formData.description,
         amount: Number(formData.amount),
         date: formData.date,
+        receipt_url: receiptUrl,
       },
     ]);
 
+    setSaving(false);
+
     if (error) {
+      await removeReceipt(receiptUrl);
       showToast("Error adding expense: " + error.message, "error");
     } else {
       showToast("Expense recorded successfully!", "success");
@@ -220,6 +373,22 @@ function Expenses() {
       return;
     }
 
+    setSaving(true);
+    const oldUrl = selectedExpense.receipt_url || null;
+    let newUrl = oldUrl;
+
+    if (receiptFile) {
+      try {
+        newUrl = await uploadReceipt(receiptFile, selectedExpense.expenses_code);
+      } catch (err) {
+        showToast("Failed to upload picture: " + err.message, "error");
+        setSaving(false);
+        return;
+      }
+    } else if (removeExistingReceipt) {
+      newUrl = null;
+    }
+
     const { error } = await supabase
       .from("expenses")
       .update({
@@ -227,14 +396,21 @@ function Expenses() {
         description: formData.description,
         amount: Number(formData.amount),
         date: formData.date,
+        receipt_url: newUrl,
       })
       .eq("expenses_code", selectedExpense.expenses_code);
 
+    setSaving(false);
+
     if (error) {
+      if (receiptFile) await removeReceipt(newUrl);
       showToast("Update failed: " + error.message, "error");
     } else {
+      // Burahin ang lumang picture kung napalitan o tinanggal
+      if (oldUrl && newUrl !== oldUrl) await removeReceipt(oldUrl);
       showToast("Expense updated successfully!", "success");
       setShowEdit(false);
+      clearReceiptState();
       fetchExpenses();
     }
   };
@@ -249,6 +425,7 @@ function Expenses() {
     if (error) {
       showToast("Delete failed: " + error.message, "error");
     } else {
+      await removeReceipt(selectedExpense.receipt_url);
       showToast("Expense deleted successfully!", "success");
       setShowDelete(false);
       fetchExpenses();
@@ -256,6 +433,7 @@ function Expenses() {
   };
 
   const resetForm = () => {
+    clearReceiptState();
     setFormData({
       category: "Utilities",
       description: "",
@@ -368,6 +546,41 @@ function Expenses() {
     { key: "description", label: "Description" },
     { key: "amount", label: "Amount", render: (row) => `₱${Number(row.amount || 0).toFixed(2)}` },
     {
+      key: "receipt_url",
+      label: "Receipt",
+      render: (row) =>
+        row.receipt_url ? (
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%" }}>
+            <button
+              type="button"
+              title="Click to view receipt"
+              onClick={() => setViewReceiptUrl(row.receipt_url)}
+              style={{
+                width: "44px",
+                height: "44px",
+                padding: 0,
+                margin: 0,
+                border: "1px solid #e2e8f0",
+                borderRadius: "8px",
+                overflow: "hidden",
+                background: "#f8fafc",
+                cursor: "zoom-in",
+                display: "block",
+                boxShadow: "0 1px 3px rgba(15,23,42,0.12)",
+              }}
+            >
+              <img
+                src={row.receipt_url}
+                alt="Receipt"
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", margin: 0 }}
+              />
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: "flex", justifyContent: "center", width: "100%", color: "#94a3b8" }}>—</div>
+        ),
+    },
+    {
       key: "actions",
       label: "Action",
       render: (row) => (
@@ -376,6 +589,7 @@ function Expenses() {
             className="edit-icon-btn"
             onClick={() => {
               setSelectedExpense(row);
+              clearReceiptState();
               setFormData({
                 category: row.category,
                 description: row.description,
@@ -613,11 +827,13 @@ function Expenses() {
                   />
                 </div>
               </div>
+
+              {renderReceiptField(null)}
             </div>
 
             <div className="exp-modal-footer">
               <button className="exp-btn ghost" onClick={() => setShowAdd(false)}>Cancel</button>
-              <button className="exp-btn primary" onClick={handleAddExpense}>Save Transaction</button>
+              <button className="exp-btn primary" disabled={saving} onClick={handleAddExpense}>{saving ? "Saving..." : "Save Transaction"}</button>
             </div>
           </div>
         </div>
@@ -683,11 +899,13 @@ function Expenses() {
                   />
                 </div>
               </div>
+
+              {renderReceiptField(selectedExpense?.receipt_url)}
             </div>
 
             <div className="exp-modal-footer">
               <button className="exp-btn ghost" onClick={() => setShowEdit(false)}>Cancel</button>
-              <button className="exp-btn primary" onClick={handleEditExpense}>Update Log</button>
+              <button className="exp-btn primary" disabled={saving} onClick={handleEditExpense}>{saving ? "Saving..." : "Update Log"}</button>
             </div>
           </div>
         </div>
@@ -713,6 +931,9 @@ function Expenses() {
                 <div className="exp-detail-row"><span>Category</span><b>{selectedExpense?.category}</b></div>
                 <div className="exp-detail-row"><span>Particulars</span><b>{selectedExpense?.description}</b></div>
                 <div className="exp-detail-row"><span>Amount Paid</span><b>₱{Number(selectedExpense?.amount || 0).toFixed(2)}</b></div>
+                {selectedExpense?.receipt_url && (
+                  <div className="exp-detail-row"><span>Receipt</span><b>Attached (will be deleted)</b></div>
+                )}
                 <div className="exp-detail-row"><span>Date</span><b>{selectedExpense?.date ? new Date(selectedExpense.date).toLocaleDateString() : "-"}</b></div>
               </div>
             </div>
@@ -721,6 +942,50 @@ function Expenses() {
               <button className="exp-btn ghost" onClick={() => setShowDelete(false)}>No, Cancel</button>
               <button className="exp-btn danger" onClick={handleDeleteExpense}>Delete Record</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================== */}
+      {/* MODAL: VIEW RECEIPT PICTURE                */}
+      {/* ========================================== */}
+      {viewReceiptUrl && (
+        <div
+          className="exp-modal-overlay"
+          style={{ zIndex: 2000 }}
+          onClick={() => setViewReceiptUrl("")}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: "relative",
+              background: "#fff",
+              borderRadius: "12px",
+              padding: "12px",
+              maxWidth: "90vw",
+              maxHeight: "90vh",
+            }}
+          >
+            <button
+              className="exp-modal-close"
+              onClick={() => setViewReceiptUrl("")}
+              style={{ position: "absolute", top: "8px", right: "8px", zIndex: 1 }}
+            >
+              <X size={18} />
+            </button>
+            <img
+              src={viewReceiptUrl}
+              alt="Receipt"
+              style={{ maxWidth: "85vw", maxHeight: "80vh", display: "block", borderRadius: "8px" }}
+            />
+            <a
+              href={viewReceiptUrl}
+              target="_blank"
+              rel="noreferrer"
+              style={{ display: "block", textAlign: "center", marginTop: "8px", fontSize: "13px" }}
+            >
+              Open in new tab
+            </a>
           </div>
         </div>
       )}

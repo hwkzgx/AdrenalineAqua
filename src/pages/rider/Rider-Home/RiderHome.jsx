@@ -17,6 +17,29 @@ import {
   ChevronRight,
 } from "lucide-react";
 
+// ==========================================
+// EARNINGS = delivery fee ng bawat Delivered na order
+// Hindi hiwalay na naka-save ang delivery fee, kaya kinukuwenta:
+//   delivery fee = total_amount - presyo ng items - logo fee (₱2 kada piraso kung may logo)
+// ==========================================
+const LOGO_FEE_PER_PIECE = 2;
+
+const getDeliveryFee = (order) => {
+  const items = order.order_items || [];
+
+  const itemsTotal = items.reduce(
+    (sum, i) => sum + Number(i.unit_price || 0) * Number(i.quantity || 0),
+    0
+  );
+
+  const logoFee = items.reduce(
+    (sum, i) => sum + (i.customized_logo ? Number(i.quantity || 0) * LOGO_FEE_PER_PIECE : 0),
+    0
+  );
+
+  return Math.max(0, Number(order.total_amount || 0) - itemsTotal - logoFee);
+};
+
 export default function RiderHome() {
   const [deliveries, setDeliveries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,6 +74,12 @@ export default function RiderHome() {
         full_name,
         delivery_address,
         delivery_date,
+        total_amount,
+        order_items (
+          quantity,
+          unit_price,
+          customized_logo
+        ),
         delivery_schedule(
           delivery_code,
           delivery_status,
@@ -93,6 +122,7 @@ export default function RiderHome() {
       address: item.delivery_address,
       date: item.delivery_date,
       status: item.delivery_schedule?.[0]?.delivery_status || "Pending",
+      deliveryFee: getDeliveryFee(item),
     }));
 
     setDeliveries(formatted);
@@ -114,11 +144,20 @@ export default function RiderHome() {
         d.status.toLowerCase() === "delivered"
     ).length;
 
+    // Earnings: kabuuang delivery fee ng mga Delivered na order ng rider
+    const earnings = formatted
+      .filter(
+        (d) =>
+          d.status.toLowerCase() === "completed" ||
+          d.status.toLowerCase() === "delivered"
+      )
+      .reduce((sum, d) => sum + d.deliveryFee, 0);
+
     setStats({
       assigned,
       progress,
       completed,
-      earnings: completed * 120,
+      earnings,
     });
 
     setLoading(false);
@@ -178,7 +217,7 @@ export default function RiderHome() {
 
         <div className="stat-card">
           <Wallet size={28}/>
-          <h2>₱{stats.earnings}</h2>
+          <h2>₱{stats.earnings.toLocaleString(undefined, { maximumFractionDigits: 2 })}</h2>
           <p>Earnings</p>
         </div>
 

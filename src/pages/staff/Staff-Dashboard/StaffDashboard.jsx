@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react"; 
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../../../supabase";
 import {
   Chart as ChartJS,
@@ -27,6 +28,13 @@ ChartJS.register(
 
 import "./staff-dashboard.css";
 
+// Palitan ang mga path na ito ayon sa routes ng staff mo
+const ROUTES = {
+  orders: "/staff/orders",
+  deliveries: "/staff/delivery-schedule",
+  sales: "/staff/sales",
+};
+
 // Returns the LOCAL calendar day ("YYYY-MM-DD") of a sales date value.
 // - A plain date column ("2026-10-18") is used as is, with no timezone shift.
 // - A timestamp is converted to the viewer's local day (Manila, UTC+8).
@@ -46,6 +54,21 @@ const toLocalDateKey = (value) => {
 };
 
 export default function StaffDashboard() {
+  const navigate = useNavigate();
+
+  // Props para maging clickable (mouse + keyboard) ang cards
+  const cardProps = (path) => ({
+    role: "link",
+    tabIndex: 0,
+    style: { cursor: "pointer" },
+    onClick: () => navigate(path),
+    onKeyDown: (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        navigate(path);
+      }
+    },
+  });
 
   const [salesData, setSalesData] = useState([]);
    const [deliveryData, setDeliveryData] = useState([]);
@@ -60,7 +83,6 @@ export default function StaffDashboard() {
     totalOrders: 0,
     pendingDeliveries: 0,
     totalInventory: 0,
-    expenses: 0,
     stock: 0
   });
   
@@ -75,13 +97,7 @@ export default function StaffDashboard() {
       // 3. Total Inventory (halimbawa: count ng items sa products table)
       const { count: inventoryCount } = await supabase.from("inventory").select("*", { count: "exact", head: true });
   
-      // 4. Total Expenses (Sum ng lahat ng amount sa expenses table)
-    const { data: expensesData } = await supabase
-      .from("expenses")
-      .select("amount");
-    const totalExpenses = expensesData?.reduce((acc, curr) => acc + (curr.amount || 0), 0) || 0;
-  
-    // 5. Total Stock (Sum ng quantity sa products table)
+    // 4. Total Stock (Sum ng quantity sa products table)
     const { data: stocksData } = await supabase
       .from("inventory")
       .select("quantity_available");
@@ -91,11 +107,20 @@ export default function StaffDashboard() {
     totalOrders: ordersCount || 0,
     pendingDeliveries: pendingCount || 0,
     totalInventory: inventoryCount || 0,
-    expenses: totalExpenses,
     stock: totalStock
-  });}
-  
+  });};
+
     fetchStats();
+
+    const statsRealtimeChannel = supabase
+      .channel("staff-dashboard-stats-updates")
+      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, fetchStats)
+      .on("postgres_changes", { event: "*", schema: "public", table: "delivery_schedule" }, fetchStats)
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(statsRealtimeChannel);
+    };
   }, []);
   
     // sales
@@ -351,26 +376,24 @@ export default function StaffDashboard() {
 
         {/* CARDS */}
         <div className="staffdashboard-grid">
-          <div className="staffdashboard-card blue">
+          <div className="staffdashboard-card blue" {...cardProps(ROUTES.orders)}>
             <h3>Total Orders</h3>
             <p>{stats.totalOrders}</p>
           </div>
 
-          <div className="staffdashboard-card orange">
+          <div className="staffdashboard-card orange" {...cardProps(ROUTES.deliveries)}>
             <h3>Pending Deliveries</h3>
             <p>{stats.pendingDeliveries}</p>
           </div>
 
-          <div className="staffdashboard-card green">
-            <h3>Total Inventory</h3>
-            <p>{stats.totalInventory}</p>
-          </div>
 
-          <div className="staffdashboard-card purple">
+          <div className="staffdashboard-card purple" {...cardProps(ROUTES.sales)}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h3>Total Sales</h3>
                     <select 
                       value={salesRange} 
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
                       onChange={(e) => setSalesRange(e.target.value)}
                       className="small-sales-dropdown"
                     >
@@ -382,15 +405,6 @@ export default function StaffDashboard() {
               <p>₱{salesValue.toLocaleString()}</p>
                 </div>
 
-          <div className="staffdashboard-card red">
-            <h3>Expenses</h3>
-            <p>₱{stats.expenses}</p>
-          </div>
-
-          <div className="staffdashboard-card blue">
-            <h3>Stocks</h3>
-            <p>{stats.stock}</p>
-          </div>
         </div>
 
         {/* CHARTS */}

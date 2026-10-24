@@ -12,7 +12,77 @@ import {
   Briefcase,
   CheckCircle2,
   XCircle,
+  Wallet,
+  Camera,
 } from "lucide-react";
+
+// ==========================================
+// PROOF OF DELIVERY (Supabase Storage bucket)
+// ==========================================
+const PROOF_BUCKET = "delivery-proofs";
+const MAX_PROOF_MB = 5;
+
+const uploadProof = async (file, code) => {
+  const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+  const path = `${code}-${Date.now()}.${ext}`;
+
+  const { error } = await supabase.storage
+    .from(PROOF_BUCKET)
+    .upload(path, file, { contentType: file.type, upsert: false });
+
+  if (error) throw error;
+
+  const { data } = supabase.storage.from(PROOF_BUCKET).getPublicUrl(path);
+  return { url: data.publicUrl, path };
+}
+
+// ==========================================
+// PAYMENT (Paid / Unpaid) PARA SA RIDER
+// COD = Unpaid hangga't hindi pa Delivered (Delivered = Paid)
+// GCash = galing sa admin (Pending / Paid / Rejected)
+// Cash (walk-in) = galing sa admin (Unpaid / Paid)
+// ==========================================
+const getPaymentStatus = (method, rawStatus, deliveryStatus) => {
+  const m = String(method || "").toLowerCase();
+  if (m === "cod") return deliveryStatus === "Delivered" ? "Paid" : "Unpaid";
+
+  const r = String(rawStatus || "").toLowerCase();
+  if (r === "paid" || r === "verified") return "Paid";
+  if (r === "rejected") return "Rejected";
+  return m === "gcash" ? "Pending" : "Unpaid";
+};
+
+const methodLabel = (method) =>
+  String(method || "").toLowerCase() === "cod" ? "Cash on Delivery" : method || "—";
+
+const PaymentTag = ({ status }) => {
+  const colors =
+    status === "Paid"
+      ? { bg: "#dcfce7", fg: "#15803d" }
+      : status === "Pending"
+      ? { bg: "#fef9c3", fg: "#a16207" }
+      : { bg: "#fee2e2", fg: "#b91c1c" };
+
+  return (
+    <span
+      style={{
+        display: "inline-block",
+        padding: "3px 10px",
+        borderRadius: "999px",
+        fontSize: "12px",
+        fontWeight: 700,
+        background: colors.bg,
+        color: colors.fg,
+      }}
+    >
+      {status}
+    </span>
+  );
+};
+
+const peso = (n) => `₱${Number(n || 0).toLocaleString()}`;
+
+
 
 export default function RiderDeliveryDetails() {
   const { id } = useParams();
@@ -56,6 +126,36 @@ export default function RiderDeliveryDetails() {
   const [showContainerModal, setShowContainerModal] = useState(false);
   const [containersDelivered, setContainersDelivered] = useState(0);
   const [containersReturned, setContainersReturned] = useState(0);
+
+  // PROOF OF DELIVERY
+  const [proofFile, setProofFile] = useState(null);
+  const [proofPreview, setProofPreview] = useState("");
+  const [savingDelivery, setSavingDelivery] = useState(false);
+
+  const clearProof = () => {
+    if (proofPreview) URL.revokeObjectURL(proofPreview);
+    setProofFile(null);
+    setProofPreview("");
+  };
+
+  const handleProofChange = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      showToast("Please choose a photo (JPG, PNG, etc.).", "error");
+      return;
+    }
+    if (file.size > MAX_PROOF_MB * 1024 * 1024) {
+      showToast(`Photo is too large. Max is ${MAX_PROOF_MB}MB.`, "error");
+      return;
+    }
+
+    if (proofPreview) URL.revokeObjectURL(proofPreview);
+    setProofFile(file);
+    setProofPreview(URL.createObjectURL(file));
+  };
 
   // I-check kung nag-Yes na dati ang rider sa localStorage
   useEffect(() => {
@@ -244,13 +344,17 @@ export default function RiderDeliveryDetails() {
         delivery_date,
         destination_lat,
         destination_lng,
+        payment_method,
+        payment_status,
+        total_amount,
         delivery_schedule (
           order_id,
           delivery_code,
           delivery_status,
           assigned_rider,
           rider_lat,
-          rider_lng
+          rider_lng,
+          proof_of_delivery
         ),
         order_items (
           item_name,
@@ -323,13 +427,17 @@ export default function RiderDeliveryDetails() {
       delivery_address: data.delivery_address,
       delivery_date: data.delivery_date,
       delivery_status: deliveryStatus || "Pending",
+      payment_method: data.payment_method,
+      payment_status_raw: data.payment_status,
+      total_amount: data.total_amount,
+      proof_url: data.delivery_schedule?.[0]?.proof_of_delivery || "",
     });
 
     setItems(data.order_items || []);
     setLoading(false);
   };
 
-  const updateDeliveryStatus = async (newStatus) => {
+  const updateDeliveryStatus = async (newStatus, extra = {}) => {
     if (!delivery?.scheduleOrderId) {
       showToast("Hindi ma-update: walang nakitang schedule sa database.", "error");
       return;
@@ -337,14 +445,19 @@ export default function RiderDeliveryDetails() {
 
     const { error } = await supabase
       .from("delivery_schedule")
-      .update({ delivery_status: newStatus })
+      .update({ delivery_status: newStatus, ...extra })
       .eq("order_id", delivery.scheduleOrderId);
 
     if (error) {
       console.log("Error updating status:", error.message);
       showToast("Failed to update status.", "error");
+      return false;
     } else {
-      setDelivery((prev) => ({ ...prev, delivery_status: newStatus }));
+      setDelivery((prev) => ({
+        ...prev,
+        delivery_status: newStatus,
+        ...(extra.proof_of_delivery ? { proof_url: extra.proof_of_delivery } : {}),
+      }));
 
       if (newStatus === "Out for Delivery") {
         showToast("Delivery accepted! You're now out for delivery.");
@@ -353,11 +466,29 @@ export default function RiderDeliveryDetails() {
       } else {
         showToast(`Status updated to: ${newStatus}`);
       }
+      return true;
     }
   };
 
   // I-save ang container transactions sa Supabase, tapos i-mark as delivered
   const handleSaveContainerAndDelivery = async () => {
+    // Kailangan ng proof of delivery (litrato) bago ma-mark as Delivered
+    if (!proofFile) {
+      showToast("Please take or upload a proof of delivery photo.", "error");
+      return;
+    }
+
+    setSavingDelivery(true);
+
+    let proof;
+    try {
+      proof = await uploadProof(proofFile, delivery.deliveryId || delivery.orderId);
+    } catch (err) {
+      showToast("Failed to upload proof: " + err.message, "error");
+      setSavingDelivery(false);
+      return;
+    }
+
     const delivered = Number(containersDelivered);
     const returned = Number(containersReturned);
     const outstanding = delivered - returned;
@@ -376,12 +507,22 @@ export default function RiderDeliveryDetails() {
       ]);
 
     if (containerError) {
+      await supabase.storage.from(PROOF_BUCKET).remove([proof.path]);
       showToast("Error saving container: " + containerError.message, "error");
+      setSavingDelivery(false);
       return;
     }
 
-    await updateDeliveryStatus("Delivered");
-    setShowContainerModal(false);
+    const ok = await updateDeliveryStatus("Delivered", {
+      proof_of_delivery: proof.url,
+    });
+
+    setSavingDelivery(false);
+
+    if (ok) {
+      setShowContainerModal(false);
+      clearProof();
+    }
   };
 
   // Logic kung bubuksan ba ang modal o direkta sa map
@@ -402,6 +543,11 @@ export default function RiderDeliveryDetails() {
   }
 
   const currentStatus = delivery.delivery_status || "Pending";
+  const paymentStatus = getPaymentStatus(
+    delivery.payment_method,
+    delivery.payment_status_raw,
+    currentStatus
+  );
 
   return (
     <div className="details-container">
@@ -482,6 +628,45 @@ export default function RiderDeliveryDetails() {
               ))
             )}
           </div>
+
+          {/* PAYMENT: Paid / Unpaid */}
+          <div className="section">
+            <div className="section-title">
+              <Wallet size={22} />
+              <h3>Payment</h3>
+            </div>
+
+            <div className="item-row">
+              <span>Method</span>
+              <span>{methodLabel(delivery.payment_method)}</span>
+            </div>
+            <div className="item-row">
+              <span>Status</span>
+              <PaymentTag status={paymentStatus} />
+            </div>
+            <div className="item-row">
+              <span>Total</span>
+              <strong>{peso(delivery.total_amount)}</strong>
+            </div>
+
+            {paymentStatus !== "Paid" && currentStatus !== "Cancelled" && (
+              <p
+                style={{
+                  marginTop: "10px",
+                  padding: "10px 12px",
+                  borderRadius: "8px",
+                  background: "#fef9c3",
+                  color: "#854d0e",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                }}
+              >
+                {String(delivery.payment_method || "").toLowerCase() === "gcash"
+                  ? "GCash payment is not verified yet."
+                  : `Collect ${peso(delivery.total_amount)} from the customer on delivery.`}
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="details-col">
@@ -507,7 +692,7 @@ export default function RiderDeliveryDetails() {
               cursor: currentStatus !== "Pending" ? "not-allowed" : "pointer",
             }}
           >
-            Accept Delivery
+            Out for Delivery
           </button>
 
           {/* Magbubukas muna ng container modal bago i-mark as delivered */}
@@ -535,6 +720,30 @@ export default function RiderDeliveryDetails() {
             >
               ✓ This delivery has been completed.
             </p>
+          )}
+
+          {currentStatus === "Delivered" && delivery.proof_url && (
+            <div className="section" style={{ marginTop: "15px" }}>
+              <div className="section-title">
+                <Camera size={22} />
+                <h3>Proof of Delivery</h3>
+              </div>
+              <a href={delivery.proof_url} target="_blank" rel="noopener noreferrer">
+                <img
+                  src={delivery.proof_url}
+                  alt="Proof of delivery"
+                  style={{
+                    width: "100%",
+                    maxHeight: "260px",
+                    objectFit: "contain",
+                    borderRadius: "10px",
+                    border: "1px solid #e2e8f0",
+                    background: "#f8fafc",
+                    display: "block",
+                  }}
+                />
+              </a>
+            </div>
           )}
         </div>
       </div>
@@ -648,9 +857,71 @@ export default function RiderDeliveryDetails() {
               </strong>
             </div>
 
+            {/* PROOF OF DELIVERY (required) */}
+            <div style={{ marginBottom: "20px" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "13px",
+                  fontWeight: "600",
+                  marginBottom: "5px",
+                  color: "#334155",
+                }}
+              >
+                Proof of Delivery (photo) *
+              </label>
+
+              {proofPreview && (
+                <img
+                  src={proofPreview}
+                  alt="Proof preview"
+                  style={{
+                    width: "100%",
+                    maxHeight: "180px",
+                    objectFit: "contain",
+                    borderRadius: "8px",
+                    border: "1px solid #e2e8f0",
+                    background: "#f8fafc",
+                    marginBottom: "8px",
+                  }}
+                />
+              )}
+
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  padding: "12px",
+                  border: "1.5px dashed #cbd5e1",
+                  borderRadius: "10px",
+                  background: "#f8fafc",
+                  color: "#475569",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                <Camera size={16} />
+                {proofFile ? "Retake / change photo" : "Take or upload photo"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleProofChange}
+                  style={{ display: "none" }}
+                />
+              </label>
+            </div>
+
             <div style={{ display: "flex", gap: "10px" }}>
               <button
-                onClick={() => setShowContainerModal(false)}
+                onClick={() => {
+                  setShowContainerModal(false);
+                  clearProof();
+                }}
+                disabled={savingDelivery}
                 style={{
                   flex: 1,
                   padding: "10px",
@@ -666,7 +937,9 @@ export default function RiderDeliveryDetails() {
               </button>
               <button
                 onClick={handleSaveContainerAndDelivery}
+                disabled={savingDelivery}
                 style={{
+                  opacity: savingDelivery ? 0.6 : 1,
                   flex: 1,
                   padding: "10px",
                   background: "#2563eb",
@@ -677,7 +950,7 @@ export default function RiderDeliveryDetails() {
                   cursor: "pointer",
                 }}
               >
-                Save & Complete
+                {savingDelivery ? "Saving..." : "Save & Complete"}
               </button>
             </div>
           </div>

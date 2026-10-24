@@ -9,11 +9,15 @@
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-.table-container th:nth-child(9), 
-.table-container td:nth-child(9) { 
-  width: 9%;  
-  text-align: center; 
-} 
+/* Payment Status (9), Delivery Status (10), Actions (11): naka-center */
+.table-container th:nth-child(9),
+.table-container td:nth-child(9),
+.table-container th:nth-child(10),
+.table-container td:nth-child(10),
+.table-container th:nth-child(11),
+.table-container td:nth-child(11) {
+  text-align: center;
+}
 
 /* HEADER */
 .Ord-header {
@@ -126,20 +130,23 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
 }
 
-/* STATUS */
+/* STATUS BADGES */
 .Ord-status {
   display: inline-block;
   padding: 4px 12px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .Ord-status.pending { background: #fff7ed; color: #c2410c; }
+.Ord-status.out-for-delivery { background: #eff6ff; color: #1d4ed8; }
 .Ord-status.processing { background: #eff6ff; color: #1d4ed8; }
 .Ord-status.delivered { background: #ecfdf5; color: #047857; }
 .Ord-status.unreturned { background: #fee2e2; color: #dc2626; }
 .Ord-status.cleared { background: #dcfce7; color: #16a34a; }
+.Ord-status.paid { background: #dcfce7; color: #16a34a; }
 .Ord-status.verified { background: #dcfce7; color: #16a34a; }
 .Ord-status.rejected { background: #fee2e2; color: #dc2626; }
 
@@ -251,6 +258,65 @@
 
 .Ord-view-info .Ord-status {
   width: fit-content;
+}
+
+/* GCash receipt (View modal) */
+.Ord-view-info .Ord-receipt-box {
+  grid-column: 1 / -1;
+}
+
+.Ord-receipt-img {
+  display: block;
+  width: 100%;
+  max-width: 250px;
+  margin-top: 6px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  cursor: zoom-in;
+}
+
+.Ord-view-info .Ord-no-receipt {
+  color: #94a3b8;
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+/* Paid / Rejected buttons (View modal) */
+.Ord-view-info .Ord-pay-actions {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 4px;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.Ord-pay-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.Ord-pay-btn.paid { background: #22c55e; }
+.Ord-pay-btn.rejected { background: #ef4444; }
+
+.Ord-pay-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.Ord-pay-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.Ord-pay-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .Ord-view-modal .Ord-modal-actions {
@@ -622,12 +688,14 @@
 
 /* =========================
    TOAST NOTIFICATION
+   (mas mataas kaysa modal para makita kahit bukas ang View modal)
 ========================= */
 .toast {
   position: fixed;
   bottom: 24px;
   right: 24px;
   min-width: 280px;
+  max-width: calc(100vw - 32px);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -635,7 +703,7 @@
   border-radius: 12px;
   color: #fff;
   font-size: 14px;
-  z-index: 9999;
+  z-index: 10050;
   opacity: 0;
   transform: translateY(30px);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -733,5 +801,47 @@
 
   .table-container table {
     min-width: 700px;
+  }
+
+  /* MODALS: kasya sa phone */
+  .Ord-modal-overlay {
+    padding: 16px;
+    box-sizing: border-box;
+  }
+
+  .Ord-view-modal,
+  .Ord-edit-modal,
+  .Ord-delete-modal,
+  .Ord-add-modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 22px 18px;
+  }
+
+  .Ord-view-info {
+    grid-template-columns: 1fr;
+  }
+
+  .Ord-form-container {
+    grid-template-columns: 1fr;
+  }
+
+  .Ord-modal-actions {
+    grid-column: auto;
+  }
+
+  .Ord-delete-details div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .toast {
+    right: 12px;
+    bottom: 14px;
+    min-width: 0;
   }
 }

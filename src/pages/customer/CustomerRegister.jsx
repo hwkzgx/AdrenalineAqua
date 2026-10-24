@@ -5,6 +5,9 @@ import { CheckCircle, XCircle } from "lucide-react";
 import "./customer-register.css";
 import AquaLogo from "../../assets/AquaLogo.png";
 
+const EMAIL_TAKEN_MSG =
+  "This email is already registered. Please use another email or log in.";
+
 export default function CustomerRegister() {
   const nav = useNavigate();
 
@@ -111,36 +114,62 @@ export default function CustomerRegister() {
       return;
     }
 
-   setLoading(true);
+    setLoading(true);
 
-// Create customer account in Supabase Authentication
-const { data: authData, error: authError } = await supabase.auth.signUp({
-  email,
-  password,
-  options: {
-    emailRedirectTo: `${window.location.origin}/customer/customerlogin`,
-  },
-});
+    const cleanEmail = email.trim().toLowerCase();
 
-if (authError) {
-  setLoading(false);
-  console.log("AUTH ERROR:", authError);
-  showModal("Registration failed: " + authError.message, "error");
-  return;
-}
+    // 1. I-check muna kung may ganitong email na sa users table
+    const { data: existing } = await supabase
+      .from("users")
+      .select("email")
+      .ilike("email", cleanEmail)
+      .limit(1);
 
-console.log("AUTH DATA:", authData);
+    if (existing && existing.length > 0) {
+      setLoading(false);
+      showModal(EMAIL_TAKEN_MSG, "error");
+      return;
+    }
 
-const customerId = await generateCustomerId();
+    // 2. Create customer account in Supabase Authentication
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: cleanEmail,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/customer/customerlogin`,
+      },
+    });
 
+    if (authError) {
+      setLoading(false);
+      console.log("AUTH ERROR:", authError);
+      if (authError.message?.toLowerCase().includes("already registered")) {
+        showModal(EMAIL_TAKEN_MSG, "error");
+      } else {
+        showModal("Registration failed: " + authError.message, "error");
+      }
+      return;
+    }
+
+    console.log("AUTH DATA:", authData);
+
+    // 3. Walang identities = may account na sa Auth
+    if (authData?.user?.identities?.length === 0) {
+      setLoading(false);
+      showModal(EMAIL_TAKEN_MSG, "error");
+      return;
+    }
+
+    const customerId = await generateCustomerId();
+
+    // 4. Save additional user information (walang password dito)
     const { error } = await supabase.from("users").insert([
       {
         user_id: customerId,
         name,
-        email,
+        email: cleanEmail,
         address,
         contact_number: contactNumber,
-        password,
         role,
       },
     ]);
@@ -149,7 +178,15 @@ const customerId = await generateCustomerId();
 
     if (error) {
       console.log(error.message);
-      showModal("Registration failed: " + error.message, "error");
+      console.log("INSERT ERROR:", error.code, error.message);
+      if (
+        error.code === "23505" ||
+        error.message?.toLowerCase().includes("duplicate key")
+      ) {
+        showModal(EMAIL_TAKEN_MSG, "error");
+      } else {
+        showModal("Registration failed: " + error.message, "error");
+      }
       return;
     }
 
@@ -260,7 +297,7 @@ const customerId = await generateCustomerId();
             type="password"
             className="login-input"
             placeholder="Confirm Password"
-            value={confirmPassword} 
+            value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
 

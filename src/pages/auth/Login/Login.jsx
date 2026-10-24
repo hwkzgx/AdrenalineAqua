@@ -67,6 +67,13 @@ export default function Login() {
         return;
       }
 
+      // Archived na account: bawal mag-login
+      if (userData.is_archived) {
+        await supabase.auth.signOut();
+        setErrorMessage("This account has been archived. Please contact the administrator.");
+        return;
+      }
+
       const actualRole = userData.role?.toLowerCase();
 
       if (actualRole !== selectedRole) {

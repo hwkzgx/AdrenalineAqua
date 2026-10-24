@@ -5,7 +5,8 @@ import {
   Eye,
   Plus,
   Pencil,
-  Trash2,
+  Archive,
+  RotateCcw,
   X,
   AlertTriangle,
   Search,
@@ -20,6 +21,7 @@ const ID_PLACEHOLDER = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
 function Customer() {
   const [customers, setCustomers] = useState([]);
   const [search, setSearch] = useState("");
+  const [viewMode, setViewMode] = useState("Active"); // Active | Archived
   const [statusFilter, setStatusFilter] = useState("All");
 
   // MODALS
@@ -30,6 +32,11 @@ function Customer() {
 
   // SELECTED
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+
+  // REJECT (kailangan ng reason)
+  const [rejectMode, setRejectMode] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+  const [rejectError, setRejectError] = useState("");
 
   // EDIT DATA
   const [editData, setEditData] = useState({
@@ -91,6 +98,8 @@ function Customer() {
   };
 
   const filtered = customers.filter((c) => {
+    if ((viewMode === "Archived") !== !!c.is_archived) return false;
+
     const matchSearch =
       c.name?.toLowerCase().includes(search.toLowerCase()) ||
       c.user_id?.toLowerCase().includes(search.toLowerCase());
@@ -131,18 +140,33 @@ const closeAdd = () => {
     }
   };
 
-  // DELETE
+  // ARCHIVE (hindi binubura: nananatili ang data na naka-link sa kanya)
   const handleDelete = async () => {
     const { error } = await supabase
       .from("users")
-      .delete()
+      .update({ is_archived: true, archived_at: new Date().toISOString() })
       .eq("users_id", selectedCustomer.users_id);
 
     if (error) {
       showToast(error.message, "error");
     } else {
-      showToast("Customer deleted successfully!", "success");
+      showToast("Customer archived successfully!", "success");
       setShowDelete(false);
+      fetchCustomers();
+    }
+  };
+
+  // RESTORE (ibalik mula sa archive)
+  const handleRestore = async (row) => {
+    const { error } = await supabase
+      .from("users")
+      .update({ is_archived: false, archived_at: null })
+      .eq("users_id", row.users_id);
+
+    if (error) {
+      showToast(error.message, "error");
+    } else {
+      showToast("Customer restored successfully!", "success");
       fetchCustomers();
     }
   };
@@ -230,9 +254,18 @@ const handleAddCustomer = async () => {
   const handleUpdateStatus = async (status) => {
     if (!selectedCustomer) return;
 
+    let reason = null;
+    if (status === "Unverified") {
+      reason = rejectReason.trim();
+      if (!reason) {
+        setRejectError("Please enter the reason for rejecting this account.");
+        return;
+      }
+    }
+
     const { error } = await supabase
       .from("users")
-      .update({ status })
+      .update({ status, rejection_reason: reason })
       .eq("users_id", selectedCustomer.users_id);
 
     if (error) {
@@ -246,8 +279,15 @@ const handleAddCustomer = async () => {
         : "Customer rejected successfully!",
       "success"
     );
-    setShowView(false);
+    closeView();
     fetchCustomers();
+  };
+
+  const closeView = () => {
+    setShowView(false);
+    setRejectMode(false);
+    setRejectReason("");
+    setRejectError("");
   };
 
   const statusLabel = (status) =>
@@ -284,13 +324,17 @@ const handleAddCustomer = async () => {
             title="View / Verify"
             onClick={() => {
               setSelectedCustomer(row);
+              setRejectMode(false);
+              setRejectReason("");
+              setRejectError("");
               setShowView(true);
             }}
           >
             <Eye size={16} />
           </button>
 
-          <button
+          {!row.is_archived && (
+            <button
             className="um-icon-btn edit"
             title="Edit"
             onClick={() => {
@@ -307,17 +351,28 @@ const handleAddCustomer = async () => {
           >
             <Pencil size={16} />
           </button>
+          )}
 
-          <button
-            className="um-icon-btn delete"
-            title="Delete"
-            onClick={() => {
-              setSelectedCustomer(row);
-              setShowDelete(true);
-            }}
-          >
-            <Trash2 size={16} />
-          </button>
+          {row.is_archived ? (
+            <button
+              className="um-icon-btn view"
+              title="Restore"
+              onClick={() => handleRestore(row)}
+            >
+              <RotateCcw size={16} />
+            </button>
+          ) : (
+            <button
+              className="um-icon-btn delete"
+              title="Archive"
+              onClick={() => {
+                setSelectedCustomer(row);
+                setShowDelete(true);
+              }}
+            >
+              <Archive size={16} />
+            </button>
+          )}
         </div>
       ),
     },
@@ -368,6 +423,15 @@ const handleAddCustomer = async () => {
             <option value="Unverified">Rejected</option>
           </select>
 
+          <select
+            className="um-select"
+            value={viewMode}
+            onChange={(e) => setViewMode(e.target.value)}
+          >
+            <option value="Active">Active</option>
+            <option value="Archived">Archived</option>
+          </select>
+
           <span className="um-count">
             {filtered.length} {filtered.length === 1 ? "record" : "records"}
           </span>
@@ -386,7 +450,7 @@ const handleAddCustomer = async () => {
       {/* VIEW / VERIFICATION MODAL                  */}
       {/* ========================================== */}
       {showView && (
-        <div className="um-modal-overlay" onClick={() => setShowView(false)}>
+        <div className="um-modal-overlay" onClick={closeView}>
           <div className="um-modal lg" onClick={(e) => e.stopPropagation()}>
             <div className="um-modal-header">
               <div className="um-modal-icon primary">
@@ -396,7 +460,7 @@ const handleAddCustomer = async () => {
                 <h2>User Verification</h2>
                 <p>Review the uploaded valid ID and verify the user account.</p>
               </div>
-              <button className="um-modal-close" onClick={() => setShowView(false)}>
+              <button className="um-modal-close" onClick={closeView}>
                 <X size={18} />
               </button>
             </div>
@@ -450,25 +514,81 @@ const handleAddCustomer = async () => {
                     <label>ID Type</label>
                     <input value={selectedCustomer?.id_type || "Not submitted"} readOnly />
                   </div>
+
+                  {/* Reason ng pagka-reject (nakikita lang kapag Rejected) */}
+                  {selectedCustomer?.status === "Unverified" && !rejectMode && (
+                    <div className="um-field">
+                      <label>Rejection Reason</label>
+                      <textarea
+                        rows={3}
+                        readOnly
+                        value={selectedCustomer?.rejection_reason || "No reason provided."}
+                        style={{ width: "100%", padding: "8px", borderRadius: "8px", border: "1px solid #e2e8f0", background: "#fef2f2", resize: "none" }}
+                      />
+                    </div>
+                  )}
+
+                  {/* Reason na kailangang ilagay bago i-reject */}
+                  {rejectMode && (
+                    <div className="um-field">
+                      <label>Reason for rejection *</label>
+                      <textarea
+                        rows={3}
+                        autoFocus
+                        value={rejectReason}
+                        onChange={(e) => {
+                          setRejectReason(e.target.value);
+                          setRejectError("");
+                        }}
+                        placeholder="e.g. ID is blurry, name does not match, expired ID..."
+                        style={{ width: "100%", padding: "8px", borderRadius: "8px", border: `1px solid ${rejectError ? "#ef4444" : "#e2e8f0"}`, resize: "vertical" }}
+                      />
+                      {rejectError && (
+                        <span style={{ color: "#ef4444", fontSize: "12px", display: "block", marginTop: "4px" }}>
+                          {rejectError}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
 
             <div className="um-modal-footer split">
-              <button
-                className="um-btn danger"
-                disabled={selectedCustomer?.status === "Verified"}
-                onClick={() => handleUpdateStatus("Unverified")}
-              >
-                Reject
-              </button>
-              <button
-                className="um-btn success"
-                disabled={selectedCustomer?.status === "Unverified" || !selectedCustomer?.valid_id}
-                onClick={() => handleUpdateStatus("Verified")}
-              >
-                Approve
-              </button>
+              {rejectMode ? (
+                <>
+                  <button
+                    className="um-btn ghost"
+                    onClick={() => {
+                      setRejectMode(false);
+                      setRejectReason("");
+                      setRejectError("");
+                    }}
+                  >
+                    Back
+                  </button>
+                  <button className="um-btn danger" onClick={() => handleUpdateStatus("Unverified")}>
+                    Confirm Reject
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    className="um-btn danger"
+                    disabled={selectedCustomer?.status === "Verified"}
+                    onClick={() => setRejectMode(true)}
+                  >
+                    Reject
+                  </button>
+                  <button
+                    className="um-btn success"
+                    disabled={selectedCustomer?.status === "Unverified" || !selectedCustomer?.valid_id}
+                    onClick={() => handleUpdateStatus("Verified")}
+                  >
+                    Approve
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -590,10 +710,9 @@ const handleAddCustomer = async () => {
               <div className="um-delete-icon">
                 <AlertTriangle size={28} />
               </div>
-              <h2>Delete Customer</h2>
+              <h2>Archive Customer</h2>
               <p className="um-delete-text">
-                Are you sure you want to delete this customer record? This will permanently
-                delete the record and all related data. This action cannot be undone.
+                Archive this customer? The account will be hidden from the active list and can no longer be used, but all linked records (orders, deliveries, history) are kept. You can restore it anytime from the Archived view.
               </p>
 
               <div className="um-details-box">
@@ -610,7 +729,7 @@ const handleAddCustomer = async () => {
                 Cancel
               </button>
               <button className="um-btn danger" onClick={handleDelete}>
-                Delete Customer
+                Archive Customer
               </button>
             </div>
           </div>
@@ -627,7 +746,7 @@ const handleAddCustomer = async () => {
               <div className="um-modal-icon primary">
                 <Plus size={22} />
               </div>
-              <div className="um-1`````-titles">
+              <div className="um-modal-titles">
                 <h2>Add Customer</h2>
                 <p>Create a new customer account.</p>
               </div>

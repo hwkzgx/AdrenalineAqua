@@ -4,12 +4,94 @@ import Table from "../../../components/Table";
 import { supabase } from "../../../supabase";
 import { exportToPDF } from "../../../pdfExporter";
 import {
+  Eye,
   Trash2,
   X,
   CheckCircle, 
   XCircle,
   Download
 } from "lucide-react";
+
+// ==========================================
+// PAYMENT (Paid / Unpaid) + PROOF OF DELIVERY (View modal)
+// COD = Unpaid hangga't hindi pa Delivered; GCash/Cash = galing sa orders.payment_status
+// ==========================================
+const getPaymentStatus = (method, rawStatus, deliveryStatus) => {
+  const m = String(method || "").toLowerCase();
+  if (m === "cod") return deliveryStatus === "Delivered" ? "Paid" : "Unpaid";
+
+  const r = String(rawStatus || "").toLowerCase();
+  if (r === "paid" || r === "verified") return "Paid";
+  if (r === "rejected") return "Rejected";
+  return m === "gcash" ? "Pending" : "Unpaid";
+};
+
+const PaymentTag = ({ status }) => {
+  const colors =
+    status === "Paid"
+      ? { bg: "#dcfce7", fg: "#15803d" }
+      : status === "Pending"
+      ? { bg: "#fef9c3", fg: "#a16207" }
+      : { bg: "#fee2e2", fg: "#b91c1c" };
+
+  return (
+    <span
+      style={{
+        display: "inline-block",
+        padding: "3px 10px",
+        borderRadius: "999px",
+        fontSize: "12px",
+        fontWeight: 700,
+        background: colors.bg,
+        color: colors.fg,
+      }}
+    >
+      {status}
+    </span>
+  );
+};
+
+const downloadImage = async (url, name) => {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const ext = (blob.type.split("/")[1] || "jpg").split("+")[0];
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${name}.${ext}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
+  } catch (err) {
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+};
+
+// ==========================================
+// AUTOMATIC SORTING
+// Pending / walang rider ("—") -> Out for Delivery -> Delivered -> Cancelled
+// Sa loob ng bawat grupo, pinakabago ang nasa itaas.
+// ==========================================
+const statusRank = (status) => {
+  if (status === "Pending" || status === "—") return 0;
+  if (status === "Out for Delivery") return 1;
+  if (status === "Delivered") return 2;
+  if (status === "Cancelled") return 3;
+  return 4;
+};
+
+const sortDeliveries = (list) =>
+  [...list].sort((a, b) => {
+    const rank = statusRank(a.status) - statusRank(b.status);
+    if (rank !== 0) return rank;
+
+    const timeA = new Date(a.orderDate || 0).getTime();
+    const timeB = new Date(b.orderDate || 0).getTime();
+    if (timeB !== timeA) return timeB - timeA;
+
+    return Number(b.id || 0) - Number(a.id || 0);
+  });
 
 function StaffDeliverySchedule() {
   const reportRef = useRef();
@@ -23,6 +105,7 @@ function StaffDeliverySchedule() {
 
   // MODALS
   const [showDelete, setShowDelete] = useState(false);
+  const [showView, setShowView] = useState(false);
 
   // SELECTED
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -36,13 +119,13 @@ function StaffDeliverySchedule() {
   const fetchRiders = async () => {
     const { data, error } = await supabase
       .from("users")
-      .select("users_id, name")
+      .select("users_id, name, is_archived")
       .eq("role", "rider");
 
     if (error) {
       console.log("Error fetching riders:", error.message);
     } else {
-      setRiders(data || []);
+      setRiders((data || []).filter((r) => !r.is_archived));
     }
   };
 
@@ -52,6 +135,10 @@ function StaffDeliverySchedule() {
       .select(`
         order_id,
         order_code,
+        order_date,
+        payment_method,
+        payment_status,
+        total_amount,
         full_name,
         delivery_address,
         delivery_date,
@@ -60,7 +147,8 @@ function StaffDeliverySchedule() {
           delivery_code,
           delivery_status,
           assigned_rider,
-          assigned_rider_id
+          assigned_rider_id,
+          proof_of_delivery
         ),
         order_items (
           item_name,
@@ -68,8 +156,7 @@ function StaffDeliverySchedule() {
           unit_price
         )
       `)
-      .eq("order_type", "Delivery")
-      .order("delivery_date", { ascending: true });
+      .eq("order_type", "Delivery");
 
     if (error) {
       console.log(error.message);
@@ -79,16 +166,26 @@ function StaffDeliverySchedule() {
 
     const formatted = data.map((item) => ({
       id: item.order_id,
+      orderDate: item.order_date,
       deliveryId: item.delivery_schedule?.[0]?.delivery_code,
       scheduleOrderId: item.delivery_schedule?.[0]?.order_id,
       orderId: item.order_code,
       customer: item.full_name,
       address: item.delivery_address,
       date: item.delivery_date,
-      status: !item.delivery_schedule?.[0]?.assigned_rider ? "—" : (item.delivery_schedule?.[0]?.delivery_status || "Pending"),
+      status:
+        item.delivery_schedule?.[0]?.delivery_status === "Cancelled"
+          ? "Cancelled"
+          : !item.delivery_schedule?.[0]?.assigned_rider
+          ? "—"
+          : item.delivery_schedule?.[0]?.delivery_status || "Pending",
       rider: item.delivery_schedule?.[0]?.assigned_rider || "",
       assignedRiderId: item.delivery_schedule?.[0]?.assigned_rider_id || "",
       orderItems: item.order_items || [],
+      paymentMethod: item.payment_method,
+      paymentStatus: item.payment_status,
+      totalAmount: item.total_amount,
+      proofUrl: item.delivery_schedule?.[0]?.proof_of_delivery || "",
     }));
 
     setDeliveries(formatted);
@@ -141,7 +238,7 @@ function StaffDeliverySchedule() {
 
     // Never push an order that is already on the way / completed back to Pending
     const isLocked =
-      row.status === "Out for Delivery" || row.status === "Delivered";
+      ["Out for Delivery", "Delivered", "Cancelled"].includes(row.status);
 
     const payload = {
       assigned_rider: selectedRider?.name || null,
@@ -213,19 +310,21 @@ function StaffDeliverySchedule() {
     }
   };
 
-  // FILTER
-  const filtered = deliveries.filter((d) => {
+  // FILTER + AUTOMATIC SORTING
+  const filtered = sortDeliveries(deliveries.filter((d) => {
     const matchSearch =
       d.deliveryId?.toLowerCase().includes(search.toLowerCase()) ||
       d.orderId?.toLowerCase().includes(search.toLowerCase()) ||
       d.customer?.toLowerCase().includes(search.toLowerCase());
 
+    // "Pending" ay kasama rin ang mga wala pang rider ("—")
     const matchStatus =
       statusFilter === "All" ||
-      d.status === statusFilter;
+      d.status === statusFilter ||
+      (statusFilter === "Pending" && d.status === "—");
 
     return matchSearch && matchStatus;
-  });
+  }));
 
   // TABLE COLUMNS
   const columns = [
@@ -292,7 +391,7 @@ function StaffDeliverySchedule() {
             value={assignedRiderId}
             // Rider can no longer be changed once the delivery is on the way or done
             disabled={
-              row.status === "Out for Delivery" || row.status === "Delivered"
+              ["Out for Delivery", "Delivered", "Cancelled"].includes(row.status)
             }
             onChange={(e) => handleAssignRider(row, e.target.value)}
           >
@@ -310,7 +409,22 @@ function StaffDeliverySchedule() {
       key: "actions",
       label: "Actions",
       render: (row) => (
-        <div className="staffdeliveryschedule-actions">
+        <div
+          className="staffdeliveryschedule-actions"
+          style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "8px", flexWrap: "wrap", justifyContent: "center" }}
+        >
+          <button
+            className="view"
+            title="View details / proof of delivery"
+            onClick={() => {
+              setSelectedOrder(row);
+              setShowView(true);
+            }}
+          >
+            <Eye size={18} />
+            <label>View</label>
+          </button>
+
           <button
             className="staffdelete"
             onClick={() => {
@@ -371,6 +485,7 @@ function StaffDeliverySchedule() {
           <option value="Pending">Pending</option>
           <option value="Out for Delivery">Out for Delivery</option>
           <option value="Delivered">Delivered</option>
+          <option value="Cancelled">Cancelled</option>
         </select>
 
         <button 
@@ -399,6 +514,259 @@ function StaffDeliverySchedule() {
           emptyMessage="No deliveries recorded yet."
         />
       </div>
+
+      {/* VIEW MODAL (kasama ang proof of delivery) */}
+      {showView && selectedOrder && (
+        <div
+          onClick={() => setShowView(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 2000,
+            background: "rgba(15, 23, 42, 0.55)",
+            backdropFilter: "blur(3px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "16px",
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: "relative",
+              width: "100%",
+              maxWidth: "540px",
+              maxHeight: "92vh",
+              overflowY: "auto",
+              background: "#fff",
+              borderRadius: "22px",
+              padding: "28px 26px 22px",
+              boxShadow: "0 25px 60px rgba(15, 23, 42, 0.3)",
+            }}
+          >
+            <button
+              onClick={() => setShowView(false)}
+              aria-label="Close"
+              style={{
+                position: "absolute",
+                top: "16px",
+                right: "16px",
+                width: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                border: "none",
+                background: "#eef2f7",
+                color: "#475569",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <X size={18} />
+            </button>
+
+            <h2 style={{ margin: 0, textAlign: "center", fontSize: "26px", fontWeight: 800, color: "#0f172a" }}>
+              Delivery Details
+            </h2>
+            <p style={{ margin: "6px 0 18px", textAlign: "center", fontSize: "14px", color: "#64748b" }}>
+              Review this delivery, its payment and proof of delivery.
+            </p>
+
+            {/* DETAILS BOX */}
+            <div
+              style={{
+                border: "1px solid #dbe3ee",
+                borderRadius: "14px",
+                background: "#f8fafc",
+                padding: "4px 18px",
+              }}
+            >
+              {[
+                ["Delivery ID", selectedOrder.deliveryId || "—"],
+                ["Order ID", selectedOrder.orderId],
+                ["Customer", selectedOrder.customer],
+                ["Delivery Date", selectedOrder.date || "—"],
+                ["Address", selectedOrder.address || "—"],
+                [
+                  "Status",
+                  <span
+                    key="status"
+                    style={{
+                      padding: "3px 12px",
+                      borderRadius: "999px",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      background:
+                        selectedOrder.status === "Delivered"
+                          ? "#dcfce7"
+                          : selectedOrder.status === "Out for Delivery"
+                          ? "#dbeafe"
+                          : selectedOrder.status === "Cancelled"
+                          ? "#fee2e2"
+                          : "#fff3e0",
+                      color:
+                        selectedOrder.status === "Delivered"
+                          ? "#15803d"
+                          : selectedOrder.status === "Out for Delivery"
+                          ? "#1d4ed8"
+                          : selectedOrder.status === "Cancelled"
+                          ? "#b91c1c"
+                          : "#c2410c",
+                    }}
+                  >
+                    {selectedOrder.status}
+                  </span>,
+                ],
+                ["Assigned Rider", selectedOrder.rider || "Not Assigned"],
+                [
+                  "Payment",
+                  <span key="pay" style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ fontSize: "13px", color: "#64748b", fontWeight: 500 }}>
+                      {String(selectedOrder.paymentMethod || "").toLowerCase() === "cod"
+                        ? "Cash on Delivery"
+                        : selectedOrder.paymentMethod || "—"}
+                    </span>
+                    <PaymentTag
+                      status={getPaymentStatus(
+                        selectedOrder.paymentMethod,
+                        selectedOrder.paymentStatus,
+                        selectedOrder.status
+                      )}
+                    />
+                  </span>,
+                ],
+                ["Total", `₱${Number(selectedOrder.totalAmount || 0).toLocaleString()}`],
+              ].map(([label, value], i, arr) => (
+                <div
+                  key={label}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: "16px",
+                    padding: "13px 0",
+                    borderBottom: i === arr.length - 1 ? "none" : "1px solid #e6ebf2",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      letterSpacing: "0.04em",
+                      textTransform: "uppercase",
+                      color: "#64748b",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {label}
+                  </span>
+                  <span style={{ fontSize: "15px", fontWeight: 600, color: "#0f172a", textAlign: "right" }}>
+                    {value}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* PROOF OF DELIVERY */}
+            <div style={{ marginTop: "18px" }}>
+              <div
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  letterSpacing: "0.04em",
+                  textTransform: "uppercase",
+                  color: "#64748b",
+                  marginBottom: "8px",
+                }}
+              >
+                Proof of Delivery
+              </div>
+
+              {selectedOrder.proofUrl ? (
+                <>
+                  <a href={selectedOrder.proofUrl} target="_blank" rel="noopener noreferrer">
+                    <img
+                      src={selectedOrder.proofUrl}
+                      alt="Proof of delivery"
+                      style={{
+                        width: "100%",
+                        maxHeight: "300px",
+                        objectFit: "contain",
+                        borderRadius: "14px",
+                        border: "1px solid #dbe3ee",
+                        background: "#f1f5f9",
+                        display: "block",
+                      }}
+                    />
+                  </a>
+                  <button
+                    onClick={() =>
+                      downloadImage(
+                        selectedOrder.proofUrl,
+                        `${selectedOrder.orderId || "delivery"}-proof`
+                      )
+                    }
+                    style={{
+                      marginTop: "10px",
+                      width: "100%",
+                      padding: "11px",
+                      borderRadius: "10px",
+                      border: "1px solid #cbd5e1",
+                      background: "#fff",
+                      color: "#334155",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    <Download size={16} /> Save photo
+                  </button>
+                </>
+              ) : (
+                <div
+                  style={{
+                    border: "1.5px dashed #cbd5e1",
+                    borderRadius: "14px",
+                    padding: "22px 16px",
+                    textAlign: "center",
+                    color: "#94a3b8",
+                    fontSize: "14px",
+                    background: "#fafbfd",
+                  }}
+                >
+                  {selectedOrder.status === "Delivered"
+                    ? "No proof of delivery was uploaded."
+                    : "Not delivered yet."}
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
+              <button
+                onClick={() => setShowView(false)}
+                style={{
+                  padding: "11px 26px",
+                  borderRadius: "10px",
+                  border: "1px solid #cbd5e1",
+                  background: "#f1f5f9",
+                  color: "#475569",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  fontSize: "15px",
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* DELETE MODAL */}
       {showDelete && (

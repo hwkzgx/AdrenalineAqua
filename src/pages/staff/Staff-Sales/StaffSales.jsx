@@ -47,6 +47,7 @@ export const exportSalesToPDF = (salesData, filename = "sales-report.pdf", gener
   const accentColor = [37, 99, 235];
   const lightBg = [248, 250, 252];
 
+  // Header Design
   doc.setFillColor(...accentColor);
   doc.rect(14, 15, 3, 14, "F");
 
@@ -67,7 +68,9 @@ export const exportSalesToPDF = (salesData, filename = "sales-report.pdf", gener
   doc.setLineWidth(0.4);
   doc.line(14, 34, 196, 34);
 
+  // Summary Box inside PDF
   const totalSalesSum = salesData.reduce((sum, item) => {
+    // Alisin ang currency symbol at commas kung meron man para makwenta nang tama
     const cleanNum = Number(String(item.totalSales || 0).replace(/[^\d.-]/g, ""));
     return sum + cleanNum;
   }, 0);
@@ -81,6 +84,7 @@ export const exportSalesToPDF = (salesData, filename = "sales-report.pdf", gener
   doc.text(`Total Records: ${salesData.length}`, 18, 49);
   doc.text(`Total Revenue: ₱${totalSalesSum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 110, 49);
 
+  // Table Setup
   const tableColumn = ["Sales ID", "Date", "Total Products", "Payment Method", "Total Sales"];
   const tableRows = salesData.map((item) => [
     item.salesId || "—",
@@ -158,11 +162,170 @@ function StaffSales() {
     return () => clearTimeout(toastTimer.current);
   }, []);
 
+  // ===============================
+  // AUTO-RECORD COMPLETED ORDERS AS SALES
+  // Kasama dito ang:
+  //   - DELIVERY: delivery_schedule.delivery_status = "Delivered"
+  //   - PICKUP:   orders.status = "Picked Up"
+  // Lahat ng completed na walang sales record ay lalagyan ng isa.
+  // ===============================
+  const syncingRef = useRef(false);
+
+  const syncDeliveredToSales = async () => {
+    if (syncingRef.current) return; // iwas doble kung sabay ang takbo
+    syncingRef.current = true;
+
+    try {
+      // 1a. Lahat ng delivered na delivery
+      const { data: delivered, error: deliveredError } = await supabase
+        .from("delivery_schedule")
+        .select("order_id")
+        .eq("delivery_status", "Delivered");
+
+      if (deliveredError) {
+        console.log("Sync (delivery_schedule) error:", deliveredError.message);
+        return;
+      }
+
+      // 1b. Lahat ng Pickup order na Picked Up na
+      const { data: pickedUp, error: pickedUpError } = await supabase
+        .from("orders")
+        .select("order_id")
+        .eq("order_type", "Pickup")
+        .eq("status", "Picked Up");
+
+      if (pickedUpError) {
+        console.log("Sync (pickup orders) error:", pickedUpError.message);
+        return;
+      }
+
+      const completedIds = [
+        ...new Set(
+          [...(delivered || []), ...(pickedUp || [])]
+            .map((d) => d.order_id)
+            .filter(Boolean)
+        ),
+      ];
+
+      if (completedIds.length === 0) return;
+
+      // 2. Mga order na mayroon nang sales record
+      const { data: existing, error: existingError } = await supabase
+        .from("sales")
+        .select("sales_code, order_id");
+
+      if (existingError) {
+        console.log("Sync (sales) error:", existingError.message);
+        return;
+      }
+
+      const existingOrderIds = new Set(
+        (existing || []).map((s) => String(s.order_id))
+      );
+
+      const missingIds = completedIds.filter(
+        (id) => !existingOrderIds.has(String(id))
+      );
+
+      if (missingIds.length === 0) return;
+
+      // 3. Detalye ng mga order na kulang ang sales record
+      const { data: missingOrders, error: ordersError } = await supabase
+        .from("orders")
+        .select(`
+          order_id,
+          total_amount,
+          payment_method,
+          order_date,
+          delivery_date,
+          order_items!order_items_order_id_fkey(
+            quantity
+          )
+        `)
+        .in("order_id", missingIds);
+
+      if (ordersError) {
+        console.log("Sync (orders) error:", ordersError.message);
+        return;
+      }
+
+      // 4. Susunod na sales code (SAL2026001, SAL2026002, ...)
+      const year = new Date().getFullYear();
+      const codePattern = new RegExp(`^SAL${year}(\\d+)$`);
+
+      let nextNumber = (existing || []).reduce((max, s) => {
+        const match = String(s.sales_code || "").match(codePattern);
+        return match ? Math.max(max, Number(match[1])) : max;
+      }, 0);
+
+      const newRows = (missingOrders || []).map((order) => {
+        nextNumber += 1;
+
+        return {
+          sales_code: `SAL${year}${String(nextNumber).padStart(3, "0")}`,
+          order_id: order.order_id,
+          total_products: (order.order_items || []).reduce(
+            (sum, item) => sum + Number(item.quantity || 0),
+            0
+          ),
+          total_sales: Number(order.total_amount || 0),
+          payment_method: order.payment_method,
+          // Delivery: delivery date. Pickup: walang delivery date kaya order date.
+          date: order.delivery_date || order.order_date || new Date(),
+        };
+      });
+
+      if (newRows.length === 0) return;
+
+      const { error: insertError } = await supabase
+        .from("sales")
+        .insert(newRows);
+
+      if (insertError) {
+        console.log("Sync (insert sales) error:", insertError.message);
+      }
+    } finally {
+      syncingRef.current = false;
+    }
+  };
+
+  // ===============================
+  // LOAD: sync muna, tapos fetch
+  // ===============================
+  const refreshSales = async () => {
+    await syncDeliveredToSales();
+    await fetchSales();
+  };
+
   useEffect(() => {
-    fetchSales();
+    refreshSales();
+  }, []);
+
+  // Kapag may bagong "Delivered" o "Picked Up" habang bukas ang page, mag-update agad.
+  // (Kailangang naka-enable ang Realtime sa delivery_schedule at orders.)
+  useEffect(() => {
+    const channel = supabase
+      .channel("staff-sales-delivery-sync")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "delivery_schedule" },
+        () => refreshSales()
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders" },
+        () => refreshSales()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchSales = async () => {
+    // AUTOMATIC SORTING: pinakabago ang nasa itaas
+    // (kung pareho ang petsa, ang mas mataas na sales code ang mauuna)
     const { data, error } = await supabase
       .from("sales")
       .select(`
@@ -172,7 +335,8 @@ function StaffSales() {
         total_sales,
         payment_method
       `)
-      .order("date", { ascending: false });
+      .order("date", { ascending: false })
+      .order("sales_code", { ascending: false });
 
     if (error) {
       console.log(error.message);
@@ -308,14 +472,14 @@ function StaffSales() {
         tension: 0.35,
         borderWidth: 3,
         pointStyle: "circle",
-        pointRadius: 4,
-        pointHoverRadius: 6,
+        pointRadius: 7,
+        pointHoverRadius: 10,
         pointBackgroundColor: "#93c5fd",
         pointBorderColor: "#2563eb",
         pointBorderWidth: 2,
         pointHoverBackgroundColor: "#ffffff",
         pointHoverBorderColor: "#2563eb",
-        pointHoverBorderWidth: 2,
+        pointHoverBorderWidth: 3,
       },
     ],
   };
@@ -348,8 +512,7 @@ function StaffSales() {
           display: false,
         },
         ticks: {
-          autoSkip: true,
-          maxTicksLimit: 6,
+          autoSkip: false,
           maxRotation: 0,
           minRotation: 0,
           font: {
@@ -370,7 +533,7 @@ function StaffSales() {
     <div className="staffsales-page">
       {/* TOAST */}
       {toast.show && (
-        <div className={`staffsales-toast ${toast.type}`}>
+        <div className={`sales-toast ${toast.type}`}>
           <div className="staffsales-toast-icon">
             {toast.type === "success" ? (
               <CheckCircle size={20} />
@@ -435,26 +598,23 @@ function StaffSales() {
 
       {/* CONTROLS SECTION */}
       <div className="staffcontrols-row">
-        <div className="staffcontrols-left">
-          <input
-            type="text"
-            className="staffsearch-input"
-            placeholder="Search sales ID..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        <input
+          type="text"
+          className="staffsearch-input"
+          placeholder="Search sales ID..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
 
-          <select
-            className="stafffilter-select"
-            value={paymentFilter}
-            onChange={(e) => setPaymentFilter(e.target.value)}
-          >
-            <option value="All">All Payment</option>
-            <option value="COD">COD</option>
-            <option value="GCash">GCash</option>
-            <option value="Card">Card</option>
-          </select>
-        </div>
+        <select
+          className="staffpaymentfilter-select"
+          value={paymentFilter}
+          onChange={(e) => setPaymentFilter(e.target.value)}
+        >
+          <option value="All">All Payment</option>
+          <option value="COD">COD</option>
+          <option value="GCash">GCash</option>
+        </select>
 
         <button
           onClick={handleExportPDF}
@@ -465,7 +625,13 @@ function StaffSales() {
             gap: "6px",
             padding: "10px 16px",
             cursor: "pointer",
-            height: "48px",
+            background: "#334155",
+            color: "#fff",
+            border: "none",
+            borderRadius: "8px",
+            fontWeight: "600",
+            fontSize: "14px",
+            height: "41px"
           }}
         >
           <Download size={16} /> Export PDF

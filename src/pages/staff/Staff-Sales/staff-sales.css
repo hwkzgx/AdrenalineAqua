@@ -166,6 +166,21 @@
   outline: none;
 }
 
+.staffpaymentfilter-select {
+  margin-right: 600px;
+  width: 180px;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  background: white;
+  color: #0f172a;
+  cursor: pointer;
+  outline: none;
+}
+
 /* ==========================================
    📊 GRAPH SECTION & CONTAINERS
    ========================================== */

@@ -1,6 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Pencil, Check, CheckCircle2, XCircle } from "lucide-react";
+import {
+  Pencil,
+  Check,
+  CheckCircle2,
+  XCircle,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import "./customer-profile.css";
 import { supabase } from "../../../supabase";
 
@@ -23,6 +30,15 @@ function CustomerProfile() {
   });
 
   const [tempProfile, setTempProfile] = useState(profile);
+
+  // ADDITIONAL ADDRESSES (table: user_addresses)
+  const [addresses, setAddresses] = useState([]);
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  const [editingAddressId, setEditingAddressId] = useState(null);
+  const [addressForm, setAddressForm] = useState({ label: "", address: "" });
+  const [savingAddress, setSavingAddress] = useState(false);
+  const [addressToDelete, setAddressToDelete] = useState(null); // address na ide-delete (modal)
+  const [deletingAddress, setDeletingAddress] = useState(false);
 
   const [profilePic, setProfilePic] = useState(null);
   const [uploadingPic, setUploadingPic] = useState(false);
@@ -293,6 +309,118 @@ function CustomerProfile() {
     showToast("success", "Valid ID submitted for verification!");
   };
 
+  // ===============================
+  // ADDITIONAL ADDRESSES
+  // ===============================
+  const fetchAddresses = async () => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser) return;
+
+    const { data, error } = await supabase
+      .from("user_addresses")
+      .select("*")
+      .eq("user_id", storedUser.users_id)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      console.log("Fetch addresses error:", error.message);
+      return;
+    }
+
+    setAddresses(data || []);
+  };
+
+  useEffect(() => {
+    fetchAddresses();
+  }, []);
+
+  const openAddAddress = () => {
+    setEditingAddressId(null);
+    setAddressForm({ label: "", address: "" });
+    setShowAddressForm(true);
+  };
+
+  const openEditAddress = (item) => {
+    setEditingAddressId(item.address_id);
+    setAddressForm({ label: item.label || "", address: item.address || "" });
+    setShowAddressForm(true);
+  };
+
+  const closeAddressForm = () => {
+    setShowAddressForm(false);
+    setEditingAddressId(null);
+    setAddressForm({ label: "", address: "" });
+  };
+
+  const handleSaveAddress = async () => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser) return;
+
+    const label = addressForm.label.trim();
+    const address = addressForm.address.trim();
+
+    if (address.length < 5) {
+      showToast("error", "Please enter a complete address.");
+      return;
+    }
+
+    setSavingAddress(true);
+
+    const { error } = editingAddressId
+      ? await supabase
+          .from("user_addresses")
+          .update({ label: label || null, address })
+          .eq("address_id", editingAddressId)
+          .eq("user_id", storedUser.users_id)
+      : await supabase
+          .from("user_addresses")
+          .insert([
+            { user_id: storedUser.users_id, label: label || null, address },
+          ]);
+
+    setSavingAddress(false);
+
+    if (error) {
+      console.log("Save address error:", error.message);
+      showToast("error", `Failed to save address: ${error.message}`);
+      return;
+    }
+
+    showToast(
+      "success",
+      editingAddressId ? "Address updated!" : "Address added!"
+    );
+    closeAddressForm();
+    fetchAddresses();
+  };
+
+  const confirmDeleteAddress = async () => {
+    if (!addressToDelete) return;
+
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser) return;
+
+    setDeletingAddress(true);
+
+    const { error } = await supabase
+      .from("user_addresses")
+      .delete()
+      .eq("address_id", addressToDelete.address_id)
+      .eq("user_id", storedUser.users_id);
+
+    setDeletingAddress(false);
+    setAddressToDelete(null);
+
+    if (error) {
+      console.log("Delete address error:", error.message);
+      showToast("error", `Failed to delete address: ${error.message}`);
+      return;
+    }
+
+    showToast("success", "Address deleted.");
+    fetchAddresses();
+  };
+
   const statusLabel =
     accountStatus === "Unverified" ? "Rejected" : accountStatus || "Pending";
 
@@ -310,6 +438,51 @@ function CustomerProfile() {
             )}
           </span>
           <span className="cusprof-toast-text">{toast.message}</span>
+        </div>
+      )}
+
+      {/* DELETE ADDRESS MODAL */}
+      {addressToDelete && (
+        <div
+          className="address-modal-overlay"
+          onClick={() => !deletingAddress && setAddressToDelete(null)}
+        >
+          <div
+            className="address-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="address-modal-icon">
+              <Trash2 size={22} />
+            </div>
+
+            <h3>Delete address?</h3>
+            <p>This will permanently remove this address from your account.</p>
+
+            <div className="address-modal-preview">
+              <strong>{addressToDelete.label || "Saved address"}</strong>
+              <span>{addressToDelete.address}</span>
+            </div>
+
+            <div className="address-modal-buttons">
+              <button
+                type="button"
+                className="address-modal-cancel"
+                disabled={deletingAddress}
+                onClick={() => setAddressToDelete(null)}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="address-modal-delete"
+                disabled={deletingAddress}
+                onClick={confirmDeleteAddress}
+              >
+                {deletingAddress ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -384,6 +557,8 @@ function CustomerProfile() {
                     ? "Full Name"
                     : field === "contact"
                     ? "Contact No."
+                    : field === "address"
+                    ? "Main Address"
                     : field.charAt(0).toUpperCase() + field.slice(1)}
                 </label>
 
@@ -401,6 +576,108 @@ function CustomerProfile() {
             ))}
 
           </div>
+        </div>
+
+        {/* ADDITIONAL ADDRESSES */}
+        <div className="addresses-section">
+          <div className="addresses-header">
+            <h3>Additional Addresses</h3>
+
+            {!showAddressForm && (
+              <button
+                type="button"
+                className="add-address-btn"
+                onClick={openAddAddress}
+              >
+                <Plus size={14} />
+                Add Address
+              </button>
+            )}
+          </div>
+
+          {addresses.length === 0 && !showAddressForm && (
+            <p className="addresses-empty">
+              No additional addresses yet. Saved addresses will appear in the
+              delivery address dropdown when you place an order.
+            </p>
+          )}
+
+          {addresses.map((item) => (
+            <div className="address-item" key={item.address_id}>
+              <div className="address-item-text">
+                <strong>{item.label || "Saved address"}</strong>
+                <span>{item.address}</span>
+              </div>
+
+              <div className="address-item-actions">
+                <button
+                  type="button"
+                  className="address-icon-btn"
+                  title="Edit"
+                  onClick={() => openEditAddress(item)}
+                >
+                  <Pencil size={14} />
+                </button>
+
+                <button
+                  type="button"
+                  className="address-icon-btn danger"
+                  title="Delete"
+                  onClick={() => setAddressToDelete(item)}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {showAddressForm && (
+            <div className="address-form">
+              <input
+                type="text"
+                placeholder="Label (e.g. Home, Shop)"
+                value={addressForm.label}
+                onChange={(e) =>
+                  setAddressForm((prev) => ({ ...prev, label: e.target.value }))
+                }
+              />
+
+              <input
+                type="text"
+                placeholder="Complete address (include Hagonoy)"
+                value={addressForm.address}
+                onChange={(e) =>
+                  setAddressForm((prev) => ({
+                    ...prev,
+                    address: e.target.value,
+                  }))
+                }
+              />
+
+              <div className="address-form-buttons">
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={closeAddressForm}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  className="custsave-btn"
+                  onClick={handleSaveAddress}
+                  disabled={savingAddress}
+                >
+                  {savingAddress
+                    ? "Saving..."
+                    : editingAddressId
+                    ? "Update Address"
+                    : "Save Address"}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* VERIFICATION */}

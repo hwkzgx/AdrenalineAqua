@@ -15,6 +15,68 @@ import {
   PackageCheck,
 } from "lucide-react";
 
+// ==========================================
+// PAYMENT (Paid / Unpaid) PARA SA RIDER
+// COD = Unpaid hangga't hindi pa Delivered (Delivered = Paid)
+// GCash = galing sa admin (Pending / Paid / Rejected)
+// Cash (walk-in) = galing sa admin (Unpaid / Paid)
+// ==========================================
+const getPaymentStatus = (method, rawStatus, deliveryStatus) => {
+  const m = String(method || "").toLowerCase();
+  if (m === "cod") return deliveryStatus === "Delivered" ? "Paid" : "Unpaid";
+
+  const r = String(rawStatus || "").toLowerCase();
+  if (r === "paid" || r === "verified") return "Paid";
+  if (r === "rejected") return "Rejected";
+  return m === "gcash" ? "Pending" : "Unpaid";
+};
+
+const methodLabel = (method) =>
+  String(method || "").toLowerCase() === "cod" ? "Cash on Delivery" : method || "—";
+
+const PaymentTag = ({ status }) => {
+  const colors =
+    status === "Paid"
+      ? { bg: "#dcfce7", fg: "#15803d" }
+      : status === "Pending"
+      ? { bg: "#fef9c3", fg: "#a16207" }
+      : { bg: "#fee2e2", fg: "#b91c1c" };
+
+  return (
+    <span
+      style={{
+        display: "inline-block",
+        padding: "3px 10px",
+        borderRadius: "999px",
+        fontSize: "12px",
+        fontWeight: 700,
+        background: colors.bg,
+        color: colors.fg,
+      }}
+    >
+      {status}
+    </span>
+  );
+};
+
+const peso = (n) => `₱${Number(n || 0).toLocaleString()}`;
+
+// Pending (nasa taas) -> Out for Delivery -> Delivered -> Cancelled
+// Sa bawat grupo, pinakabagong order muna
+const STATUS_ORDER = { Pending: 0, "Out for Delivery": 1, Delivered: 2, Completed: 2, Cancelled: 3 };
+const sortByPendingThenLatest = (list) =>
+  [...list].sort((a, b) => {
+    const ra = STATUS_ORDER[a.status] ?? 4;
+    const rb = STATUS_ORDER[b.status] ?? 4;
+    if (ra !== rb) return ra - rb;
+
+    const ta = new Date(a.orderDate || 0).getTime();
+    const tb = new Date(b.orderDate || 0).getTime();
+    if (tb !== ta) return tb - ta;
+
+    return Number(b.id || 0) - Number(a.id || 0);
+  });
+
 export default function RiderHistory() {
   const [historyList, setHistoryList] = useState([]);
   const [totalAssigned, setTotalAssigned] = useState(0);
@@ -44,6 +106,10 @@ export default function RiderHistory() {
       .select(`
         order_id,
         order_code,
+        order_date,
+        total_amount,
+        payment_method,
+        payment_status,
         full_name,
         delivery_address,
         delivery_date,
@@ -52,11 +118,11 @@ export default function RiderHistory() {
           delivery_code,
           delivery_status,
           assigned_rider,
-          assigned_rider_id
+          assigned_rider_id,
+          proof_of_delivery
         )
       `)
-      .eq("order_type", "Delivery")
-      .order("delivery_date", { ascending: false });
+      .eq("order_type", "Delivery");
 
     if (error) {
       console.log(error.message);
@@ -86,6 +152,15 @@ export default function RiderHistory() {
     const formatted = riderOrders
       .map((item) => ({
         id: item.order_id,
+        orderDate: item.order_date,
+        totalAmount: item.total_amount,
+        paymentMethod: item.payment_method,
+        paymentStatus: getPaymentStatus(
+          item.payment_method,
+          item.payment_status,
+          item.delivery_schedule?.[0]?.delivery_status || "Delivered"
+        ),
+        proofUrl: item.delivery_schedule?.[0]?.proof_of_delivery || "",
         orderId: item.order_code,
         customer: item.full_name,
         address: item.delivery_address,
@@ -97,7 +172,8 @@ export default function RiderHistory() {
         return s === "delivered" || s === "completed";
       });
 
-    setHistoryList(formatted);
+    // Pinakabagong delivery muna
+    setHistoryList(sortByPendingThenLatest(formatted));
     setLoading(false);
   };
 
@@ -175,6 +251,40 @@ export default function RiderHistory() {
               <div className="historyinfo">
                 <Clock size={16} className="info-icon" /> <span>{item.date}</span>
               </div>
+
+              {/* PAYMENT: Paid / Unpaid + total na binayaran */}
+              <div
+                className="historyinfo"
+                style={{ justifyContent: "space-between", alignItems: "center" }}
+              >
+                <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <PaymentTag status={item.paymentStatus} />
+                  <span style={{ fontSize: "12px", color: "#64748b" }}>
+                    {methodLabel(item.paymentMethod)}
+                  </span>
+                </span>
+                <strong style={{ fontSize: "16px", color: "#1e293b" }}>
+                  {peso(item.totalAmount)}
+                </strong>
+              </div>
+
+              {item.proofUrl && (
+                <a
+                  href={item.proofUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}
+                >
+                  <img
+                    src={item.proofUrl}
+                    alt="Proof of delivery"
+                    style={{ width: "48px", height: "48px", objectFit: "cover", borderRadius: "8px", border: "1px solid #e2e8f0" }}
+                  />
+                  <span style={{ fontSize: "13px", fontWeight: 600, color: "#2563eb" }}>
+                    View proof of delivery
+                  </span>
+                </a>
+              )}
             </div>
           </div>
         ))

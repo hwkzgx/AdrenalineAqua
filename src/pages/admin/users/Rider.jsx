@@ -4,7 +4,8 @@ import {
   XCircle,
   Plus,
   Pencil,
-  Trash2,
+  Archive,
+  RotateCcw,
   X,
   AlertTriangle,
   Search,
@@ -17,6 +18,7 @@ import { supabase } from "../../../supabase";
 function Rider() {
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
+  const [viewMode, setViewMode] = useState("Active"); // Active | Archived
 
   // MODALS
   const [showEdit, setShowEdit] = useState(false);
@@ -101,6 +103,7 @@ function Rider() {
 
   // SEARCH FILTER
   const filtered = items.filter((i) => {
+    if ((viewMode === "Archived") !== !!i.is_archived) return false;
     return (
       i.name?.toLowerCase().includes(search.toLowerCase()) ||
       i.user_id?.toLowerCase().includes(search.toLowerCase())
@@ -138,18 +141,33 @@ function Rider() {
     }
   };
 
-  // DELETE
+  // ARCHIVE (hindi binubura: nananatili ang data na naka-link sa kanya)
   const handleDelete = async () => {
     const { error } = await supabase
       .from("users")
-      .delete()
+      .update({ is_archived: true, archived_at: new Date().toISOString() })
       .eq("users_id", selected.users_id);
 
     if (error) {
       showToast(error.message, "error");
     } else {
-      showToast("Rider deleted successfully!", "success");
+      showToast("Rider archived successfully!", "success");
       setShowDelete(false);
+      fetchData();
+    }
+  };
+
+  // RESTORE (ibalik mula sa archive)
+  const handleRestore = async (row) => {
+    const { error } = await supabase
+      .from("users")
+      .update({ is_archived: false, archived_at: null })
+      .eq("users_id", row.users_id);
+
+    if (error) {
+      showToast(error.message, "error");
+    } else {
+      showToast("Rider restored successfully!", "success");
       fetchData();
     }
   };
@@ -240,7 +258,8 @@ if (authError) {
       label: "Actions",
       render: (row) => (
         <div className="um-actions">
-          <button
+          {!row.is_archived && (
+            <button
             className="um-icon-btn edit"
             title="Edit"
             onClick={() => {
@@ -256,17 +275,28 @@ if (authError) {
           >
             <Pencil size={16} />
           </button>
+          )}
 
-          <button
-            className="um-icon-btn delete"
-            title="Delete"
-            onClick={() => {
-              setSelected(row);
-              setShowDelete(true);
-            }}
-          >
-            <Trash2 size={16} />
-          </button>
+          {row.is_archived ? (
+            <button
+              className="um-icon-btn view"
+              title="Restore"
+              onClick={() => handleRestore(row)}
+            >
+              <RotateCcw size={16} />
+            </button>
+          ) : (
+            <button
+              className="um-icon-btn delete"
+              title="Archive"
+              onClick={() => {
+                setSelected(row);
+                setShowDelete(true);
+              }}
+            >
+              <Archive size={16} />
+            </button>
+          )}
         </div>
       ),
     },
@@ -306,6 +336,15 @@ if (authError) {
         </div>
 
         <div className="um-toolbar-right">
+          <select
+            className="um-select"
+            value={viewMode}
+            onChange={(e) => setViewMode(e.target.value)}
+          >
+            <option value="Active">Active</option>
+            <option value="Archived">Archived</option>
+          </select>
+
           <span className="um-count">
             {filtered.length} {filtered.length === 1 ? "record" : "records"}
           </span>
@@ -399,10 +438,9 @@ if (authError) {
               <div className="um-delete-icon">
                 <AlertTriangle size={28} />
               </div>
-              <h2>Delete Rider</h2>
+              <h2>Archive Rider</h2>
               <p className="um-delete-text">
-                Are you sure you want to delete this rider record? This will permanently
-                delete the record and all related data. This action cannot be undone.
+                Archive this rider? The account will be hidden from the active list and can no longer be used, but all linked records (orders, deliveries, history) are kept. You can restore it anytime from the Archived view.
               </p>
 
               <div className="um-details-box">
@@ -419,7 +457,7 @@ if (authError) {
                 No, Cancel
               </button>
               <button className="um-btn danger" onClick={handleDelete}>
-                Delete Rider
+                Archive Rider
               </button>
             </div>
           </div>

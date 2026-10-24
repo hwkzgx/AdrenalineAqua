@@ -10,9 +10,16 @@ import {
   User,
   ShieldAlert,
 } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "../../../supabase";
 
+// Palitan ayon sa route ng Profile page mo
+const PROFILE_PATH = "/customer/customerprofile";
+
 export default function CustomerMakeOrder() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [quantity, setQuantity] = useState(0);
   const [payment, setPayment] = useState("cod");
 
@@ -35,6 +42,20 @@ export default function CustomerMakeOrder() {
 
   const [destinationCoords, setDestinationCoords] = useState(null);
   const [isCheckingAddress, setIsCheckingAddress] = useState(false);
+
+  // ===============================
+  // PROFILE INFO + SAVED ADDRESSES (galing sa registration/profile)
+  // ===============================
+  const [profileInfo, setProfileInfo] = useState({
+    name: "",
+    contact: "",
+    address: "",
+  });
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState("");
+  const [profileLoaded, setProfileLoaded] = useState(false);
+  // Dating address galing sa Order Again na wala na sa profile (isang beses lang gagamitin)
+  const [reorderAddress, setReorderAddress] = useState("");
 
   // ===============================
   // VERIFICATION (ID na-verify ng admin = taga-Hagonoy)
@@ -135,17 +156,219 @@ export default function CustomerMakeOrder() {
   }, []);
 
   // ===============================
+  // REORDER PREFILL (galing sa Order History > "Order Again")
+  // Isang size lang kada order ang kaya ng page na ito, kaya ang
+  // unang item na may stock pa ang ipe-prefill.
+  // ===============================
+  useEffect(() => {
+    const reorder = location.state;
+    const reorderItems = reorder?.reorderItems;
+
+    if (!reorderItems || reorderItems.length === 0) return;
+
+    // Hintayin munang ma-load ang inventory, verification at profile/addresses
+    if (inventoryItems.length === 0 || verificationLoading || !profileLoaded) {
+      return;
+    }
+
+    // Linisin ang state para hindi mag-prefill ulit kapag nag-refresh
+    navigate(location.pathname, { replace: true, state: null });
+
+    // Item lang na nasa inventory pa at may stock
+    const available = reorderItems.filter((r) => {
+      const inv = inventoryItems.find((i) => i.item_name === r.item_name);
+      return inv && Number(inv.quantity_available) > 0;
+    });
+
+    if (available.length === 0) {
+      showToast(
+        "The items from that order are no longer available.",
+        "error"
+      );
+      return;
+    }
+
+    const notes = [];
+    let hasWarning = false;
+
+    // ---------- PRODUCT ----------
+    const first = available[0];
+    const inv = inventoryItems.find((i) => i.item_name === first.item_name);
+    const stock = Number(inv.quantity_available || 0);
+    const wanted = Number(first.quantity || 0);
+    const finalQty = Math.min(wanted, stock);
+
+    setSize(first.item_name);
+    setQuantity(finalQty);
+
+    if (finalQty < wanted) {
+      notes.push(`Only ${stock} left in stock, so we adjusted your quantity.`);
+      hasWarning = true;
+    } else if (reorderItems.length > 1) {
+      notes.push(
+        `Added ${first.item_name} only. You can order one size at a time.`
+      );
+    }
+
+    // ---------- NAME / CONTACT / PAYMENT ----------
+    if (reorder.name) setName(reorder.name);
+    if (reorder.contact) setContact(reorder.contact);
+
+    if (reorder.payment) {
+      setPayment(
+        String(reorder.payment).toLowerCase() === "gcash" ? "gcash" : "cod"
+      );
+    }
+
+    // ---------- ORDER TYPE + ADDRESS ----------
+    if (reorder.orderType === "Delivery") {
+      if (isVerified) {
+        setOrderType("Delivery");
+
+        // Ihambing na walang pakialam sa comma, space at laki ng letra
+        const norm = (s) =>
+          String(s || "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "");
+
+        const wantedAddress = norm(reorder.address);
+
+        const match = wantedAddress
+          ? addressOptions.find((o) => norm(o.address) === wantedAddress)
+          : null;
+
+        if (match) {
+          handleAddressSelect(match.id);
+        } else if (reorder.address) {
+          // Wala sa profile: gamitin pa rin ang dating address
+          setReorderAddress(reorder.address);
+          setSelectedAddressId("previous");
+          setAddress(reorder.address);
+          setDestinationCoords(null);
+          notes.push("Your previous delivery address was loaded.");
+        }
+
+        notes.push("Please choose a new delivery date.");
+      } else {
+        setOrderType("Pickup");
+        notes.push(getNotVerifiedMessage(verificationStatus));
+        hasWarning = true;
+      }
+    } else if (reorder.orderType === "Pickup") {
+      setOrderType("Pickup");
+    }
+
+    showToast(
+      notes.length > 0
+        ? notes.join(" ")
+        : "Your previous order has been loaded.",
+      hasWarning ? "error" : "success"
+    );
+  }, [location.state, inventoryItems, verificationLoading, profileLoaded]);
+
+  // ===============================
   // RESET DELIVERY FIELDS FOR PICKUP
   // ===============================
   useEffect(() => {
     if (orderType === "Pickup") {
       setAddress("");
+      setSelectedAddressId("");
       setDate("");
       setDistance(0);
       setDeliveryFee(0);
       setDestinationCoords(null);
     }
   }, [orderType]);
+
+  // ===============================
+  // FETCH PROFILE (name, contact, main address) + SAVED ADDRESSES
+  // ===============================
+  useEffect(() => {
+    const fetchProfileAndAddresses = async () => {
+      const currentUser = JSON.parse(localStorage.getItem("user") || "null");
+      const userId = currentUser?.users_id || currentUser?.id;
+      if (!userId) {
+        setProfileLoaded(true);
+        return;
+      }
+
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("name, contact_number, address")
+        .eq("users_id", userId)
+        .maybeSingle();
+
+      if (userError) {
+        console.log("Error fetching user info:", userError.message);
+      } else if (userData) {
+        setProfileInfo({
+          name: userData.name || "",
+          contact: userData.contact_number || "",
+          address: userData.address || "",
+        });
+      }
+
+      const { data: addressData, error: addressError } = await supabase
+        .from("user_addresses")
+        .select("address_id, label, address")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: true });
+
+      if (addressError) {
+        console.log("Error fetching addresses:", addressError.message);
+      } else {
+        setSavedAddresses(addressData || []);
+      }
+
+      setProfileLoaded(true);
+    };
+
+    fetchProfileAndAddresses();
+  }, []);
+
+  // Lahat ng puwedeng piliin sa dropdown: main address (profile) + saved addresses
+  const addressOptions = [
+    ...(profileInfo.address
+      ? [{ id: "main", label: "Main address", address: profileInfo.address }]
+      : []),
+    ...savedAddresses.map((a) => ({
+      id: String(a.address_id),
+      label: a.label || "Saved address",
+      address: a.address,
+    })),
+    ...(reorderAddress
+      ? [{ id: "previous", label: "Previous address", address: reorderAddress }]
+      : []),
+  ];
+
+  const handleAddressSelect = (value) => {
+    setSelectedAddressId(value);
+    setDestinationCoords(null);
+
+    const found = addressOptions.find((o) => o.id === value);
+    setAddress(found ? found.address : "");
+  };
+
+  // DELIVERY: auto-fill ng name at contact galing sa profile
+  useEffect(() => {
+    if (orderType !== "Delivery") return;
+
+    if (profileInfo.name) setName(profileInfo.name);
+    if (profileInfo.contact) setContact(profileInfo.contact);
+  }, [orderType, profileInfo]);
+
+  // DELIVERY: auto-select ang unang address (main) kung wala pang napili
+  useEffect(() => {
+    if (
+      orderType !== "Delivery" ||
+      selectedAddressId ||
+      addressOptions.length === 0
+    ) {
+      return;
+    }
+
+    handleAddressSelect(addressOptions[0].id);
+  }, [orderType, selectedAddressId, addressOptions.length]);
 
   // ===============================
   // GEOCODE ADDRESS
@@ -751,10 +974,7 @@ export default function CustomerMakeOrder() {
                         key={item.id || item.item_name}
                         value={item.item_name}
                       >
-                        {item.item_name}{" "}
-                        {item.quantity_available !== undefined
-                          ? `(Stock: ${item.quantity_available})`
-                          : ""}
+                        {item.item_name}
                       </option>
                     ))}
                   </select>
@@ -776,7 +996,7 @@ export default function CustomerMakeOrder() {
                   </button>
                 </div>
 
-                {size === "500ml" && (
+                {size === "500ml" && quantity < 12 && (
                   <small
                     style={{
                       color: "#d9534f",
@@ -825,6 +1045,7 @@ export default function CustomerMakeOrder() {
                       type="text"
                       placeholder="Enter full name"
                       value={name}
+                      readOnly={orderType === "Delivery" && !!profileInfo.name}
                       onChange={(e) => setName(e.target.value)}
                     />
                   </div>
@@ -838,6 +1059,7 @@ export default function CustomerMakeOrder() {
                       type="text"
                       placeholder="09XXXXXXXXX"
                       value={contact}
+                      readOnly={orderType === "Delivery" && !!profileInfo.contact}
                       onChange={(e) => setContact(e.target.value)}
                     />
                   </div>
@@ -861,22 +1083,50 @@ export default function CustomerMakeOrder() {
               {/* DELIVERY ADDRESS */}
               <div className="field">
                 <label>Delivery Address</label>
-                <input
-                  type="text"
-                  value={address}
+                <select
+                  value={selectedAddressId}
                   disabled={orderType !== "Delivery"}
-                  placeholder={
-                    orderType === "Pickup"
+                  onChange={(e) => handleAddressSelect(e.target.value)}
+                  style={{ width: "100%", boxSizing: "border-box" }}
+                >
+                  <option value="" disabled hidden>
+                    {orderType === "Pickup"
                       ? "Not required for pickup"
                       : orderType === "Delivery"
-                      ? "Enter full delivery address"
-                      : "Select order type first"
-                  }
-                  onChange={(e) => {
-                    setAddress(e.target.value);
-                    setDestinationCoords(null);
-                  }}
-                />
+                      ? "Select delivery address"
+                      : "Select order type first"}
+                  </option>
+
+                  {addressOptions.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.label} — {o.address}
+                    </option>
+                  ))}
+                </select>
+
+                {orderType === "Delivery" && (
+                  <small
+                    style={{
+                      display: "block",
+                      marginTop: "5px",
+                      color: "#64748b",
+                    }}
+                  >
+                    {addressOptions.length === 0
+                      ? "You don't have a saved address yet. "
+                      : "Need a different address? "}
+                    <span
+                      style={{
+                        color: "#2563eb",
+                        cursor: "pointer",
+                        textDecoration: "underline",
+                      }}
+                      onClick={() => navigate(PROFILE_PATH)}
+                    >
+                      Add it in your Profile
+                    </span>
+                  </small>
+                )}
 
                 {orderType === "Delivery" && address.length >= 5 && (
                   <small

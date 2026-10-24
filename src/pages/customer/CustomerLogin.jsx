@@ -62,6 +62,13 @@ export default function CustomerLogin() {
         return;
       }
 
+      // Archived na account: bawal mag-login
+      if (customerData.is_archived) {
+        await supabase.auth.signOut();
+        setError("This account has been archived. Please contact the administrator.");
+        return;
+      }
+
       clearInsightsStorage();
       localStorage.setItem("user", JSON.stringify(customerData));
 

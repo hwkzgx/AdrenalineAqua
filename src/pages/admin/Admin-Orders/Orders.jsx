@@ -16,6 +16,123 @@ import {
 } from "lucide-react";
 
 // ==========================================
+// STATUS HELPERS
+// DELIVERY order: ang status ay galing sa delivery_schedule (delivery status).
+//   "—" = Delivery order pero wala pang rider
+// PICKUP order: walang delivery, kaya orders.status ang status at
+//   ito ang ine-edit ng admin (Pending -> Ready for Pickup -> Picked Up).
+// ==========================================
+// Walang Cancelled dito: ang customer lang ang nagka-cancel (Order History)
+const PICKUP_STATUSES = ["Pending", "Ready for Pickup", "Picked Up"];
+
+// Payment status options (Pickup orders: ine-edit ng admin kapag nagbayad na)
+const getPaymentStatusOptions = (method, current) => {
+  const base =
+    String(method || "").toLowerCase() === "gcash"
+      ? ["Pending", "Paid", "Rejected"]
+      : ["Unpaid", "Paid"];
+
+  return current && !base.includes(current) ? [current, ...base] : base;
+};
+
+// Container status: "Returned" sa database, "Cleared" ang ipinapakita
+const containerLabel = (status) => (status === "Returned" ? "Cleared" : status);
+
+const statusClass = (status) =>
+  String(status || "").toLowerCase().replace(/\s+/g, "-");
+
+const StatusBadge = ({ status }) => {
+  if (!status || status === "—" || status === "N/A") {
+    return <span style={{ color: "#94a3b8" }}>{status || "—"}</span>;
+  }
+  return <span className={`Ord-status ${statusClass(status)}`}>{status}</span>;
+};
+
+// Payment status badge (Pending / Paid / Rejected). Ang lumang "Verified" ay ituturing na Paid.
+const PaymentBadge = ({ status }) => {
+  const value = status || "Pending";
+  const key = value.toLowerCase();
+
+  const colors =
+    key === "paid" || key === "verified"
+      ? { bg: "#dcfce7", fg: "#15803d" }
+      : key === "rejected"
+      ? { bg: "#fee2e2", fg: "#b91c1c" }
+      : { bg: "#fef9c3", fg: "#a16207" };
+
+  return (
+    <span
+      style={{
+        display: "inline-block",
+        padding: "4px 12px",
+        borderRadius: "999px",
+        fontSize: "12px",
+        fontWeight: 600,
+        background: colors.bg,
+        color: colors.fg,
+      }}
+    >
+      {key === "verified" ? "Paid" : value}
+    </span>
+  );
+};
+
+// Payment method rules (admin Add/Edit): Cash = pwede sa lahat (walk-in),
+// COD = Delivery lang, GCash = pareho
+const getPaymentMethodOptions = (orderType) =>
+  orderType === "Pickup"
+    ? [{ value: "Cash", label: "Cash" }, { value: "GCash", label: "GCash" }]
+    : [
+        { value: "Cash", label: "Cash" },
+        { value: "COD", label: "Cash on Delivery" },
+        { value: "GCash", label: "GCash" },
+      ];
+
+// Kapag naging Pickup ang order, hindi na valid ang COD -> gawing Cash
+const fixPaymentMethod = (orderType, method) => {
+  const m = String(method || "").toLowerCase();
+  if (!m) return "";
+  if (m === "gcash") return "GCash";
+  if (m === "cash") return "Cash";
+  return orderType === "Pickup" ? "Cash" : "COD";
+};
+
+// Editable ng admin: Pickup (Cash) at Delivery na Cash (walk-in).
+// COD = kusa sa delivery status, GCash = Paid/Rejected sa View.
+const isPaymentStatusEditable = (orderType, method) => {
+  const m = String(method || "").toLowerCase();
+  if (m === "gcash") return false;
+  if (orderType === "Delivery" && m === "cod") return false;
+  return true;
+};
+
+const defaultPaymentStatus = (method) =>
+  String(method || "").toLowerCase() === "gcash" ? "Pending" : "Unpaid";
+
+// Pending / walang rider (nasa taas) -> Out for Delivery / Ready for Pickup
+// -> Delivered / Picked Up -> Cancelled (nasa ilalim)
+const statusRank = (status) => {
+  if (status === "Pending" || status === "—") return 0;
+  if (status === "Out for Delivery" || status === "Ready for Pickup") return 1;
+  if (status === "Delivered" || status === "Picked Up") return 2;
+  if (status === "Cancelled") return 3;
+  return 4;
+};
+
+// AUTOMATIC SORTING: sundin ang statusRank sa taas; pinakabagong order muna sa bawat grupo.
+const sortOrders = (list) =>
+  [...list].sort((a, b) => {
+    const rank = statusRank(a.status) - statusRank(b.status);
+    if (rank !== 0) return rank;
+
+    const timeA = new Date(a.order_date || 0).getTime();
+    const timeB = new Date(b.order_date || 0).getTime();
+    if (timeB !== timeA) return timeB - timeA;
+
+    return Number(b.id || 0) - Number(a.id || 0);
+  });
+
+// ==========================================
 // EXPORT PDF FUNCTION (Modern Style - Delivery Template)
 // ==========================================
 export const exportOrdersToPDF = (ordersData, filename = "orders-report.pdf", generatedBy = "System Admin") => {
@@ -46,9 +163,9 @@ export const exportOrdersToPDF = (ordersData, filename = "orders-report.pdf", ge
   doc.line(14, 34, 196, 34);
 
   const total = ordersData.length;
-  const pending = ordersData.filter(o => o.status === 'Pending').length;
-  const processing = ordersData.filter(o => o.status === 'Processing').length;
-  const delivered = ordersData.filter(o => o.status === 'Delivered').length;
+  const pending = ordersData.filter(o => o.status === 'Pending' || o.status === '—').length;
+  const outForDelivery = ordersData.filter(o => o.status === 'Out for Delivery').length;
+  const completed = ordersData.filter(o => o.status === 'Delivered' || o.status === 'Picked Up').length;
 
   doc.setFillColor(...lightBg);
   doc.roundedRect(14, 40, 182, 14, 1.5, 1.5, "F");
@@ -58,8 +175,8 @@ export const exportOrdersToPDF = (ordersData, filename = "orders-report.pdf", ge
   doc.setTextColor(...primaryColor);
   doc.text(`Total: ${total}`, 18, 49);
   doc.text(`Pending: ${pending}`, 60, 49);
-  doc.text(`Processing: ${processing}`, 110, 49);
-  doc.text(`Delivered: ${delivered}`, 160, 49);
+  doc.text(`Out for Delivery: ${outForDelivery}`, 105, 49);
+  doc.text(`Completed: ${completed}`, 160, 49);
 
   const tableColumn = [
     "Order ID",
@@ -68,7 +185,7 @@ export const exportOrdersToPDF = (ordersData, filename = "orders-report.pdf", ge
     "Qty",
     "Containers",
     "Payment",
-    "Status"
+    "Order Status"
   ];
 
   const tableRows = ordersData.map((order) => [
@@ -138,6 +255,14 @@ function Orders() {
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
+
+  // CUSTOMER LOGO (lightbox para malakihan at ma-save)
+  const [logoView, setLogoView] = useState("");
+
+  // GCASH REJECT (kailangan ng reason)
+  const [payRejectMode, setPayRejectMode] = useState(false);
+  const [payRejectReason, setPayRejectReason] = useState("");
+  const [payRejectError, setPayRejectError] = useState("");
 
   // ADD DATA
   const [addData, setAddData] = useState({
@@ -235,24 +360,6 @@ function Orders() {
     return () => clearTimeout(timeout);
   }, [addData.delivery_address, addData.order_type, addData.size_variant]);
 
-  const generateSalesCode = async () => {
-    const year = new Date().getFullYear();
-    const { data } = await supabase
-      .from("sales")
-      .select("sales_code")
-      .like("sales_code", `SAL${year}%`)
-      .order("sales_code", { ascending: false })
-      .limit(1);
-
-    let nextNumber = 1;
-    if (data?.length > 0 && data[0].sales_code) {
-      const lastCode = data[0].sales_code;
-      const numberPart = lastCode.replace(`SAL${year}`, "");
-      nextNumber = Number(numberPart) + 1;
-    }
-    return `SAL${year}${String(nextNumber).padStart(3, "0")}`;
-  };
-
   const geocodeAddress = async (address) => {
     if (!address) return null;
 
@@ -335,15 +442,32 @@ function Orders() {
     delivery_date: "",
     quantity: "",
     payment_method: "",
-    payment_status: "",
-    status: "",
     borrowed_containers: 0,
     container_status: "Unreturned",
+    status: "Pending",
+    payment_status: "",
   });
 
   useEffect(() => {
     fetchOrders();
     fetchInventoryStocks();
+  }, []);
+
+  // SYNC: i-refresh ang table kapag may nagbago sa delivery (rider, staff, ibang admin)
+  // Kailangang naka-enable ang Realtime sa delivery_schedule.
+  useEffect(() => {
+    const channel = supabase
+      .channel("admin-orders-delivery-sync")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "delivery_schedule" },
+        () => fetchOrders()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchInventoryStocks = async () => {
@@ -365,16 +489,20 @@ function Orders() {
         *,
         order_items!order_items_order_id_fkey(
           item_name,
-          quantity
+          quantity,
+          customized_logo
         ),
         container_transactions(
           delivered_quantity,
           returned_quantity,
           outstanding_quantity,
           container_status
+        ),
+        delivery_schedule(
+          delivery_status,
+          assigned_rider
         )
-      `)
-      .order("delivery_date");
+      `);
 
     if (error) {
       console.log(error.message);
@@ -383,22 +511,58 @@ function Orders() {
 
     const merged = (data || []).map((order) => {
       const container = order.container_transactions?.[0] || {};
+
+      // one-to-one ay object, one-to-many ay array
+      const schedule = Array.isArray(order.delivery_schedule)
+        ? order.delivery_schedule[0]
+        : order.delivery_schedule;
+
+      const isDelivery = String(order.order_type || "").toLowerCase() === "delivery";
+
+      // DELIVERY: delivery status (parehong logic sa Delivery page)
+      // PICKUP: walang delivery, kaya orders.status ang gamit
+      const orderStatus = !isDelivery
+        ? order.status || "Pending"
+        : schedule?.delivery_status === "Cancelled" || order.status === "Cancelled"
+        ? "Cancelled"
+        : !schedule?.assigned_rider
+        ? "—"
+        : schedule?.delivery_status || "Pending";
+
+      // COD (Delivery): sa delivery status nakabase ang payment status.
+      // Delivered = Paid, hindi pa Delivered = Unpaid.
+      const isCodDelivery =
+        isDelivery && String(order.payment_method || "").toLowerCase() === "cod";
+
+      const paymentStatus = isCodDelivery
+        ? schedule?.delivery_status === "Delivered"
+          ? "Paid"
+          : "Unpaid"
+        : order.payment_status;
+
       return {
         id: order.order_id || order.id,
         order_code: order.order_code,
+        order_date: order.order_date,
         delivery_code: order.delivery_code || "-",
         order_type: order.order_type || "-",
         full_name: order.full_name,
         delivery_date: order.delivery_date,
         payment_method: order.payment_method,
-        payment_status: order.payment_status,
+        payment_status: paymentStatus,
         receipt_url: order.receipt_url,
-        status: order.status,
+        status: orderStatus,
+        remarks: order.remarks,
+        payment_remarks: order.payment_remarks,
         total_amount: order.total_amount,
 
         quantity: order.order_items
           ? order.order_items.reduce((sum, i) => sum + Number(i.quantity || 0), 0)
           : 0,
+
+        logos: (order.order_items || [])
+          .map((i) => i.customized_logo)
+          .filter(Boolean),
 
         item_name: order.order_items
           ? order.order_items.map(i => i.item_name).join(", ")
@@ -464,7 +628,7 @@ function Orders() {
           delivery_date: addData.order_type === "Delivery" ? addData.delivery_date : null,
           delivery_address: addData.order_type === "Delivery" ? addData.delivery_address : null,
           payment_method: addData.payment_method,
-          payment_status: addData.payment_status,
+          payment_status: defaultPaymentStatus(addData.payment_method),
           status: "Pending",
           total_amount: totalAmount,
         },
@@ -549,7 +713,29 @@ function Orders() {
     fetchInventoryStocks();
   };
 
+  // I-save ang logo (blob download; kapag hindi pwede, buksan sa bagong tab)
+  const downloadLogo = async (url) => {
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const ext = (blob.type.split("/")[1] || "png").split("+")[0];
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${selectedOrder?.order_code || "order"}-logo.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(a.href);
+    } catch (err) {
+      console.log("Logo download error:", err);
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+  };
+
   const handleView = (row) => {
+    setPayRejectMode(false);
+    setPayRejectReason("");
+    setPayRejectError("");
     setSelectedOrder(row);
     setShowView(true);
   };
@@ -562,27 +748,92 @@ function Orders() {
       full_name: row.full_name || "",
       delivery_date: row.delivery_date || "",
       quantity: row.quantity || "",
-      payment_method: row.payment_method || "",
-      payment_status: row.payment_status || "Pending",
-      status: row.status || "Pending",
+      payment_method: fixPaymentMethod(row.order_type || "Delivery", row.payment_method),
       borrowed_containers: row.borrowed_containers || 0,
       container_status: row.container_status || "Unreturned",
+      status: row.order_type === "Pickup" ? row.status || "Pending" : "Pending",
+      payment_status:
+        row.payment_status ||
+        (String(row.payment_method || "").toLowerCase() === "gcash"
+          ? "Pending"
+          : "Unpaid"),
     });
     setShowEdit(true);
   };
 
+  // Ibalik ang stock sa inventory (kapag na-Cancel ang Pickup order)
+  const restoreStock = async (orderId) => {
+    const { data: items, error: itemsError } = await supabase
+      .from("order_items")
+      .select("item_name, quantity")
+      .eq("order_id", orderId);
+
+    if (itemsError) {
+      console.log("Restore stock (items) error:", itemsError.message);
+      return;
+    }
+
+    for (const item of items || []) {
+      const { data: inv, error: invError } = await supabase
+        .from("inventory")
+        .select("inventory_id, quantity_available")
+        .eq("item_name", item.item_name)
+        .maybeSingle();
+
+      if (invError || !inv) {
+        console.log("Restore stock lookup error:", invError?.message);
+        continue;
+      }
+
+      const { error: updateError } = await supabase
+        .from("inventory")
+        .update({
+          quantity_available:
+            Number(inv.quantity_available || 0) + Number(item.quantity || 0),
+        })
+        .eq("inventory_id", inv.inventory_id);
+
+      if (updateError) {
+        console.log("Restore stock error:", updateError.message);
+      }
+    }
+
+    fetchInventoryStocks();
+  };
+
+  // DELIVERY order: delivery status ang batayan (hindi ine-edit dito).
+  // PICKUP order: dito ine-edit ang orders.status. Kapag "Picked Up",
+  // ang Sales page na ang gagawa ng sales record.
   const handleSaveChanges = async () => {
     try {
+      const isPickupOrder =
+        selectedOrder.order_type === "Pickup" && editData.order_type === "Pickup";
+
+      // Kapag Picked Up o Cancelled na, naka-lock na ang status
+      const statusLocked = ["Picked Up", "Cancelled"].includes(selectedOrder.status);
+
+      const orderUpdate = {
+        order_type: editData.order_type,
+        full_name: editData.full_name,
+        // Pickup walang delivery date; blank ay dapat null (hindi "") sa date column
+        delivery_date:
+          editData.order_type === "Delivery" ? editData.delivery_date || null : null,
+        payment_method: fixPaymentMethod(editData.order_type, editData.payment_method),
+      };
+
+      if (isPickupOrder && !statusLocked) {
+        orderUpdate.status = editData.status;
+      }
+
+      // Payment status: ine-edit ng admin para sa cash na Pickup lang.
+      // COD (Delivery) = kusang Paid kapag Delivered; GCash = sa View modal.
+      if (isPaymentStatusEditable(editData.order_type, editData.payment_method)) {
+        orderUpdate.payment_status = editData.payment_status || "Unpaid";
+      }
+
       const { error: updateError } = await supabase
         .from("orders")
-        .update({
-          order_type: editData.order_type,
-          full_name: editData.full_name,
-          delivery_date: editData.delivery_date,
-          status: editData.status,
-          payment_method: editData.payment_method,
-          payment_status: editData.payment_status,
-        })
+        .update(orderUpdate)
         .eq("order_code", selectedOrder.order_code);
 
       if (updateError) {
@@ -599,29 +850,6 @@ function Orders() {
         })
         .eq("order_id", selectedOrder.id);
 
-      if (editData.status === "Delivered") {
-        const { data: existingSales } = await supabase
-          .from("sales")
-          .select("sales_code")
-          .eq("order_id", selectedOrder.id)
-          .maybeSingle();
-
-        if (!existingSales) {
-          const salesCode = await generateSalesCode();
-          const totalSalesAmount = selectedOrder.total_amount || 0;
-
-          await supabase.from("sales").insert([
-            {
-              sales_code: salesCode,
-              order_id: selectedOrder.id,
-              total_products: Number(selectedOrder.quantity || 0),
-              total_sales: totalSalesAmount,
-              payment_method: editData.payment_method,
-              date: new Date(),
-            },
-          ]);
-        }
-      }
       showToast("Order updated successfully!", "success");
       setShowEdit(false);
       fetchOrders();
@@ -654,9 +882,18 @@ function Orders() {
   // UPDATE PAYMENT STATUS (Verify / Reject)
   // ===============================
   const updatePaymentStatus = async (newStatus) => {
+    let remarks = null;
+    if (newStatus === "Rejected") {
+      remarks = payRejectReason.trim();
+      if (!remarks) {
+        setPayRejectError("Please enter the reason for rejecting this payment.");
+        return;
+      }
+    }
+
     const { error } = await supabase
       .from("orders")
-      .update({ payment_status: newStatus })
+      .update({ payment_status: newStatus, payment_remarks: remarks })
       .eq("order_code", selectedOrder.order_code);
 
     if (error) {
@@ -665,25 +902,32 @@ function Orders() {
     }
 
     showToast(`Payment marked as ${newStatus}!`, "success");
-    setSelectedOrder({ ...selectedOrder, payment_status: newStatus });
+    setSelectedOrder({ ...selectedOrder, payment_status: newStatus, payment_remarks: remarks });
+    setPayRejectMode(false);
+    setPayRejectReason("");
+    setPayRejectError("");
     fetchOrders();
   };
 
-  const filteredOrders = orders.filter((order) => {
-    const matchesSearch =
-      order.order_code?.toLowerCase().includes(search.toLowerCase()) ||
-      order.full_name?.toLowerCase().includes(search.toLowerCase());
+  const filteredOrders = sortOrders(
+    orders.filter((order) => {
+      const matchesSearch =
+        order.order_code?.toLowerCase().includes(search.toLowerCase()) ||
+        order.full_name?.toLowerCase().includes(search.toLowerCase());
 
-    const matchesStatus =
-      statusFilter === "All" ||
-      order.status === statusFilter;
+      // "Pending" ay kasama rin ang mga wala pang rider ("—")
+      const matchesStatus =
+        statusFilter === "All" ||
+        order.status === statusFilter ||
+        (statusFilter === "Pending" && order.status === "—");
 
-    const matchesType =
-      typeFilter === "All" ||
-      order.order_type === typeFilter;
+      const matchesType =
+        typeFilter === "All" ||
+        order.order_type === typeFilter;
 
-    return matchesSearch && matchesStatus && matchesType;
-  });
+      return matchesSearch && matchesStatus && matchesType;
+    })
+  );
 
   const columns = [
     { key: "order_code", label: "Order ID" },
@@ -709,7 +953,7 @@ function Orders() {
       label: "Container Status",
       render: (row) => (
         <span className={`Ord-status ${row.container_status?.toLowerCase()}`}>
-          {row.container_status}
+          {containerLabel(row.container_status)}
         </span>
       ),
     },
@@ -719,21 +963,15 @@ function Orders() {
       label: "Payment Status",
       render: (row) =>
         row.payment_method?.toLowerCase() === "gcash" ? (
-          <span className={`Ord-status ${(row.payment_status || "pending").toLowerCase()}`}>
-            {row.payment_status || "Pending"}
-          </span>
+          <PaymentBadge status={row.payment_status} />
         ) : (
-          <span style={{ color: "#94a3b8" }}>N/A</span>
+          <PaymentBadge status={row.payment_status || "Unpaid"} />
         ),
     },
     {
       key: "status",
       label: "Order Status",
-      render: (row) => (
-        <span className={`Ord-status ${row.status?.toLowerCase()}`}>
-          {row.status}
-        </span>
-      ),
+      render: (row) => <StatusBadge status={row.status} />,
     },
     {
       key: "actions",
@@ -747,6 +985,8 @@ function Orders() {
       ),
     },
   ];
+
+  const editStatusLocked = ["Picked Up", "Cancelled"].includes(selectedOrder?.status);
 
   return (
     <div className="Ord-page">
@@ -782,8 +1022,11 @@ function Orders() {
         <select className="Ord-filter" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
           <option value="All">All Status</option>
           <option value="Pending">Pending</option>
-          <option value="Processing">Processing</option>
+          <option value="Out for Delivery">Out for Delivery</option>
           <option value="Delivered">Delivered</option>
+          <option value="Ready for Pickup">Ready for Pickup</option>
+          <option value="Picked Up">Picked Up</option>
+          <option value="Cancelled">Cancelled</option>
         </select>
 
         <button className="Ord-addBtn" onClick={() => setShowAdd(true)}>+ Add Order</button>
@@ -820,70 +1063,200 @@ function Orders() {
               <div><label>Delivery Date</label><p>{selectedOrder?.delivery_date}</p></div>
               <div><label>Quantity</label><p>{selectedOrder?.quantity}</p></div>
               <div><label>Borrowed Containers</label><p>{selectedOrder?.borrowed_containers}</p></div>
-              <div><label>Container Status</label><p>{selectedOrder?.container_status}</p></div>
+              <div><label>Container Status</label><p>{containerLabel(selectedOrder?.container_status)}</p></div>
               <div><label>Payment Method</label><p>{selectedOrder?.payment_method}</p></div>
               <div><label>Order Type</label><p>{selectedOrder?.order_type}</p></div>
-              <div><label>Status</label><span className={`Ord-status ${selectedOrder?.status?.toLowerCase()}`}>{selectedOrder?.status}</span></div>
+              <div><label>Order Status</label><StatusBadge status={selectedOrder?.status} /></div>
 
-              {selectedOrder?.payment_method === "GCash" && (
+              {selectedOrder?.logos?.length > 0 && (
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label>Customer Logo</label>
+                  <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "6px" }}>
+                    {selectedOrder.logos.map((url, idx) => (
+                      <div key={idx} style={{ textAlign: "center" }}>
+                        <img
+                          src={url}
+                          alt="Customer logo"
+                          title="Click to enlarge"
+                          onClick={() => setLogoView(url)}
+                          style={{
+                            width: "110px",
+                            height: "110px",
+                            objectFit: "contain",
+                            background: "#f8fafc",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "10px",
+                            cursor: "zoom-in",
+                            display: "block",
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => downloadLogo(url)}
+                          style={{ marginTop: "6px", background: "none", border: "none", color: "#4f46e5", cursor: "pointer", fontSize: "12px", fontWeight: 600 }}
+                        >
+                          Download
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedOrder?.status === "Cancelled" && (
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label>Cancellation Reason</label>
+                  <p>{selectedOrder?.remarks || "No reason provided."}</p>
+                </div>
+              )}
+
+              {selectedOrder?.payment_method?.toLowerCase() !== "gcash" && (
+                <div>
+                  <label>Payment Status</label>
+                  <PaymentBadge status={selectedOrder?.payment_status || "Unpaid"} />
+                </div>
+              )}
+
+              {selectedOrder?.payment_method?.toLowerCase() === "gcash" && (
                 <>
                   <div>
                     <label>Payment Status</label>
-                    <span className={`Ord-status ${(selectedOrder?.payment_status || "pending").toLowerCase()}`}>
-                      {selectedOrder?.payment_status || "Pending"}
-                    </span>
+                    <PaymentBadge status={selectedOrder?.payment_status} />
                   </div>
 
-                  {selectedOrder?.receipt_url && (
+                  <div style={{ gridColumn: "1 / -1" }}>
+                    <label>GCash Receipt</label>
+                    {selectedOrder?.receipt_url ? (
+                      <a
+                        href={selectedOrder.receipt_url}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <img
+                          src={selectedOrder.receipt_url}
+                          alt="GCash Receipt"
+                          style={{
+                            width: "100%",
+                            maxWidth: "250px",
+                            borderRadius: "10px",
+                            border: "1px solid #e2e8f0",
+                            marginTop: "6px",
+                            display: "block",
+                          }}
+                        />
+                      </a>
+                    ) : (
+                      <p style={{ color: "#94a3b8", marginTop: "6px" }}>
+                        No receipt uploaded.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Ang pipindutin dito ang ise-save sa database (payment_status) */}
+                  <div
+                    style={{
+                      gridColumn: "1 / -1",
+                      display: "flex",
+                      gap: "10px",
+                      marginTop: "10px",
+                    }}
+                  >
+                    <button
+                      onClick={() => updatePaymentStatus("Paid")}
+                      disabled={
+                        ["paid", "verified"].includes(
+                          (selectedOrder?.payment_status || "").toLowerCase()
+                        )
+                      }
+                      style={{
+                        flex: 1,
+                        padding: "10px",
+                        borderRadius: "8px",
+                        border: "none",
+                        background: "#22c55e",
+                        color: "#fff",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        opacity: ["paid", "verified"].includes(
+                          (selectedOrder?.payment_status || "").toLowerCase()
+                        )
+                          ? 0.5
+                          : 1,
+                      }}
+                    >
+                      Paid
+                    </button>
+                    <button
+                      onClick={() => {
+                        setPayRejectMode(true);
+                        setPayRejectReason("");
+                        setPayRejectError("");
+                      }}
+                      disabled={
+                        (selectedOrder?.payment_status || "").toLowerCase() ===
+                        "rejected"
+                      }
+                      style={{
+                        flex: 1,
+                        padding: "10px",
+                        borderRadius: "8px",
+                        border: "none",
+                        background: "#ef4444",
+                        color: "#fff",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        opacity:
+                          (selectedOrder?.payment_status || "").toLowerCase() ===
+                          "rejected"
+                            ? 0.5
+                            : 1,
+                      }}
+                    >
+                      Reject
+                    </button>
+                  </div>
+
+                  {/* Reason ng pagka-reject ng payment */}
+                  {payRejectMode && (
                     <div style={{ gridColumn: "1 / -1" }}>
-                      <label>GCash Receipt</label>
-                      <img
-                        src={selectedOrder.receipt_url}
-                        alt="GCash Receipt"
-                        style={{
-                          width: "100%",
-                          maxWidth: "250px",
-                          borderRadius: "10px",
-                          border: "1px solid #e2e8f0",
-                          marginTop: "6px",
-                          display: "block",
+                      <label>Reason for rejection *</label>
+                      <textarea
+                        rows={3}
+                        autoFocus
+                        value={payRejectReason}
+                        onChange={(e) => {
+                          setPayRejectReason(e.target.value);
+                          setPayRejectError("");
                         }}
+                        placeholder="e.g. Wrong amount, blurry receipt, reference number not found..."
+                        style={{ width: "100%", padding: "8px", borderRadius: "8px", border: `1px solid ${payRejectError ? "#ef4444" : "#e2e8f0"}`, resize: "vertical", marginTop: "6px" }}
                       />
+                      {payRejectError && (
+                        <span style={{ color: "#ef4444", fontSize: "12px", display: "block", marginTop: "4px" }}>
+                          {payRejectError}
+                        </span>
+                      )}
+                      <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
+                        <button
+                          onClick={() => setPayRejectMode(false)}
+                          style={{ flex: 1, padding: "10px", borderRadius: "8px", border: "1px solid #e2e8f0", background: "#fff", cursor: "pointer", fontWeight: 600 }}
+                        >
+                          Back
+                        </button>
+                        <button
+                          onClick={() => updatePaymentStatus("Rejected")}
+                          style={{ flex: 1, padding: "10px", borderRadius: "8px", border: "none", background: "#ef4444", color: "#fff", cursor: "pointer", fontWeight: 600 }}
+                        >
+                          Confirm Reject
+                        </button>
+                      </div>
                     </div>
                   )}
 
-                  {selectedOrder?.payment_status === "Pending" && (
-                    <div style={{ gridColumn: "1 / -1", display: "flex", gap: "10px", marginTop: "10px" }}>
-                      <button
-                        onClick={() => updatePaymentStatus("Verified")}
-                        style={{
-                          flex: 1,
-                          padding: "10px",
-                          borderRadius: "8px",
-                          border: "none",
-                          background: "#22c55e",
-                          color: "#fff",
-                          fontWeight: 600,
-                          cursor: "pointer",
-                        }}
-                      >
-                        Verify Payment
-                      </button>
-                      <button
-                        onClick={() => updatePaymentStatus("Rejected")}
-                        style={{
-                          flex: 1,
-                          padding: "10px",
-                          borderRadius: "8px",
-                          border: "none",
-                          background: "#ef4444",
-                          color: "#fff",
-                          fontWeight: 600,
-                          cursor: "pointer",
-                        }}
-                      >
-                        Reject Payment
-                      </button>
+                  {(selectedOrder?.payment_status || "").toLowerCase() === "rejected" && !payRejectMode && (
+                    <div style={{ gridColumn: "1 / -1" }}>
+                      <label>Payment Rejection Reason</label>
+                      <p>{selectedOrder?.payment_remarks || "No reason provided."}</p>
                     </div>
                   )}
                 </>
@@ -892,6 +1265,41 @@ function Orders() {
             <div className="Ord-modal-actions">
               <button className="Ord-closeAction" onClick={() => setShowView(false)}>Close</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* LOGO LIGHTBOX */}
+      {logoView && (
+        <div
+          className="Ord-modal-overlay"
+          style={{ zIndex: 3000 }}
+          onClick={() => setLogoView("")}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: "relative",
+              background: "#fff",
+              borderRadius: "12px",
+              padding: "14px",
+              maxWidth: "92vw",
+              maxHeight: "92vh",
+              textAlign: "center",
+            }}
+          >
+            <button className="Ord-close-btn" onClick={() => setLogoView("")}><X size={20} /></button>
+            <img
+              src={logoView}
+              alt="Customer logo"
+              style={{ maxWidth: "85vw", maxHeight: "72vh", display: "block", margin: "0 auto", borderRadius: "8px", background: "#f8fafc" }}
+            />
+            <button
+              onClick={() => downloadLogo(logoView)}
+              style={{ marginTop: "12px", padding: "10px 20px", borderRadius: "8px", border: "none", background: "#4f46e5", color: "#fff", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}
+            >
+              <Download size={16} /> Save Logo
+            </button>
           </div>
         </div>
       )}
@@ -906,11 +1314,49 @@ function Orders() {
             <div className="Ord-form-group"><label>Customer</label><input value={editData.full_name} onChange={(e) => setEditData({...editData, full_name: e.target.value})} /></div>
             <div className="Ord-form-group">
               <label>Order Type</label>
-              <select value={editData.order_type} onChange={(e) => setEditData({...editData, order_type: e.target.value})}>
+              <select
+                value={editData.order_type}
+                onChange={(e) => {
+                  const type = e.target.value;
+                  const method = fixPaymentMethod(type, editData.payment_method);
+                  setEditData({
+                    ...editData,
+                    order_type: type,
+                    payment_method: method,
+                    payment_status:
+                      method.toLowerCase() === "gcash" ? editData.payment_status : editData.payment_status === "Paid" ? "Paid" : "Unpaid",
+                  });
+                }}
+              >
                 <option value="Delivery">Delivery</option>
                 <option value="Pickup">Pickup</option>
               </select>
             </div>
+
+            {/* ORDER STATUS: para sa Pickup lang (ang Delivery ay delivery status ang sinusunod) */}
+            {selectedOrder?.order_type === "Pickup" && editData.order_type === "Pickup" && (
+              <div className="Ord-form-group">
+                <label>Order Status</label>
+                <select
+                  value={editData.status}
+                  disabled={editStatusLocked}
+                  onChange={(e) => setEditData({...editData, status: e.target.value})}
+                >
+                  {(PICKUP_STATUSES.includes(editData.status)
+                    ? PICKUP_STATUSES
+                    : [editData.status, ...PICKUP_STATUSES]
+                  ).map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+                {editStatusLocked && (
+                  <small style={{ color: "#94a3b8", display: "block", marginTop: "4px" }}>
+                    Status is locked because this order is already {selectedOrder?.status}.
+                  </small>
+                )}
+              </div>
+            )}
+
             {editData.order_type === "Delivery" && (
               <div className="Ord-form-group"><label>Date</label><input type="date" value={editData.delivery_date} onChange={(e) => setEditData({...editData, delivery_date: e.target.value})} /></div>
             )}
@@ -927,35 +1373,43 @@ function Orders() {
               <label>Container Status</label>
               <select value={editData.container_status} onChange={(e) => setEditData({...editData, container_status: e.target.value})}>
                 <option value="Unreturned">Unreturned</option>
-                <option value="Returned">Returned</option>
+                <option value="Returned">Cleared</option>
               </select>
             </div>
             <div className="Ord-form-group">
               <label>Payment Method</label>
-              <select value={editData.payment_method} onChange={(e) => setEditData({...editData, payment_method: e.target.value})}>
-                <option value="COD">COD</option>
-                <option value="GCash">GCash</option>
-                <option value="Card">Card</option>
+              <select
+                value={editData.payment_method}
+                onChange={(e) =>
+                  setEditData({
+                    ...editData,
+                    payment_method: e.target.value,
+                    payment_status: defaultPaymentStatus(e.target.value),
+                  })
+                }
+              >
+                {getPaymentMethodOptions(editData.order_type).map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
               </select>
             </div>
-            {editData.payment_method === "GCash" && (
+
+            {/* PAYMENT STATUS: para sa cash na Pickup lang.
+                COD (Delivery) = kusang Paid kapag Delivered; GCash = Paid / Rejected sa View */}
+            {isPaymentStatusEditable(editData.order_type, editData.payment_method) && (
               <div className="Ord-form-group">
                 <label>Payment Status</label>
-                <select value={editData.payment_status} onChange={(e) => setEditData({...editData, payment_status: e.target.value})}>
-                  <option value="Pending">Pending</option>
-                  <option value="Verified">Verified</option>
-                  <option value="Rejected">Rejected</option>
+                <select
+                  value={editData.payment_status}
+                  onChange={(e) => setEditData({...editData, payment_status: e.target.value})}
+                >
+                  {getPaymentStatusOptions(editData.payment_method, editData.payment_status).map((s) => (
+                    <option key={s} value={s}>{s === "verified" || s === "Verified" ? "Paid" : s}</option>
+                  ))}
                 </select>
               </div>
             )}
-            <div className="Ord-form-group">
-              <label>Status</label>
-              <select value={editData.status} onChange={(e) => setEditData({...editData, status: e.target.value})}>
-                <option value="Pending">Pending</option>
-                <option value="Processing">Processing</option>
-                <option value="Delivered">Delivered</option>
-              </select>
-            </div>
+
             <div className="Ord-modal-actions">
               <button className="Ord-closeAction" onClick={() => setShowEdit(false)}>Cancel</button>
               <button className="Ord-save-btn" onClick={handleSaveChanges}>Save Changes</button>
@@ -990,10 +1444,8 @@ function Orders() {
                 <p>₱{selectedOrder?.total_amount}</p>
               </div>
               <div>
-                <label>Status</label>
-                <span className={`Ord-status ${selectedOrder?.status?.toLowerCase()}`}>
-                  {selectedOrder?.status}
-                </span>
+                <label>Order Status</label>
+                <StatusBadge status={selectedOrder?.status} />
               </div>
             </div>
 
@@ -1067,7 +1519,13 @@ function Orders() {
                 <label>Order Type</label>
                 <select
                   value={addData.order_type}
-                  onChange={(e) => setAddData({ ...addData, order_type: e.target.value })}
+                  onChange={(e) =>
+                    setAddData({
+                      ...addData,
+                      order_type: e.target.value,
+                      payment_method: fixPaymentMethod(e.target.value, addData.payment_method),
+                    })
+                  }
                 >
                   <option value="Delivery">Delivery</option>
                   <option value="Pickup">Pickup</option>
@@ -1095,7 +1553,7 @@ function Orders() {
                   style={{ backgroundColor: addData.order_type === "Pickup" ? "#f3f4f6" : "#fff", cursor: addData.order_type === "Pickup" ? "not-allowed" : "pointer" }}
                 >
                   <option value="Unreturned">Unreturned</option>
-                  <option value="Returned">Returned</option>
+                  <option value="Returned">Cleared</option>
                 </select>
               </div>
 
@@ -1144,9 +1602,9 @@ function Orders() {
                   onChange={(e) => setAddData({ ...addData, payment_method: e.target.value })}
                 >
                   <option value="">Select payment method</option>
-                  <option value="Card">Cash</option>
-                  <option value="COD">Cash on Delivery</option>
-                  <option value="GCash">GCash</option>
+                  {getPaymentMethodOptions(addData.order_type).map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
                 </select>
               </div>
 

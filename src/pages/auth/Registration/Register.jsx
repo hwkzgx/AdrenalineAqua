@@ -5,6 +5,9 @@ import { CheckCircle, XCircle } from "lucide-react";
 import "./register.css";
 import AquaLogo from "../../../assets/AquaLogo.png";
 
+const EMAIL_TAKEN_MSG =
+  "This email is already registered. Please use another email or log in.";
+
 export default function Register() {
   const nav = useNavigate();
 
@@ -134,9 +137,24 @@ export default function Register() {
 
     setLoading(true);
 
-    // Create account in Supabase Authentication
+    const cleanEmail = email.trim().toLowerCase();
+
+    // 1. I-check muna kung may ganitong email na sa users table
+    const { data: existing } = await supabase
+      .from("users")
+      .select("email")
+      .ilike("email", cleanEmail)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      setLoading(false);
+      showModal(EMAIL_TAKEN_MSG, "error");
+      return;
+    }
+
+    // 2. Create account in Supabase Authentication
     const { data, error: authError } = await supabase.auth.signUp({
-      email,
+      email: cleanEmail,
       password,
     });
 
@@ -145,21 +163,31 @@ export default function Register() {
 
     if (authError) {
       setLoading(false);
-      showModal("Registration failed: " + authError.message, "error");
+      if (authError.message?.toLowerCase().includes("already registered")) {
+        showModal(EMAIL_TAKEN_MSG, "error");
+      } else {
+        showModal("Registration failed: " + authError.message, "error");
+      }
+      return;
+    }
+
+    // 3. Walang identities = may account na sa Auth
+    if (data?.user?.identities?.length === 0) {
+      setLoading(false);
+      showModal(EMAIL_TAKEN_MSG, "error");
       return;
     }
 
     const customId = await generateUserId(role);
 
-    // Save additional user information
+    // 4. Save additional user information (walang password dito)
     const { error: userError } = await supabase.from("users").insert([
       {
         user_id: customId,
         name,
-        email,
+        email: cleanEmail,
         address,
         contact_number: contactNumber,
-        password,
         role,
       },
     ]);
@@ -168,7 +196,15 @@ export default function Register() {
 
     if (userError) {
       console.log(userError.message);
-      showModal("Registration failed: " + userError.message, "error");
+      console.log("INSERT ERROR:", userError.code, userError.message);
+      if (
+        userError.code === "23505" ||
+        userError.message?.toLowerCase().includes("duplicate key")
+      ) {
+        showModal(EMAIL_TAKEN_MSG, "error");
+      } else {
+        showModal("Registration failed: " + userError.message, "error");
+      }
       return;
     }
 
@@ -276,7 +312,7 @@ export default function Register() {
             {loading ? "Creating..." : done ? "Account created ✓" : "Register"}
           </button>
 
-        {/* FOOTER LINK */}
+          {/* FOOTER LINK */}
           <p className="signup-text">
             Already have an account?{" "}
             <span onClick={() => nav("/login", { state: { role } })}>

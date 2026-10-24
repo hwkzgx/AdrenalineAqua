@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../../../supabase";
 import {
   Chart as ChartJS,
@@ -14,6 +15,8 @@ import {
 
 import { Line, Pie } from "react-chartjs-2";
 
+import "./admin-dashboard.css";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -25,7 +28,13 @@ ChartJS.register(
   Filler
 );
 
-import "./admin-dashboard.css";
+// Palitan ang mga path na ito ayon sa routes ng project mo
+const ROUTES = {
+  orders: "/admin/orders",
+  deliveries: "/admin/delivery",
+  sales: "/admin/sales",
+  expenses: "/admin/expenses",
+};
 
 // Returns the LOCAL calendar day ("YYYY-MM-DD") of a sales date value.
 // - A plain date column ("2026-10-18") is used as is, with no timezone shift.
@@ -46,6 +55,8 @@ const toLocalDateKey = (value) => {
 };
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
+
   const [salesData, setSalesData] = useState([]);
   const [deliveryData, setDeliveryData] = useState([]);
 
@@ -55,9 +66,20 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({
     totalOrders: 0,
     pendingDeliveries: 0,
-    totalInventory: 0,
     expenses: 0,
-    stock: 0,
+  });
+
+  // Props para maging clickable (mouse + keyboard) ang cards
+  const cardProps = (path) => ({
+    role: "link",
+    tabIndex: 0,
+    onClick: () => navigate(path),
+    onKeyDown: (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        navigate(path);
+      }
+    },
   });
 
   // =========================================================
@@ -67,25 +89,12 @@ export default function AdminDashboard() {
     const fetchStats = async () => {
       const { count: ordersCount } = await supabase
         .from("orders")
-        .select("*", {
-          count: "exact",
-          head: true,
-        });
+        .select("*", { count: "exact", head: true });
 
       const { count: pendingCount } = await supabase
         .from("delivery_schedule")
-        .select("*", {
-          count: "exact",
-          head: true,
-        })
+        .select("*", { count: "exact", head: true })
         .eq("delivery_status", "Pending");
-
-      const { count: inventoryCount } = await supabase
-        .from("inventory")
-        .select("*", {
-          count: "exact",
-          head: true,
-        });
 
       const { data: expensesData } = await supabase
         .from("expenses")
@@ -93,84 +102,40 @@ export default function AdminDashboard() {
 
       const totalExpenses =
         expensesData?.reduce(
-          (acc, curr) =>
-            acc + Number(curr.amount || 0),
-          0
-        ) || 0;
-
-      const { data: stocksData } = await supabase
-        .from("inventory")
-        .select("quantity_available");
-
-      const totalStock =
-        stocksData?.reduce(
-          (acc, curr) =>
-            acc +
-            Number(
-              curr.quantity_available || 0
-            ),
+          (acc, curr) => acc + Number(curr.amount || 0),
           0
         ) || 0;
 
       setStats({
         totalOrders: ordersCount || 0,
-        pendingDeliveries:
-          pendingCount || 0,
-        totalInventory:
-          inventoryCount || 0,
+        pendingDeliveries: pendingCount || 0,
         expenses: totalExpenses,
-        stock: totalStock,
       });
     };
 
     fetchStats();
 
     const statsRealtimeChannel = supabase
-      .channel(
-        "admin-dashboard-stats-updates"
-      )
+      .channel("admin-dashboard-stats-updates")
       .on(
         "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "expenses",
-        },
+        { event: "*", schema: "public", table: "expenses" },
         fetchStats
       )
       .on(
         "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "inventory",
-        },
+        { event: "*", schema: "public", table: "orders" },
         fetchStats
       )
       .on(
         "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "orders",
-        },
-        fetchStats
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "delivery_schedule",
-        },
+        { event: "*", schema: "public", table: "delivery_schedule" },
         fetchStats
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(
-        statsRealtimeChannel
-      );
+      supabase.removeChannel(statsRealtimeChannel);
     };
   }, []);
 
@@ -179,120 +144,101 @@ export default function AdminDashboard() {
   // =========================================================
   useEffect(() => {
     const fetchSales = async () => {
-        // Compare by LOCAL calendar day. The old code used
-        // startDate.toISOString(), which turns local midnight into UTC. In
-        // Manila (UTC+8) that is 4 PM of the previous day, so "Today" also
-        // counted yesterday's sales (and the card looked like the weekly total).
-        const now = new Date();
-        const todayKey = toLocalDateKey(now);
+      // Compare by LOCAL calendar day. The old code used
+      // startDate.toISOString(), which turns local midnight into UTC. In
+      // Manila (UTC+8) that is 4 PM of the previous day, so "Today" also
+      // counted yesterday's sales (and the card looked like the weekly total).
+      const now = new Date();
+      const todayKey = toLocalDateKey(now);
 
-        let startKey;
-        if (salesRange === "daily") {
-          startKey = todayKey;
-        } else if (salesRange === "weekly") {
-          // last 7 days, including today
-          startKey = toLocalDateKey(
-            new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6)
-          );
-        } else {
-          // monthly: one month back, same day
-          startKey = toLocalDateKey(
-            new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
-          );
-        }
+      let startKey;
+      if (salesRange === "daily") {
+        startKey = todayKey;
+      } else if (salesRange === "weekly") {
+        // last 7 days, including today
+        startKey = toLocalDateKey(
+          new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6)
+        );
+      } else {
+        // monthly: one month back, same day
+        startKey = toLocalDateKey(
+          new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
+        );
+      }
 
-        const { data, error } = await supabase
-          .from("sales")
-          .select("date, total_sales");
+      const { data, error } = await supabase
+        .from("sales")
+        .select("date, total_sales");
 
-        if (error) {
-          console.log(error.message);
-          return;
-        }
+      if (error) {
+        console.log(error.message);
+        return;
+      }
 
-        const total = (data || []).reduce((acc, curr) => {
-          const key = toLocalDateKey(curr.date);
-          if (!key || key < startKey || key > todayKey) return acc;
-          return acc + (Number(curr.total_sales) || 0);
-        }, 0);
+      const total = (data || []).reduce((acc, curr) => {
+        const key = toLocalDateKey(curr.date);
+        if (!key || key < startKey || key > todayKey) return acc;
+        return acc + (Number(curr.total_sales) || 0);
+      }, 0);
 
-        setSalesValue(total);
-      };
+      setSalesValue(total);
+    };
 
-      fetchSales();
-    }, [salesRange]);
+    fetchSales();
+  }, [salesRange]);
 
   // =========================================================
   // MONTHLY SALES CHART
   // =========================================================
   useEffect(() => {
-    const fetchMonthlySales =
-      async () => {
-        const { data, error } =
-          await supabase
-            .from("sales")
-            .select(
-              "date, total_sales"
-            );
+    const fetchMonthlySales = async () => {
+      const { data, error } = await supabase
+        .from("sales")
+        .select("date, total_sales");
 
-        if (error) {
-          console.log(
-            error.message
-          );
-          return;
-        }
+      if (error) {
+        console.log(error.message);
+        return;
+      }
 
-        const months = [
-          "Jan",
-          "Feb",
-          "Mar",
-          "Apr",
-          "May",
-          "Jun",
-          "Jul",
-          "Aug",
-          "Sep",
-          "Oct",
-          "Nov",
-          "Dec",
-        ];
+      const months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
 
-        const grouped = {};
+      const grouped = {};
 
-        months.forEach((month) => {
-          grouped[month] = 0;
+      months.forEach((month) => {
+        grouped[month] = 0;
+      });
+
+      (data || []).forEach((sale) => {
+        if (!sale.date) return;
+
+        const month = new Date(sale.date).toLocaleString("en-US", {
+          month: "short",
         });
 
-        (data || []).forEach(
-          (sale) => {
-            if (!sale.date) return;
+        grouped[month] += Number(sale.total_sales || 0);
+      });
 
-            const month =
-              new Date(
-                sale.date
-              ).toLocaleString(
-                "en-US",
-                {
-                  month: "short",
-                }
-              );
+      const graphData = months.map((month) => ({
+        month,
+        sales: grouped[month],
+      }));
 
-            grouped[month] +=
-              Number(
-                sale.total_sales || 0
-              );
-          }
-        );
-
-        const graphData =
-          months.map((month) => ({
-            month,
-            sales:
-              grouped[month],
-          }));
-
-        setSalesData(graphData);
-      };
+      setSalesData(graphData);
+    };
 
     fetchMonthlySales();
   }, []);
@@ -301,65 +247,34 @@ export default function AdminDashboard() {
   // DELIVERY STATUS
   // =========================================================
   useEffect(() => {
-    const fetchDeliveryStatus =
-      async () => {
-        const { data, error } =
-          await supabase
-            .from(
-              "delivery_schedule"
-            )
-            .select(
-              "delivery_status"
-            );
+    const fetchDeliveryStatus = async () => {
+      const { data, error } = await supabase
+        .from("delivery_schedule")
+        .select("delivery_status");
 
-        if (error) {
-          console.log(
-            error.message
-          );
-          return;
-        }
+      if (error) {
+        console.log(error.message);
+        return;
+      }
 
-        const counts = {
-          Delivered: 0,
-          Pending: 0,
-          "Out for Delivery": 0,
-        };
-
-        (data || []).forEach(
-          (item) => {
-            if (
-              counts[
-                item.delivery_status
-              ] !== undefined
-            ) {
-              counts[
-                item.delivery_status
-              ]++;
-            }
-          }
-        );
-
-        setDeliveryData([
-          {
-            name: "Delivered",
-            value:
-              counts.Delivered,
-          },
-          {
-            name: "Pending",
-            value:
-              counts.Pending,
-          },
-          {
-            name:
-              "Out for Delivery",
-            value:
-              counts[
-                "Out for Delivery"
-              ],
-          },
-        ]);
+      const counts = {
+        Delivered: 0,
+        Pending: 0,
+        "Out for Delivery": 0,
       };
+
+      (data || []).forEach((item) => {
+        if (counts[item.delivery_status] !== undefined) {
+          counts[item.delivery_status]++;
+        }
+      });
+
+      setDeliveryData([
+        { name: "Delivered", value: counts.Delivered },
+        { name: "Pending", value: counts.Pending },
+        { name: "Out for Delivery", value: counts["Out for Delivery"] },
+      ]);
+    };
 
     fetchDeliveryStatus();
   }, []);
@@ -368,19 +283,11 @@ export default function AdminDashboard() {
   // CHART DATA
   // =========================================================
   const pieData = {
-    labels: deliveryData.map(
-      (item) => item.name
-    ),
+    labels: deliveryData.map((item) => item.name),
     datasets: [
       {
-        data: deliveryData.map(
-          (item) => item.value
-        ),
-        backgroundColor: [
-          "#22c55e",
-          "#facc15",
-          "#1d4ed8",
-        ],
+        data: deliveryData.map((item) => item.value),
+        backgroundColor: ["#22c55e", "#facc15", "#1d4ed8"],
       },
     ],
   };
@@ -413,12 +320,9 @@ export default function AdminDashboard() {
     datasets: [
       {
         label: "Monthly Sales",
-        data: salesData.map(
-          (item) => item.sales
-        ),
+        data: salesData.map((item) => item.sales),
         borderColor: "#2563eb",
-        backgroundColor:
-          "#93c5fd",
+        backgroundColor: "#93c5fd",
         fill: false,
         tension: 0,
         borderWidth: 3,
@@ -467,8 +371,7 @@ export default function AdminDashboard() {
           color: "#e5e7eb",
         },
         ticks: {
-          callback: (value) =>
-            `₱${value}`,
+          callback: (value) => `₱${value}`,
           font: {
             size: 11,
           },
@@ -490,37 +393,30 @@ export default function AdminDashboard() {
       </div>
 
       <div className="dashboard-grid">
-        <div className="dashboard-card blue">
+        <div
+          className="dashboard-card blue clickable"
+          {...cardProps(ROUTES.orders)}
+        >
           <h3>Total Orders</h3>
           <p>{stats.totalOrders}</p>
         </div>
 
-        <div className="dashboard-card orange">
-          <h3>
-            Pending Deliveries
-          </h3>
-
-          <p>
-            {
-              stats.pendingDeliveries
-            }
-          </p>
+        <div
+          className="dashboard-card orange clickable"
+          {...cardProps(ROUTES.deliveries)}
+        >
+          <h3>Pending Deliveries</h3>
+          <p>{stats.pendingDeliveries}</p>
         </div>
 
-        <div className="dashboard-card green">
-          <h3>Total Inventory</h3>
-
-          <p>
-            {stats.totalInventory}
-          </p>
-        </div>
-
-        <div className="dashboard-card purple">
+        <div
+          className="dashboard-card purple clickable"
+          {...cardProps(ROUTES.sales)}
+        >
           <div
             style={{
               display: "flex",
-              justifyContent:
-                "space-between",
+              justifyContent: "space-between",
               alignItems: "center",
             }}
           >
@@ -528,47 +424,26 @@ export default function AdminDashboard() {
 
             <select
               value={salesRange}
-              onChange={(e) =>
-                setSalesRange(
-                  e.target.value
-                )
-              }
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+              onChange={(e) => setSalesRange(e.target.value)}
               className="small-sales-dropdown"
             >
-              <option value="daily">
-                Today
-              </option>
-
-              <option value="weekly">
-                Weekly
-              </option>
-
-              <option value="monthly">
-                Monthly
-              </option>
+              <option value="daily">Today</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
             </select>
           </div>
 
-          <p>
-            ₱
-            {salesValue.toLocaleString()}
-          </p>
+          <p>₱{salesValue.toLocaleString()}</p>
         </div>
 
-        <div className="dashboard-card red">
+        <div
+          className="dashboard-card red clickable"
+          {...cardProps(ROUTES.expenses)}
+        >
           <h3>Expenses</h3>
-
-          <p>
-            ₱
-            {Number(
-              stats.expenses
-            ).toLocaleString()}
-          </p>
-        </div>
-
-        <div className="dashboard-card blue">
-          <h3>Stocks</h3>
-          <p>{stats.stock}</p>
+          <p>₱{Number(stats.expenses).toLocaleString()}</p>
         </div>
       </div>
 
@@ -577,45 +452,22 @@ export default function AdminDashboard() {
           <h3>Monthly Sales</h3>
 
           {salesData.length === 0 ? (
-            <div className="empty-state">
-              No sales data yet
-            </div>
+            <div className="empty-state">No sales data yet</div>
           ) : (
-            <div
-              style={{
-                width: "100%",
-                height: "320px",
-              }}
-            >
-              <Line
-                data={lineData}
-                options={lineOptions}
-              />
+            <div style={{ width: "100%", height: "320px" }}>
+              <Line data={lineData} options={lineOptions} />
             </div>
           )}
         </div>
 
         <div className="chart-card">
-          <h3>
-            Delivery Status
-          </h3>
+          <h3>Delivery Status</h3>
 
-          {deliveryData.length ===
-          0 ? (
-            <div className="empty-state">
-              No delivery data yet
-            </div>
+          {deliveryData.length === 0 ? (
+            <div className="empty-state">No delivery data yet</div>
           ) : (
-            <div
-              style={{
-                width: "100%",
-                height: "250px",
-              }}
-            >
-              <Pie
-                data={pieData}
-                options={pieOptions}
-              />
+            <div style={{ width: "100%", height: "250px" }}>
+              <Pie data={pieData} options={pieOptions} />
             </div>
           )}
         </div>
